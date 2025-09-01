@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organization Setup - Login System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: white;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .navbar-user {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .organization-container {
+            max-width: 600px;
+            margin: 4rem auto;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .welcome-icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 2rem;
+            background: #f8f9fa;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .welcome-icon img {
+            width: 60%;
+            height: 60%;
+            object-fit: contain;
+        }
+
+        .welcome-title {
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #1f2937;
+        }
+
+        .welcome-subtitle {
+            color: #4b5563;
+            margin-bottom: 3rem;
+            font-size: 1.1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #000000;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: #9ca3af;
+        }
+
+        .error-text {
+            color: #dc2626;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            background: #000000;
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .submit-btn:hover {
+            background: #333333;
+        }
+
+        .submit-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #e5e7eb;
+            border-radius: 2px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #000000;
+            width: 66%;
+            transition: width 0.3s ease;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 3rem;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .step.active .step-number {
+            background: #000000;
+            color: white;
+        }
+
+        .step.completed .step-number {
+            background: #10b981;
+            color: white;
+        }
+
+        .step-label {
+            font-size: 0.75rem;
+            color: #6b7280;
+            text-align: center;
+        }
+
+        .step.active .step-label {
+            color: #000000;
+            font-weight: 600;
+        }
+
+        .step.completed .step-label {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: #000000;
+        }
+
+        .back-link svg {
+            width: 16px;
+            height: 16px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">Organization Setup</div>
+        <div class="navbar-user">Welcome, {{ user.name }}</div>
+    </nav>
+
+    <div class="organization-container">
+        <div class="welcome-icon">
+            <img src="/static/images/building.png" alt="Building Icon">
+        </div>
+
+        <h1 class="welcome-title">Set Up Your Organization</h1>
+        <p class="welcome-subtitle">Tell us about your company to get started</p>
+
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+
+        <div class="step-indicator">
+            <div class="step completed">
+                <div class="step-number">1</div>
+                <div class="step-label">Profile</div>
+            </div>
+            <div class="step active">
+                <div class="step-number">2</div>
+                <div class="step-label">Organization</div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-label">Setup</div>
+            </div>
+        </div>
+
+        <a href="/complete-profile" class="back-link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Back to Profile
+        </a>
+
+        <form id="organizationForm">
+            <div class="form-group">
+                <label for="organizationName" class="form-label">Organization Name</label>
+                <input type="text" id="organizationName" name="organizationName" class="form-input" placeholder="Enter your organization name" required>
+                <div class="error-text" id="organizationNameError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="location" class="form-label">Location</label>
+                <input type="text" id="location" name="location" class="form-input" placeholder="Enter your organization location" required>
+                <div class="error-text" id="locationError"></div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">
+                Continue to People Count
+            </button>
+        </form>
+    </div>
+
+    <script>
+        // Form submission
+        document.getElementById('organizationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                organizationName: document.getElementById('organizationName').value,
+                location: document.getElementById('location').value
+            };
+
+            // Clear previous errors
+            document.querySelectorAll('.error-text').forEach(el => el.style.display = 'none');
+
+            // Validate form
+            let hasErrors = false;
+            if (!formData.organizationName.trim()) {
+                document.getElementById('organizationNameError').textContent = 'Organization name is required';
+                document.getElementById('organizationNameError').style.display = 'block';
+                hasErrors = true;
+            }
+
+            if (!formData.location.trim()) {
+                document.getElementById('locationError').textContent = 'Location is required';
+                document.getElementById('locationError').style.display = 'block';
+                hasErrors = true;
+            }
+
+            if (hasErrors) return;
+
+            // Submit form
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+
+            fetch('/api/setup-organization', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.redirect) {
+                    window.location.href = data.redirect;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Continue to People Count';
+            });
+        });
+
+        // Pre-fill form with stored data if available
+        window.addEventListener('load', function() {
+            // This would typically come from the server, but for now we'll leave it empty
+            // You can add logic here to pre-fill fields if needed
+        });
+    </script>
+</body>
+</html> 

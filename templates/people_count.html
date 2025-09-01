@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>People Count - Login System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: white;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .navbar-user {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .people-container {
+            max-width: 600px;
+            margin: 4rem auto;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .welcome-icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 2rem;
+            background: #f5f5f5;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .welcome-icon img {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+        }
+
+        .welcome-title {
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #1f2937;
+        }
+
+        .welcome-subtitle {
+            color: #4b5563;
+            margin-bottom: 3rem;
+            font-size: 1.1rem;
+        }
+
+        .size-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .size-button {
+            padding: 1rem 2rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 2rem;
+            background: white;
+            color: #1f2937;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 120px;
+        }
+
+        .size-button:hover {
+            border-color: #000000;
+            background: #f8f9fa;
+        }
+
+        .size-button.selected {
+            background: #000000;
+            color: white;
+            border-color: #000000;
+        }
+
+        .error-text {
+            color: #dc2626;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            text-align: center;
+            display: none;
+        }
+
+        .btn-continue {
+            width: 100%;
+            padding: 1rem;
+            background: #000000;
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 1rem;
+        }
+
+        .btn-continue:hover {
+            background: #333333;
+        }
+
+        .btn-continue:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #e5e7eb;
+            border-radius: 2px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #000000;
+            width: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 3rem;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .step.active .step-number {
+            background: #000000;
+            color: white;
+        }
+
+        .step.completed .step-number {
+            background: #10b981;
+            color: white;
+        }
+
+        .step-label {
+            font-size: 0.75rem;
+            color: #6b7280;
+            text-align: center;
+        }
+
+        .step.active .step-label {
+            color: #000000;
+            font-weight: 600;
+        }
+
+        .step.completed .step-label {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: #000000;
+        }
+
+        .back-link svg {
+            width: 16px;
+            height: 16px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">People Count</div>
+        <div class="navbar-user">Welcome, {{ user.name }}</div>
+    </nav>
+
+    <div class="people-container">
+        <div class="welcome-icon">
+            <img src="/static/images/people-group.png" alt="People Icon">
+        </div>
+
+        <h1 class="welcome-title">How Many People?</h1>
+        <p class="welcome-subtitle">Select the size of your organization</p>
+
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+
+        <div class="step-indicator">
+            <div class="step completed">
+                <div class="step-number">1</div>
+                <div class="step-label">Profile</div>
+            </div>
+            <div class="step completed">
+                <div class="step-number">2</div>
+                <div class="step-label">Organization</div>
+            </div>
+            <div class="step active">
+                <div class="step-number">3</div>
+                <div class="step-label">Setup</div>
+            </div>
+        </div>
+
+        <a href="/organization-setup" class="back-link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Back to Organization
+        </a>
+
+        <div class="size-options">
+            <button class="size-button" data-size="1-10">1-10</button>
+            <button class="size-button" data-size="11-50">11-50</button>
+            <button class="size-button" data-size="51-200">51-200</button>
+            <button class="size-button" data-size="201-500">201-500</button>
+            <button class="size-button" data-size="501-1000">501-1000</button>
+            <button class="size-button" data-size="1000+">1000+</button>
+        </div>
+
+        <div class="error-text" id="sizeError">Please select an organization size</div>
+
+        <button class="btn-continue" id="continueBtn" disabled>
+            Complete Setup
+        </button>
+    </div>
+
+    <script>
+        let selectedSize = null;
+
+        // Size button selection
+        document.querySelectorAll('.size-button').forEach(button => {
+            button.addEventListener('click', function() {
+                // Remove selection from all buttons
+                document.querySelectorAll('.size-button').forEach(btn => btn.classList.remove('selected'));
+                
+                // Select clicked button
+                this.classList.add('selected');
+                selectedSize = this.dataset.size;
+                
+                // Enable continue button
+                document.getElementById('continueBtn').disabled = false;
+                
+                // Hide error
+                document.getElementById('sizeError').style.display = 'none';
+            });
+        });
+
+        // Continue button
+        document.getElementById('continueBtn').addEventListener('click', function() {
+            if (!selectedSize) {
+                document.getElementById('sizeError').style.display = 'block';
+                return;
+            }
+
+            // Disable button and show loading
+            const btn = this;
+            btn.disabled = true;
+            btn.textContent = 'Setting up...';
+
+            fetch('/api/update-organization-size', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    size: selectedSize,
+                    isSubmitting: true
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.redirect) {
+                    window.location.href = data.redirect;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+                btn.disabled = false;
+                btn.textContent = 'Complete Setup';
+            });
+        });
+    </script>
+</body>
+</html> 
