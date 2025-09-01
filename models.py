@@ -1,7 +1,5 @@
-from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-
-db = SQLAlchemy()
+from core.database import db
 
 # User model (enhanced for complete onboarding)
 class User(db.Model):
