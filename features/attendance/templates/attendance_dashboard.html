@@ -1,0 +1,853 @@
+{% extends "base.html" %}
+
+{% block title %}Chấm Công - HRM System{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Sidebar Styles */
+    .sidebar {
+        width: 280px;
+        background: white;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        position: fixed;
+        height: 100vh;
+        left: 0;
+        top: 0;
+        z-index: 1000;
+        overflow-y: auto;
+    }
+
+    /* Main Content with Sidebar */
+    .main-content-with-sidebar {
+        margin-left: 280px;
+        min-height: 100vh;
+    }
+
+    .sidebar-header {
+        padding: 20px;
+        border-bottom: 1px solid #e0e0e0;
+        background: #f8f9fa;
+    }
+
+    .sidebar-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #333;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .sidebar-nav {
+        padding: 20px 0;
+    }
+
+    .nav-section {
+        margin-bottom: 30px;
+    }
+
+    .nav-section-title {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 0 20px 10px 20px;
+        margin: 0;
+    }
+
+    .nav-item {
+        display: flex;
+        align-items: center;
+        padding: 12px 20px;
+        color: #333;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border-left: 3px solid transparent;
+        cursor: pointer;
+    }
+
+    .nav-item:hover {
+        background-color: #f1f3f4;
+        color: #1a73e8;
+    }
+
+    .nav-item.active {
+        background-color: #e8f0fe;
+        color: #1a73e8;
+        border-left-color: #1a73e8;
+        font-weight: 500;
+    }
+
+    .nav-item-icon {
+        width: 20px;
+        height: 20px;
+        margin-right: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .nav-item-text {
+        font-size: 0.9rem;
+    }
+
+
+
+    /* Content Area */
+    .content-area {
+        padding: 30px;
+    }
+
+    /* Tab Content Styles */
+    .tab-content {
+        animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .sidebar {
+            width: 100%;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar.open {
+            transform: translateX(0);
+        }
+
+        .main-content-with-sidebar {
+            margin-left: 0;
+        }
+
+        .content-area {
+            padding: 15px;
+        }
+
+        .attendance-container {
+            padding: 10px;
+        }
+
+        .attendance-card {
+            padding: 20px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .sidebar-title {
+            font-size: 1rem;
+        }
+    }
+
+    /* Navigation Bar Styles (Legacy - keeping for compatibility) */
+    .navbar {
+        background: white;
+        padding: 0 2rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 70px;
+        margin-bottom: 20px;
+    }
+
+    .navbar-left {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .company-section {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        transition: background-color 0.3s;
+    }
+
+    .company-section:hover {
+        background-color: #f8f9fa;
+    }
+
+    .company-name {
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: #333;
+    }
+
+    .dropdown-arrow {
+        color: #666;
+        transition: transform 0.3s;
+    }
+
+    .company-section:hover .dropdown-arrow {
+        transform: rotate(180deg);
+    }
+
+    .nav-menu {
+        display: flex;
+        gap: 2rem;
+        align-items: center;
+    }
+
+    .nav-item {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-weight: 500;
+        text-decoration: none;
+        color: #666;
+    }
+
+    .nav-item:hover {
+        background-color: #f8f9fa;
+        color: #333;
+    }
+
+    .nav-item.active {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .navbar-right {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .search-bar {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 12px;
+        color: #666;
+        z-index: 1;
+    }
+
+    .search-input {
+        padding: 0.5rem 1rem 0.5rem 2.5rem;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        background: #f8f9fa;
+        font-size: 0.9rem;
+        width: 200px;
+        transition: all 0.3s;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: #007bff;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+    }
+
+    .utility-icon {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        color: #666;
+    }
+
+    .utility-icon:hover {
+        background-color: #f8f9fa;
+    }
+
+    .user-profile {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        color: #666;
+        position: relative;
+    }
+
+    .user-profile:hover {
+        background-color: #f8f9fa;
+    }
+
+    .attendance-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .attendance-card {
+        background: white;
+        border-radius: 10px;
+        padding: 30px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+    
+    .time-display {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #2c3e50;
+        text-align: center;
+        margin: 20px 0;
+    }
+    
+    .date-display {
+        font-size: 1.2rem;
+        color: #7f8c8d;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .button-group {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        margin: 30px 0;
+    }
+    
+    .btn-attendance {
+        padding: 15px 30px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        min-width: 150px;
+    }
+    
+    .btn-check-in {
+        background: #27ae60;
+        color: white;
+    }
+    
+    .btn-check-in:hover {
+        background: #229954;
+        transform: translateY(-2px);
+    }
+    
+    .btn-check-out {
+        background: #e74c3c;
+        color: white;
+    }
+    
+    .btn-check-out:hover {
+        background: #c0392b;
+        transform: translateY(-2px);
+    }
+    
+    .btn-disabled {
+        background: #bdc3c7;
+        color: #7f8c8d;
+        cursor: not-allowed;
+    }
+    
+    .status-indicator {
+        text-align: center;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 20px 0;
+        font-weight: bold;
+    }
+    
+    .status-checked-in {
+        background: #d5f4e6;
+        color: #27ae60;
+        border: 2px solid #27ae60;
+    }
+    
+    .status-checked-out {
+        background: #fadbd8;
+        color: #e74c3c;
+        border: 2px solid #e74c3c;
+    }
+    
+    .status-not-checked {
+        background: #f8f9fa;
+        color: #6c757d;
+        border: 2px solid #6c757d;
+    }
+    
+    .attendance-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-top: 20px;
+    }
+    
+    .info-card {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        text-align: center;
+    }
+    
+    .info-label {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-bottom: 5px;
+    }
+    
+    .info-value {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #2c3e50;
+    }
+    
+    .quick-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin-top: 20px;
+    }
+    
+    .btn-secondary {
+        background: #3498db;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: background 0.3s ease;
+    }
+    
+    .btn-secondary:hover {
+        background: #2980b9;
+        color: white;
+        text-decoration: none;
+    }
+    
+    .loading {
+        display: none;
+        text-align: center;
+        color: #7f8c8d;
+    }
+    
+    .error-message {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 10px;
+        border-radius: 5px;
+        margin: 10px 0;
+        display: none;
+    }
+    
+    .success-message {
+        background: #d4edda;
+        color: #155724;
+        padding: 10px;
+        border-radius: 5px;
+        margin: 10px 0;
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Sidebar -->
+<div class="sidebar">
+    <div class="sidebar-header">
+        <h1 class="sidebar-title">
+            <i class="fas fa-clock"></i>
+            Quản Lý Chấm Công
+        </h1>
+    </div>
+    
+    <nav class="sidebar-nav">
+        <div class="nav-section">
+            <h3 class="nav-section-title">Quản Lý Chấm Công</h3>
+            <a href="#" class="nav-item active" onclick="showTab('monthly_detail')">
+                <div class="nav-item-icon">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <span class="nav-item-text">Bảng chấm công chi tiết trong tháng</span>
+            </a>
+            <a href="#" class="nav-item" onclick="showTab('summary')">
+                <div class="nav-item-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <span class="nav-item-text">Bảng chấm công tổng hợp</span>
+            </a>
+            <a href="#" class="nav-item" onclick="showTab('work_data')">
+                <div class="nav-item-icon">
+                    <i class="fas fa-database"></i>
+                </div>
+                <span class="nav-item-text">Dữ liệu công</span>
+            </a>
+        </div>
+    </nav>
+</div>
+
+<!-- Main Content with original layout -->
+<div class="main-content-with-sidebar">
+    <!-- Original Navigation Bar -->
+    <nav class="navbar">
+        <!-- Left Side - Company Section -->
+        <div class="navbar-left">
+            <div class="company-section">
+                <span class="company-name">{{ user.organization.name if user.organization else "Your Company" }}</span>
+                <i class="fas fa-chevron-down dropdown-arrow"></i>
+            </div>
+        </div>
+
+        <!-- Middle - Navigation Menu -->
+        <div class="nav-menu">
+            <a href="/dashboard" class="nav-item">Home</a>
+            <a href="#" class="nav-item">Administrative Personnel</a>
+            <a href="/attendance/admin" class="nav-item active">Attendance</a>
+            <a href="#" class="nav-item">Salary</a>
+            <a href="#" class="nav-item">Decision</a>
+        </div>
+
+        <!-- Right Side - Utilities -->
+        <div class="navbar-right">
+            <div class="search-bar">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" placeholder="Search HR data...">
+            </div>
+            
+            <div class="utility-icon">
+                <i class="fas fa-bell"></i>
+            </div>
+            
+            <div class="utility-icon">
+                <i class="fas fa-cog"></i>
+            </div>
+            
+            <div class="user-profile">
+                <i class="fas fa-user"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Content Area -->
+    <div class="content-area">
+        <!-- Monthly Detail Tab Content -->
+        <div id="monthly_detail-tab" class="tab-content">
+            <div class="attendance-container">
+                <div class="attendance-card">
+                    <h1 style="text-align: center; color: #2c3e50; margin-bottom: 30px;">
+                        <i class="fas fa-calendar-alt"></i> Bảng Chấm Công Chi Tiết Trong Tháng
+                    </h1>
+        
+        <div class="month-selector" style="margin-bottom: 20px;">
+            <label for="monthSelect" style="font-weight: 600; margin-right: 10px;">Chọn tháng:</label>
+            <select id="monthSelect" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                <option value="2024-01">Tháng 1/2024</option>
+                <option value="2024-02">Tháng 2/2024</option>
+                <option value="2024-03">Tháng 3/2024</option>
+                <option value="2024-04">Tháng 4/2024</option>
+                <option value="2024-05">Tháng 5/2024</option>
+                <option value="2024-06">Tháng 6/2024</option>
+                <option value="2024-07">Tháng 7/2024</option>
+                <option value="2024-08">Tháng 8/2024</option>
+                <option value="2024-09">Tháng 9/2024</option>
+                <option value="2024-10">Tháng 10/2024</option>
+                <option value="2024-11">Tháng 11/2024</option>
+                <option value="2024-12">Tháng 12/2024</option>
+            </select>
+        </div>
+        
+        <div class="attendance-table-container" style="background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <h3 style="color: #2c3e50; margin-bottom: 15px;">Bảng chấm công chi tiết</h3>
+            <div class="table-responsive">
+                <table class="attendance-table" style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #f8f9fa;">
+                            <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Ngày</th>
+                            <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Giờ vào</th>
+                            <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Giờ ra</th>
+                            <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Số giờ làm</th>
+                            <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Trạng thái</th>
+                            <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Ghi chú</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendanceTableBody">
+                        <tr>
+                            <td colspan="6" style="padding: 20px; text-align: center; color: #666;">
+                                Đang tải dữ liệu chấm công...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+                        <div class="quick-actions">
+                            <a href="/attendance-history" class="btn-secondary">
+                                <i class="fas fa-history"></i> Lịch Sử Chấm Công
+                            </a>
+                            <a href="/dashboard" class="btn-secondary">
+                                <i class="fas fa-home"></i> Trang Chủ
+                            </a>
+                        </div>
+                        
+                        <div class="loading" id="loading">
+                            <i class="fas fa-spinner fa-spin"></i> Đang xử lý...
+                        </div>
+                        
+                        <div class="error-message" id="errorMessage"></div>
+                        <div class="success-message" id="successMessage"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Tab Content -->
+            <div id="summary-tab" class="tab-content" style="display: none;">
+                <div class="attendance-container">
+                    <div class="attendance-card">
+                        <h2 style="color: #2c3e50; margin-bottom: 20px;">
+                            <i class="fas fa-chart-line"></i> Bảng Chấm Công Tổng Hợp
+                        </h2>
+                        <p>Bảng tổng hợp chấm công của tất cả nhân viên sẽ được hiển thị ở đây.</p>
+                        <!-- Summary content will be added here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Work Data Tab Content -->
+            <div id="work_data-tab" class="tab-content" style="display: none;">
+                <div class="attendance-container">
+                    <div class="attendance-card">
+                        <h2 style="color: #2c3e50; margin-bottom: 20px;">
+                            <i class="fas fa-database"></i> Dữ Liệu Công
+                        </h2>
+                        <p>Dữ liệu công chi tiết và thống kê sẽ được hiển thị ở đây.</p>
+                        <!-- Work data content will be added here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Tab switching functionality
+function showTab(tabName) {
+    // Hide all tab contents
+    const tabContents = document.querySelectorAll('.tab-content');
+    tabContents.forEach(tab => {
+        tab.style.display = 'none';
+    });
+    
+    // Remove active class from all nav items
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        item.classList.remove('active');
+    });
+    
+    // Show selected tab content
+    const selectedTab = document.getElementById(tabName + '-tab');
+    if (selectedTab) {
+        selectedTab.style.display = 'block';
+    }
+    
+    // Add active class to clicked nav item
+    const clickedItem = event.target.closest('.nav-item');
+    if (clickedItem) {
+        clickedItem.classList.add('active');
+    }
+    
+    // Update page title
+    const pageTitle = document.getElementById('pageTitle');
+    const titles = {
+        'monthly_detail': 'Bảng Chấm Công Chi Tiết Trong Tháng',
+        'summary': 'Bảng Chấm Công Tổng Hợp',
+        'work_data': 'Dữ Liệu Công'
+    };
+    
+    if (pageTitle && titles[tabName]) {
+        pageTitle.textContent = titles[tabName];
+    }
+}
+
+// Update time display
+function updateTime() {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('vi-VN');
+    const dateString = now.toLocaleDateString('vi-VN');
+    
+    const timeElement = document.getElementById('currentTime');
+    const dateElement = document.getElementById('currentDate');
+    
+    if (timeElement) timeElement.textContent = timeString;
+    if (dateElement) dateElement.textContent = dateString;
+}
+
+// Update time every second
+setInterval(updateTime, 1000);
+updateTime();
+
+// Load attendance status
+function loadAttendanceStatus() {
+    fetch('/api/attendance-status')
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                showError(data.error);
+                return;
+            }
+            
+            updateStatusDisplay(data);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showError('Không thể tải trạng thái chấm công');
+        });
+}
+
+// Update status display
+function updateStatusDisplay(data) {
+    const statusIndicator = document.getElementById('statusIndicator');
+    const statusText = document.getElementById('statusText');
+    const checkInBtn = document.getElementById('checkInBtn');
+    const checkOutBtn = document.getElementById('checkOutBtn');
+    const attendanceInfo = document.getElementById('attendanceInfo');
+    
+    // Reset classes
+    statusIndicator.className = 'status-indicator';
+    checkInBtn.className = 'btn-attendance btn-check-in';
+    checkOutBtn.className = 'btn-attendance btn-check-out';
+    
+    switch(data.status) {
+        case 'not_checked_in':
+            statusIndicator.classList.add('status-not-checked');
+            statusText.textContent = 'Chưa chấm công hôm nay';
+            checkInBtn.disabled = false;
+            checkOutBtn.disabled = true;
+            checkOutBtn.classList.add('btn-disabled');
+            attendanceInfo.style.display = 'none';
+            break;
+            
+        case 'checked_in':
+            statusIndicator.classList.add('status-checked-in');
+            statusText.textContent = 'Đã check in - Sẵn sàng check out';
+            checkInBtn.disabled = true;
+            checkInBtn.classList.add('btn-disabled');
+            checkOutBtn.disabled = false;
+            attendanceInfo.style.display = 'grid';
+            document.getElementById('checkInTime').textContent = data.check_in_time;
+            document.getElementById('checkOutTime').textContent = '--:--';
+            break;
+            
+        case 'checked_out':
+            statusIndicator.classList.add('status-checked-out');
+            statusText.textContent = 'Hoàn thành chấm công hôm nay';
+            checkInBtn.disabled = true;
+            checkInBtn.classList.add('btn-disabled');
+            checkOutBtn.disabled = true;
+            checkOutBtn.classList.add('btn-disabled');
+            attendanceInfo.style.display = 'grid';
+            document.getElementById('checkInTime').textContent = data.check_in_time;
+            document.getElementById('checkOutTime').textContent = data.check_out_time;
+            break;
+    }
+}
+
+// Check in function
+function checkIn() {
+    showLoading(true);
+    hideMessages();
+    
+    fetch('/api/check-in', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        showLoading(false);
+        if (data.error) {
+            showError(data.error);
+        } else {
+            showSuccess(data.message);
+            loadAttendanceStatus(); // Reload status
+        }
+    })
+    .catch(error => {
+        showLoading(false);
+        console.error('Error:', error);
+        showError('Lỗi khi check in');
+    });
+}
+
+// Check out function
+function checkOut() {
+    showLoading(true);
+    hideMessages();
+    
+    fetch('/api/check-out', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        showLoading(false);
+        if (data.error) {
+            showError(data.error);
+        } else {
+            showSuccess(data.message);
+            loadAttendanceStatus(); // Reload status
+        }
+    })
+    .catch(error => {
+        showLoading(false);
+        console.error('Error:', error);
+        showError('Lỗi khi check out');
+    });
+}
+
+// Utility functions
+function showLoading(show) {
+    document.getElementById('loading').style.display = show ? 'block' : 'none';
+}
+
+function showError(message) {
+    const errorDiv = document.getElementById('errorMessage');
+    errorDiv.textContent = message;
+    errorDiv.style.display = 'block';
+    setTimeout(() => {
+        errorDiv.style.display = 'none';
+    }, 5000);
+}
+
+function showSuccess(message) {
+    const successDiv = document.getElementById('successMessage');
+    successDiv.textContent = message;
+    successDiv.style.display = 'block';
+    setTimeout(() => {
+        successDiv.style.display = 'none';
+    }, 3000);
+}
+
+function hideMessages() {
+    document.getElementById('errorMessage').style.display = 'none';
+    document.getElementById('successMessage').style.display = 'none';
+}
+
+// Load initial status
+loadAttendanceStatus();
+</script>
+{% endblock %}
