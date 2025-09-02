@@ -288,7 +288,7 @@
     }
 
     .attendance-container {
-        max-width: 800px;
+        max-width: 100%;
         margin: 0 auto;
         padding: 20px;
     }
@@ -549,42 +549,122 @@
                         <i class="fas fa-calendar-alt"></i> Bảng Chấm Công Chi Tiết Trong Tháng
                     </h1>
         
-        <div class="month-selector" style="margin-bottom: 20px;">
-            <label for="monthSelect" style="font-weight: 600; margin-right: 10px;">Chọn tháng:</label>
-            <select id="monthSelect" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
-                <option value="2024-01">Tháng 1/2024</option>
-                <option value="2024-02">Tháng 2/2024</option>
-                <option value="2024-03">Tháng 3/2024</option>
-                <option value="2024-04">Tháng 4/2024</option>
-                <option value="2024-05">Tháng 5/2024</option>
-                <option value="2024-06">Tháng 6/2024</option>
-                <option value="2024-07">Tháng 7/2024</option>
-                <option value="2024-08">Tháng 8/2024</option>
-                <option value="2024-09">Tháng 9/2024</option>
-                <option value="2024-10">Tháng 10/2024</option>
-                <option value="2024-11">Tháng 11/2024</option>
-                <option value="2024-12">Tháng 12/2024</option>
-            </select>
-        </div>
+
         
-        <div class="attendance-table-container" style="background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-            <h3 style="color: #2c3e50; margin-bottom: 15px;">Bảng chấm công chi tiết</h3>
+        <div class="attendance-table-container" style="background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-top: 20px;">
+            <!-- Action Buttons -->
+            <div class="action-buttons" style="margin-bottom: 20px; display: flex; gap: 15px; align-items: center;">
+                <button class="btn btn-primary" id="exportExcelBtn" style="padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-file-excel"></i>
+                    Xuất Excel
+                </button>
+                <button class="btn btn-secondary" id="filterBtn" style="padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-filter"></i>
+                    Bộ lọc
+                </button>
+            </div>
+            
             <div class="table-responsive">
                 <table class="attendance-table" style="width: 100%; border-collapse: collapse;">
                     <thead>
                         <tr style="background: #f8f9fa;">
-                            <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Ngày</th>
-                            <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Giờ vào</th>
-                            <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Giờ ra</th>
-                            <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Số giờ làm</th>
-                            <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Trạng thái</th>
-                            <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Ghi chú</th>
+                            <th rowspan="3" style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 50px;">STT</th>
+                            <th rowspan="3" style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 50px;">Nhân viên</th>
+                            <th colspan="31" style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 1000px;">Công chi tiết tháng</th>
+                            <th rowspan="3" style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 60px;">Công định mức</th>
+                            <th rowspan="3" style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 60px;">Công hành chính</th>
+                            <th rowspan="3" style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 60px;">Công đi đường</th>
+                            <th rowspan="3" style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 80px;">Tổng công VĐM quy đổi hệ số</th>
+                            <th rowspan="3" style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 60px;">Tổng công đi làm</th>
+                            <th colspan="3" style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 100px;">Công nghỉ hưởng lương</th>
+                            <th rowspan="3" style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 60px;">Công nghỉ hưởng lương</th>
+                            <th colspan="6" style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 200px;">Các khoản công bị giảm trừ</th>
+                            <th rowspan="3" style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 60px;">Tổng ngày nghỉ không hưởng lương</th>
+                            <th rowspan="3" style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 60px;">Tổng công ca đêm</th>
+                            <th rowspan="3" style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 60px;">Tổng công tính lương</th>
+                        </tr>
+                        <tr style="background: #f8f9fa;">
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">T2</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">T3</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">T4</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">T5</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">T6</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px; color:#f39c12;">T7</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px; color:#e74c3c;">CN</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">T2</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">T3</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">T4</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">T5</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">T6</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px; color:#f39c12;">T7</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px; color:#e74c3c;">CN</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">T2</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">T3</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">T4</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">T5</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">T6</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px; color:#f39c12;">T7</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px; color:#e74c3c;">CN</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">T2</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">T3</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">T4</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">T5</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">T6</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px; color:#f39c12;">T7</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px; color:#e74c3c;">CN</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">T2</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">T3</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">T4</th>
+                            <th rowspan="2" style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">Phép</th>
+                            <th rowspan="2" style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">Lễ, Tết</th>
+                            <th rowspan="2" style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">Chế độ hưởng nguyên lương</th>
+                            <th colspan="3" style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 100px;">Đi muộn</th>
+                            <th colspan="3" style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 100px;">Về trễ</th>
+                        </tr>
+                        <tr style="background: #f8f9fa;">
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">01</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">02</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">03</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">04</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">05</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px; color:#f39c12;">06</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px; color:#e74c3c;">07</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">08</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">09</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">10</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">11</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">12</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">13</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">14</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">15</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">16</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">17</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">18</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">19</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">20</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">21</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">22</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">23</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">24</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">25</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">26</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">27</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">28</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">29</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">30</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">31</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">Số công</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">Số lần</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">Số phút</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">Số công</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">Số lần</th>
+                            <th style="padding: 6px 4px; border: 1px solid #ddd; text-align: center; min-width: 32px;">Số phút</th>
                         </tr>
                     </thead>
-                    <tbody id="attendanceTableBody">
+                    <tbody id="monthlySummaryTableBody">
                         <tr>
-                            <td colspan="6" style="padding: 20px; text-align: center; color: #666;">
-                                Đang tải dữ liệu chấm công...
+                            <td colspan="54" style="padding: 20px; text-align: center; color: #666;">
+                                Đang tải dữ liệu tổng hợp công tháng...
                             </td>
                         </tr>
                     </tbody>
@@ -592,14 +672,7 @@
             </div>
         </div>
         
-                        <div class="quick-actions">
-                            <a href="/attendance-history" class="btn-secondary">
-                                <i class="fas fa-history"></i> Lịch Sử Chấm Công
-                            </a>
-                            <a href="/dashboard" class="btn-secondary">
-                                <i class="fas fa-home"></i> Trang Chủ
-                            </a>
-                        </div>
+
                         
                         <div class="loading" id="loading">
                             <i class="fas fa-spinner fa-spin"></i> Đang xử lý...
