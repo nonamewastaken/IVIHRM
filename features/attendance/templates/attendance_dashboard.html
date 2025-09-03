@@ -199,24 +199,40 @@
     }
 
     .nav-item {
-        padding: 0.75rem 1.5rem;
-        border-radius: 8px;
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0.55rem 1.1rem;
+        border-radius: 999px;
         cursor: pointer;
-        transition: all 0.3s;
-        font-weight: 500;
+        transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.06s ease;
+        font-weight: 600;
         text-decoration: none;
-        color: #666;
+        color: #444;
+        background: #ffffff;
+        border: 1px solid #e6e8ec;
+        box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
     }
 
     .nav-item:hover {
-        background-color: #f8f9fa;
-        color: #333;
+        background-color: #f6f8fb;
+        color: #111827;
+        box-shadow: 0 2px 6px rgba(16, 24, 40, 0.06);
+    }
+
+    .nav-item:active {
+        transform: translateY(1px);
     }
 
     .nav-item.active {
-        background-color: #007bff;
-        color: white;
+        background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+        color: #ffffff;
+        border-color: transparent;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
     }
+
+    .nav-item.active i { color: #ffffff; }
 
     .navbar-right {
         display: flex;
@@ -459,6 +475,46 @@
         margin: 10px 0;
         display: none;
     }
+
+    /* Pager styles for Summary tab */
+    .pager {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+    .pager-btn {
+        min-width: 36px;
+        height: 36px;
+        padding: 0 10px;
+        border-radius: 8px;
+        border: 1px solid #e6e8ec;
+        background: #ffffff;
+        color: #344054;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
+    }
+    .pager-btn:hover { background: #f6f8fb; box-shadow: 0 1px 3px rgba(16,24,40,.06); }
+    .pager-btn:disabled { background: #f1f3f5; color: #98a2b3; cursor: not-allowed; box-shadow: none; }
+    .pager-page {
+        min-width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        background: #f8fafc;
+        color: #111827;
+        font-weight: 700;
+        border: 1px solid #e6e8ec;
+    }
+    .pager-select {
+        padding: 6px 10px;
+        border: 1px solid #e6e8ec;
+        border-radius: 8px;
+        background: #fff;
+        color: #344054;
+    }
 </style>
 {% endblock %}
 
@@ -691,8 +747,101 @@
                         <h2 style="color: #2c3e50; margin-bottom: 20px;">
                             <i class="fas fa-chart-line"></i> Bảng Chấm Công Tổng Hợp
                         </h2>
-                        <p>Bảng tổng hợp chấm công của tất cả nhân viên sẽ được hiển thị ở đây.</p>
-                        <!-- Summary content will be added here -->
+                        <!-- Actions Row -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <div style="display:flex; gap: 10px; align-items: center;">
+                                <button id="openFilterBtn" class="btn-secondary" style="background:#6c757d;">
+                                    <i class="fas fa-filter"></i> Bộ lọc
+                                </button>
+                                <input id="boardSearchInput" type="text" placeholder="Tìm bảng chấm công..." 
+                                       style="padding:10px 12px; border:1px solid #ddd; border-radius:6px; width:260px;"/>
+                            </div>
+                            <button id="createBoardBtn" class="btn-secondary" style="background:#28a745;">
+                                <i class="fas fa-plus"></i> Thêm mới
+                            </button>
+                        </div>
+
+                        <!-- Filter Panel -->
+                        <div id="boardFilterPanel" style="display:none; background:#f8f9fa; border:1px solid #eee; border-radius:8px; padding:16px; margin-bottom:16px;">
+                            <div style="display:grid; grid-template-columns: repeat(6, 1fr); gap:12px;">
+                                <div>
+                                    <label style="font-weight:600; color:#2c3e50; font-size:0.9rem;">Từ ngày</label>
+                                    <input id="boardFromDate" type="date" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:6px;"/>
+                                </div>
+                                <div>
+                                    <label style="font-weight:600; color:#2c3e50; font-size:0.9rem;">Đến ngày</label>
+                                    <input id="boardToDate" type="date" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:6px;"/>
+                                </div>
+                                <div>
+                                    <label style="font-weight:600; color:#2c3e50; font-size:0.9rem;">Đơn vị</label>
+                                    <input id="boardUnit" type="text" placeholder="VD: Phòng Kinh Doanh" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:6px;"/>
+                                </div>
+                                <div>
+                                    <label style="font-weight:600; color:#2c3e50; font-size:0.9rem;">Loại</label>
+                                    <select id="boardType" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:6px;">
+                                        <option value="">Tất cả</option>
+                                        <option value="monthly">Theo tháng</option>
+                                        <option value="period">Theo kỳ</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="font-weight:600; color:#2c3e50; font-size:0.9rem;">Trạng thái</label>
+                                    <select id="boardStatus" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:6px;">
+                                        <option value="">Tất cả</option>
+                                        <option value="draft">Nháp</option>
+                                        <option value="processing">Đang xử lý</option>
+                                        <option value="completed">Hoàn thành</option>
+                                    </select>
+                                </div>
+                                <div style="display:flex; align-items:flex-end; gap:10px;">
+                                    <button id="applyBoardFilterBtn" class="btn-secondary" style="background:#3498db;">
+                                        Áp dụng
+                                    </button>
+                                    <button id="resetBoardFilterBtn" class="btn-secondary" style="background:#6c757d;">
+                                        Đặt lại
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Table Container -->
+                        <div class="table-responsive" style="min-height:240px;">
+                            <table style="width:100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr style="background:#f8f9fa;">
+                                        <th style="padding:10px; border-bottom:1px solid #e9ecef; text-align:left;">Tên bảng chấm công</th>
+                                        <th style="padding:10px; border-bottom:1px solid #e9ecef; text-align:left;">Từ ngày</th>
+                                        <th style="padding:10px; border-bottom:1px solid #e9ecef; text-align:left;">Đến ngày</th>
+                                        <th style="padding:10px; border-bottom:1px solid #e9ecef; text-align:left;">Đơn vị</th>
+                                        <th style="padding:10px; border-bottom:1px solid #e9ecef; text-align:left;">Loại</th>
+                                        <th style="padding:10px; border-bottom:1px solid #e9ecef; text-align:left;">Trạng thái</th>
+                                        <th style="padding:10px; border-bottom:1px solid #e9ecef; text-align:left;">Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="timesheetBoardsBody">
+                                    <tr>
+                                        <td colspan="7" style="padding:20px; text-align:center; color:#666;">Chưa có dữ liệu</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <div style="display:flex; justify-content: space-between; align-items:center; margin-top:12px;">
+                            <div style="color:#666; font-size:0.9rem;">Tổng số bản ghi: <span id="boardsTotal">0</span></div>
+                            <div class="pager">
+                                <select id="boardsPageSize" class="pager-select">
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                </select>
+                                <button id="boardsFirst" class="pager-btn" title="Trang đầu">«</button>
+                                <button id="boardsPrev" class="pager-btn" title="Trang trước">‹</button>
+                                <span id="boardsPage" class="pager-page">1</span>
+                                <button id="boardsNext" class="pager-btn" title="Trang sau">›</button>
+                                <button id="boardsLast" class="pager-btn" title="Trang cuối">»</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -704,8 +853,98 @@
                         <h2 style="color: #2c3e50; margin-bottom: 20px;">
                             <i class="fas fa-database"></i> Dữ Liệu Công
                         </h2>
-                        <p>Dữ liệu công chi tiết và thống kê sẽ được hiển thị ở đây.</p>
-                        <!-- Work data content will be added here -->
+                        <!-- Actions Row -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <div style="display:flex; gap: 10px; align-items: center;">
+                                <button id="workOpenFilterBtn" class="btn-secondary" style="background:#6c757d;">
+                                    <i class="fas fa-filter"></i> Bộ lọc
+                                </button>
+                                <input id="workSearchInput" type="text" placeholder="Tìm theo tên/mã nhân viên..." 
+                                       style="padding:10px 12px; border:1px solid #ddd; border-radius:6px; width:260px;"/>
+                            </div>
+                        </div>
+
+                        <!-- Filter Panel -->
+                        <div id="workFilterPanel" style="display:none; background:#f8f9fa; border:1px solid #eee; border-radius:8px; padding:16px; margin-bottom:16px;">
+                            <div style="display:grid; grid-template-columns: repeat(6, 1fr); gap:12px;">
+                                <div>
+                                    <label style="font-weight:600; color:#2c3e50; font-size:0.9rem;">Từ ngày</label>
+                                    <input id="workFromDate" type="date" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:6px;"/>
+                                </div>
+                                <div>
+                                    <label style="font-weight:600; color:#2c3e50; font-size:0.9rem;">Đến ngày</label>
+                                    <input id="workToDate" type="date" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:6px;"/>
+                                </div>
+                                <div>
+                                    <label style="font-weight:600; color:#2c3e50; font-size:0.9rem;">Phòng ban</label>
+                                    <input id="workDepartment" type="text" placeholder="VD: Hành chính" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:6px;"/>
+                                </div>
+                                <div>
+                                    <label style="font-weight:600; color:#2c3e50; font-size:0.9rem;">Hình thức</label>
+                                    <select id="workMethod" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:6px;">
+                                        <option value="">Tất cả</option>
+                                        <option value="app">App điện thoại</option>
+                                        <option value="device">Máy chấm công</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="font-weight:600; color:#2c3e50; font-size:0.9rem;">Ca/Phiếu</label>
+                                    <input id="workShift" type="text" placeholder="VD: Hành chính" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:6px;"/>
+                                </div>
+                                <div style="display:flex; align-items:flex-end; gap:10px;">
+                                    <button id="applyWorkFilterBtn" class="btn-secondary" style="background:#3498db;">
+                                        Áp dụng
+                                    </button>
+                                    <button id="resetWorkFilterBtn" class="btn-secondary" style="background:#6c757d;">
+                                        Đặt lại
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Table Container -->
+                        <div class="table-responsive" style="min-height:240px;">
+                            <table style="width:100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr style="background:#f8f9fa;">
+                                        <th style="padding:10px; border-bottom:1px solid #e9ecef; text-align:left;">Mã nhân viên</th>
+                                        <th style="padding:10px; border-bottom:1px solid #e9ecef; text-align:left;">Họ và tên</th>
+                                        <th style="padding:10px; border-bottom:1px solid #e9ecef; text-align:left;">Chức danh</th>
+                                        <th style="padding:10px; border-bottom:1px solid #e9ecef; text-align:left;">Số điện thoại</th>
+                                        <th style="padding:10px; border-bottom:1px solid #e9ecef; text-align:left;">Phòng ban</th>
+                                        <th style="padding:10px; border-bottom:1px solid #e9ecef; text-align:left;">Hình thức chấm công</th>
+                                        <th style="padding:10px; border-bottom:1px solid #e9ecef; text-align:left;">Tên máy chấm công</th>
+                                        <th style="padding:10px; border-bottom:1px solid #e9ecef; text-align:left;">Vị trí chấm công</th>
+                                        <th style="padding:10px; border-bottom:1px solid #e9ecef; text-align:left;">Ngày giờ chấm công</th>
+                                        <th style="padding:10px; border-bottom:1px solid #e9ecef; text-align:left;">Ca/Phiếu</th>
+                                        <th style="padding:10px; border-bottom:1px solid #e9ecef; text-align:left;">Hình ảnh</th>
+                                        <th style="padding:10px; border-bottom:1px solid #e9ecef; text-align:left;">Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="workDataBody">
+                                    <tr>
+                                        <td colspan="12" style="padding:20px; text-align:center; color:#666;">Chưa có dữ liệu</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <div style="display:flex; justify-content: space-between; align-items:center; margin-top:12px;">
+                            <div style="color:#666; font-size:0.9rem;">Tổng số bản ghi: <span id="workTotal">0</span></div>
+                            <div class="pager">
+                                <select id="workPageSize" class="pager-select">
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                </select>
+                                <button id="workFirst" class="pager-btn" title="Trang đầu">«</button>
+                                <button id="workPrev" class="pager-btn" title="Trang trước">‹</button>
+                                <span id="workPage" class="pager-page">1</span>
+                                <button id="workNext" class="pager-btn" title="Trang sau">›</button>
+                                <button id="workLast" class="pager-btn" title="Trang cuối">»</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -922,5 +1161,266 @@ function hideMessages() {
 
 // Load initial status
 loadAttendanceStatus();
+
+// ================= Summary Boards JS =================
+let boardsPage = 1;
+function getBoardsPageSize() {
+    const sel = document.getElementById('boardsPageSize');
+    return sel ? parseInt(sel.value, 10) : 10;
+}
+
+function buildBoardsQuery() {
+    const params = new URLSearchParams();
+    params.set('page', boardsPage);
+    params.set('page_size', getBoardsPageSize());
+    const q = document.getElementById('boardSearchInput')?.value || '';
+    const unit = document.getElementById('boardUnit')?.value || '';
+    const type = document.getElementById('boardType')?.value || '';
+    const status = document.getElementById('boardStatus')?.value || '';
+    const fromDate = document.getElementById('boardFromDate')?.value || '';
+    const toDate = document.getElementById('boardToDate')?.value || '';
+    if (q) params.set('q', q);
+    if (unit) params.set('unit', unit);
+    if (type) params.set('type', type);
+    if (status) params.set('status', status);
+    if (fromDate) params.set('from_date', fromDate);
+    if (toDate) params.set('to_date', toDate);
+    return params.toString();
+}
+
+function loadTimesheetBoards() {
+    const tbody = document.getElementById('timesheetBoardsBody');
+    if (tbody) {
+        tbody.innerHTML = '<tr><td colspan="7" style="padding:20px; text-align:center; color:#666;">Đang tải...</td></tr>';
+    }
+    fetch('/api/timesheet-boards?' + buildBoardsQuery())
+        .then(r => r.json())
+        .then(data => {
+            const items = data.items || [];
+            const total = data.total || 0;
+            const page = data.page || boardsPage;
+            const pageSize = data.page_size || getBoardsPageSize();
+            const totalEl = document.getElementById('boardsTotal');
+            if (totalEl) totalEl.textContent = total;
+            const pageEl = document.getElementById('boardsPage');
+            if (pageEl) pageEl.textContent = page;
+            if (tbody) {
+                if (items.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="padding:20px; text-align:center; color:#666;">Chưa có dữ liệu</td></tr>';
+                } else {
+                    tbody.innerHTML = '';
+                    items.forEach(item => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td style="padding:10px; border-bottom:1px solid #f1f1f1; font-weight:600; color:#2c3e50;">${item.name || ''}</td>
+                            <td style="padding:10px; border-bottom:1px solid #f1f1f1;">${item.from_date || ''}</td>
+                            <td style="padding:10px; border-bottom:1px solid #f1f1f1;">${item.to_date || ''}</td>
+                            <td style="padding:10px; border-bottom:1px solid #f1f1f1;">${item.unit || ''}</td>
+                            <td style="padding:10px; border-bottom:1px solid #f1f1f1;">${item.type || ''}</td>
+                            <td style="padding:10px; border-bottom:1px solid #f1f1f1;">${item.status || ''}</td>
+                            <td style="padding:10px; border-bottom:1px solid #f1f1f1;">
+                                <button class="btn-secondary" style="background:#f1f3f5; color:#333;">Xem</button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+            }
+            // Enable/disable pager
+            const prevBtn = document.getElementById('boardsPrev');
+            const nextBtn = document.getElementById('boardsNext');
+            const firstBtn = document.getElementById('boardsFirst');
+            const lastBtn = document.getElementById('boardsLast');
+            const maxPage = Math.max(1, Math.ceil(total / pageSize));
+            if (prevBtn) prevBtn.disabled = page <= 1;
+            if (firstBtn) firstBtn.disabled = page <= 1;
+            if (nextBtn) nextBtn.disabled = page >= maxPage;
+            if (lastBtn) lastBtn.disabled = page >= maxPage;
+        })
+        .catch(() => {
+            if (tbody) {
+                tbody.innerHTML = '<tr><td colspan="7" style="padding:20px; text-align:center; color:#c00;">Lỗi tải dữ liệu</td></tr>';
+            }
+        });
+}
+
+// Toggle filter panel
+document.getElementById('openFilterBtn')?.addEventListener('click', function() {
+    const panel = document.getElementById('boardFilterPanel');
+    if (panel) {
+        panel.style.display = panel.style.display === 'none' || panel.style.display === '' ? 'block' : 'none';
+    }
+});
+
+// Apply / Reset filters
+document.getElementById('applyBoardFilterBtn')?.addEventListener('click', function() {
+    boardsPage = 1;
+    loadTimesheetBoards();
+});
+document.getElementById('resetBoardFilterBtn')?.addEventListener('click', function() {
+    const ids = ['boardFromDate','boardToDate','boardUnit','boardType','boardStatus','boardSearchInput'];
+    ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            if (el.tagName === 'SELECT') el.selectedIndex = 0; else el.value = '';
+        }
+    });
+    boardsPage = 1;
+    loadTimesheetBoards();
+});
+
+// Search typing debounce
+let boardSearchTimer;
+document.getElementById('boardSearchInput')?.addEventListener('input', function() {
+    clearTimeout(boardSearchTimer);
+    boardSearchTimer = setTimeout(() => { boardsPage = 1; loadTimesheetBoards(); }, 400);
+});
+
+// Pagination controls
+document.getElementById('boardsPrev')?.addEventListener('click', function() {
+    if (boardsPage > 1) { boardsPage -= 1; loadTimesheetBoards(); }
+});
+document.getElementById('boardsNext')?.addEventListener('click', function() {
+    boardsPage += 1; loadTimesheetBoards();
+});
+document.getElementById('boardsFirst')?.addEventListener('click', function() {
+    boardsPage = 1; loadTimesheetBoards();
+});
+document.getElementById('boardsLast')?.addEventListener('click', function() {
+    // We don't know max page here; force a fetch to compute then jump via response.
+    // Quick approach: temporarily set a very large page, backend will clamp/return last page when wired.
+    boardsPage = 999999; loadTimesheetBoards();
+});
+document.getElementById('boardsPageSize')?.addEventListener('change', function() {
+    boardsPage = 1; loadTimesheetBoards();
+});
+
+// Initialize when Summary tab first shown
+// If user clicks Summary nav, data will load automatically
+document.querySelector(".nav-item[onclick=\"showTab('summary')\"]")?.addEventListener('click', function() {
+    setTimeout(loadTimesheetBoards, 0);
+});
+
+// ================= Work Data JS =================
+let workPage = 1;
+function getWorkPageSize() {
+    const sel = document.getElementById('workPageSize');
+    return sel ? parseInt(sel.value, 10) : 10;
+}
+
+function buildWorkQuery() {
+    const params = new URLSearchParams();
+    params.set('page', workPage);
+    params.set('page_size', getWorkPageSize());
+    const q = document.getElementById('workSearchInput')?.value || '';
+    const department = document.getElementById('workDepartment')?.value || '';
+    const method = document.getElementById('workMethod')?.value || '';
+    const shift = document.getElementById('workShift')?.value || '';
+    const fromDate = document.getElementById('workFromDate')?.value || '';
+    const toDate = document.getElementById('workToDate')?.value || '';
+    if (q) params.set('q', q);
+    if (department) params.set('department', department);
+    if (method) params.set('method', method);
+    if (shift) params.set('shift', shift);
+    if (fromDate) params.set('from_date', fromDate);
+    if (toDate) params.set('to_date', toDate);
+    return params.toString();
+}
+
+function loadWorkData() {
+    const tbody = document.getElementById('workDataBody');
+    if (tbody) {
+        tbody.innerHTML = '<tr><td colspan="12" style="padding:20px; text-align:center; color:#666;">Đang tải...</td></tr>';
+    }
+    fetch('/api/work-data?' + buildWorkQuery())
+        .then(r => r.json())
+        .then(data => {
+            const items = data.items || [];
+            const total = data.total || 0;
+            const page = data.page || workPage;
+            const pageSize = data.page_size || getWorkPageSize();
+            document.getElementById('workTotal').textContent = total;
+            document.getElementById('workPage').textContent = page;
+            if (tbody) {
+                if (items.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="12" style="padding:20px; text-align:center; color:#666;">Chưa có dữ liệu</td></tr>';
+                } else {
+                    tbody.innerHTML = '';
+                    items.forEach(item => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td style=\"padding:10px; border-bottom:1px solid #f1f1f1;\">${item.employee_code || ''}</td>
+                            <td style=\"padding:10px; border-bottom:1px solid #f1f1f1; font-weight:600; color:#2c3e50;\">${item.employee_name || ''}</td>
+                            <td style=\"padding:10px; border-bottom:1px solid #f1f1f1;\">${item.title || ''}</td>
+                            <td style=\"padding:10px; border-bottom:1px solid #f1f1f1;\">${item.phone || ''}</td>
+                            <td style=\"padding:10px; border-bottom:1px solid #f1f1f1;\">${item.department || ''}</td>
+                            <td style=\"padding:10px; border-bottom:1px solid #f1f1f1;\">${item.method || ''}</td>
+                            <td style=\"padding:10px; border-bottom:1px solid #f1f1f1;\">${item.device_name || ''}</td>
+                            <td style=\"padding:10px; border-bottom:1px solid #f1f1f1; white-space: pre-line; color:#0ea5e9;\">${item.location || ''}</td>
+                            <td style=\"padding:10px; border-bottom:1px solid #f1f1f1;\">${item.timestamp || ''}</td>
+                            <td style=\"padding:10px; border-bottom:1px solid #f1f1f1;\">${item.shift || ''}</td>
+                            <td style=\"padding:10px; border-bottom:1px solid #f1f1f1;\">${item.image ? '📷' : ''}</td>
+                            <td style=\"padding:10px; border-bottom:1px solid #f1f1f1;\"><button class=\"btn-secondary\" style=\"background:#22c55e;\">⚙</button></td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+            }
+
+            const prev = document.getElementById('workPrev');
+            const next = document.getElementById('workNext');
+            const first = document.getElementById('workFirst');
+            const last = document.getElementById('workLast');
+            const maxPage = Math.max(1, Math.ceil(total / pageSize));
+            if (prev) prev.disabled = page <= 1;
+            if (first) first.disabled = page <= 1;
+            if (next) next.disabled = page >= maxPage;
+            if (last) last.disabled = page >= maxPage;
+        })
+        .catch(() => {
+            if (tbody) {
+                tbody.innerHTML = '<tr><td colspan="12" style="padding:20px; text-align:center; color:#c00;">Lỗi tải dữ liệu</td></tr>';
+            }
+        });
+}
+
+// Toggle filter panel
+document.getElementById('workOpenFilterBtn')?.addEventListener('click', function() {
+    const panel = document.getElementById('workFilterPanel');
+    if (panel) {
+        panel.style.display = panel.style.display === 'none' || panel.style.display === '' ? 'block' : 'none';
+    }
+});
+
+// Apply / Reset filters
+document.getElementById('applyWorkFilterBtn')?.addEventListener('click', function() {
+    workPage = 1; loadWorkData();
+});
+document.getElementById('resetWorkFilterBtn')?.addEventListener('click', function() {
+    const ids = ['workFromDate','workToDate','workDepartment','workMethod','workShift','workSearchInput'];
+    ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { if (el.tagName === 'SELECT') el.selectedIndex = 0; else el.value = ''; }
+    });
+    workPage = 1; loadWorkData();
+});
+
+// Search typing debounce
+let workSearchTimer;
+document.getElementById('workSearchInput')?.addEventListener('input', function() {
+    clearTimeout(workSearchTimer);
+    workSearchTimer = setTimeout(() => { workPage = 1; loadWorkData(); }, 400);
+});
+
+// Pagination
+document.getElementById('workPrev')?.addEventListener('click', function() { if (workPage > 1) { workPage -= 1; loadWorkData(); } });
+document.getElementById('workNext')?.addEventListener('click', function() { workPage += 1; loadWorkData(); });
+document.getElementById('workFirst')?.addEventListener('click', function() { workPage = 1; loadWorkData(); });
+document.getElementById('workLast')?.addEventListener('click', function() { workPage = 999999; loadWorkData(); });
+document.getElementById('workPageSize')?.addEventListener('change', function() { workPage = 1; loadWorkData(); });
+
+document.querySelector(".nav-item[onclick=\"showTab('work_data')\"]")?.addEventListener('click', function() {
+    setTimeout(loadWorkData, 0);
+});
 </script>
 {% endblock %}

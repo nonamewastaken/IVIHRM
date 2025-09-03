@@ -222,3 +222,85 @@ def calculate_work_hours(check_in_time, check_out_time):
     time_diff = check_out_time - check_in_time
     hours = time_diff.total_seconds() / 3600
     return round(hours, 2)
+
+
+# ========================= Timesheet Boards (Summary) =========================
+@attendance_bp.route('/api/timesheet-boards', methods=['GET'])
+@api_login_required
+def list_timesheet_boards():
+    """List timesheet summary boards created by managers.
+
+    This is a stub endpoint that currently returns an empty list with
+    pagination metadata and echoes back filter parameters. It is intended to
+    power the Summary tab UI. Later, this can be wired to real persistence.
+    """
+    try:
+        # Parse filters
+        page = int(request.args.get('page', 1))
+        page_size = int(request.args.get('page_size', 10))
+        query_text = request.args.get('q')
+        unit = request.args.get('unit')
+        board_type = request.args.get('type')
+        status = request.args.get('status')
+        from_date = request.args.get('from_date')
+        to_date = request.args.get('to_date')
+
+        # Placeholder data (empty state by default)
+        items = []
+        total = 0
+
+        # Response structure
+        return jsonify({
+            'items': items,
+            'page': page,
+            'page_size': page_size,
+            'total': total,
+            'filters': {
+                'q': query_text,
+                'unit': unit,
+                'type': board_type,
+                'status': status,
+                'from_date': from_date,
+                'to_date': to_date
+            }
+        }), 200
+    except Exception:
+        return jsonify({'error': 'Failed to load timesheet boards'}), 500
+
+
+@attendance_bp.route('/api/work-data', methods=['GET'])
+@api_login_required
+def list_work_data():
+    """List raw attendance work data records per employee (stub).
+
+    Accepts filters similar to the example UI and returns a paginated list.
+    """
+    try:
+        page = int(request.args.get('page', 1))
+        page_size = int(request.args.get('page_size', 10))
+        q = request.args.get('q')
+        department = request.args.get('department')
+        method = request.args.get('method')
+        shift = request.args.get('shift')
+        from_date = request.args.get('from_date')
+        to_date = request.args.get('to_date')
+
+        items = []
+        total = 0
+
+        return jsonify({
+            'items': items,
+            'page': page,
+            'page_size': page_size,
+            'total': total,
+            'filters': {
+                'q': q,
+                'department': department,
+                'method': method,
+                'shift': shift,
+                'from_date': from_date,
+                'to_date': to_date
+            }
+        }), 200
+    except Exception:
+        return jsonify({'error': 'Failed to load work data'}), 500
