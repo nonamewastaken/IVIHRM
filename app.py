@@ -6,7 +6,9 @@ from core.database import db, init_database
 
 def create_app(config_name='default'):
     """Application factory pattern"""
-    app = Flask(__name__, static_folder='shared/static')
+    app = Flask(__name__, 
+                static_folder='shared/static',
+                template_folder='shared/templates')
     
     # Load configuration
     app.config.from_object(config[config_name])
@@ -23,12 +25,14 @@ def create_app(config_name='default'):
     from features.dashboard import dashboard_bp
     from features.onboarding import onboarding_bp
     from features.password_reset import password_reset_bp
+    from features.attendance import attendance_bp
     
     # Register blueprints
     app.register_blueprint(auth_bp)
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(onboarding_bp)
     app.register_blueprint(password_reset_bp)
+    app.register_blueprint(attendance_bp)
     
     return app
 

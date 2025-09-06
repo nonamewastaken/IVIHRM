@@ -381,7 +381,7 @@
         <div class="nav-menu">
             <a href="#" class="nav-item active">Home</a>
             <a href="#" class="nav-item">Administrative Personnel</a>
-            <a href="#" class="nav-item">Attendance</a>
+            <a href="/attendance" class="nav-item">Attendance</a>
             <a href="#" class="nav-item">Salary</a>
             <a href="#" class="nav-item">Decision</a>
         </div>
@@ -436,7 +436,12 @@
         // Add click event listeners for navigation items
         document.querySelectorAll('.nav-item').forEach(item => {
             item.addEventListener('click', function(e) {
-                e.preventDefault();
+                const href = this.getAttribute('href');
+                
+                // Only prevent default for placeholder links (#)
+                if (href === '#') {
+                    e.preventDefault();
+                }
                 
                 // Remove active class from all nav items
                 document.querySelectorAll('.nav-item').forEach(nav => {

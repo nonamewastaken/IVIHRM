@@ -56,3 +56,34 @@ class Organization(db.Model):
     
     # Relationships
     users = db.relationship('User', back_populates='organization')
+
+# Attendance model
+class Attendance(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    check_in_time = db.Column(db.DateTime)
+    check_out_time = db.Column(db.DateTime)
+    work_hours = db.Column(db.Float, default=0.0)
+    status = db.Column(db.String(20), default='present')  # present, absent, late, half_day
+    notes = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationship
+    user = db.relationship('User', backref='attendance_records')
+    
+    def __repr__(self):
+        return f'<Attendance {self.user_id} - {self.date}>'
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'date': self.date.strftime('%Y-%m-%d') if self.date else None,
+            'check_in_time': self.check_in_time.strftime('%H:%M:%S') if self.check_in_time else None,
+            'check_out_time': self.check_out_time.strftime('%H:%M:%S') if self.check_out_time else None,
+            'work_hours': self.work_hours,
+            'status': self.status,
+            'notes': self.notes
+        }
