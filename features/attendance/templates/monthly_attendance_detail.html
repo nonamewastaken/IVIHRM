@@ -1,0 +1,790 @@
+{% extends "base.html" %}
+
+{% block title %}Monthly Attendance Detail - HRM System{% endblock %}
+
+{% block page_title %}<i class="fas fa-calendar-alt"></i> Monthly Attendance Detail{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Attendance-specific styles */
+    .attendance-container {
+        max-width: 100%;
+    }
+
+    .attendance-card {
+        background: white;
+        border-radius: 8px;
+        padding: 30px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    /* Attendance Table Styles */
+    .attendance-table-container {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-top: 20px;
+    }
+
+    .action-buttons {
+        margin-bottom: 20px;
+        display: flex;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: #28a745;
+        color: white;
+    }
+
+    .btn-info {
+        background: #17a2b8;
+        color: white;
+    }
+
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+        width: 100%;
+        border: 0px solid #000;
+    }
+
+    .attendance-table {
+        border-collapse: collapse;
+        table-layout: auto;
+        min-width: 100vw;
+        width: max-content;
+    }
+
+    .attendance-table th {
+        border: 1px solid #ddd;
+        padding: 4px;
+        text-align: center;
+    }
+
+    .attendance-table td {
+        border: 1px solid #ddd;
+        padding: 4px;
+    }
+
+    /* Sticky columns for tbody */
+    .attendance-table tbody tr td:first-child {
+        position: sticky;
+        left: 0;
+        background-color: #f8f9fa;
+        z-index: 10;
+        border-right: 2px solid #ddd;
+    }
+
+    .attendance-table tbody tr td:nth-child(2) {
+        position: sticky;
+        left: 75px; /* Width of first column */
+        background-color: #f8f9fa;
+        z-index: 10;
+        border-right: 2px solid #ddd;
+        white-space: nowrap; /* Prevent text wrapping */
+        min-width: 200px; /* Increased width for employee names */
+        max-width: 200px; /* Prevent column from expanding too much */
+        overflow: hidden; /* Hide overflow text */
+        text-overflow: ellipsis; /* Show ... for very long names */
+    }
+
+    .loading {
+        display: none;
+        text-align: center;
+        padding: 20px;
+        color: #666;
+    }
+
+    .error-message, .success-message {
+        display: none;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 5px;
+    }
+
+    .error-message {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    .success-message {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <div class="attendance-container">
+        <div class="attendance-card">
+            <h1 style="text-align: center; color: #2c3e50; margin-bottom: 30px;">
+                <i class="fas fa-calendar-alt"></i> Monthly Attendance Detail
+            </h1>
+        
+                <div class="attendance-table-container">
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" id="exportExcelBtn">
+                            <i class="fas fa-file-excel"></i>
+                            Export Excel
+                        </button>
+                        <button class="btn btn-info" id="importExcelBtn">
+                            <i class="fas fa-upload"></i>
+                            Import Excel
+                        </button>
+                        <button class="btn btn-secondary" id="filterBtn">
+                            <i class="fas fa-filter"></i>
+                            Filter
+                        </button>
+                        <button class="btn btn-primary" id="loadDataBtn">
+                            <i class="fas fa-download"></i>
+                            Load Data
+                        </button>
+                        <select id="yearSelect" style="padding: 10px 15px; border: 1px solid #ddd; border-radius: 5px; background: white; font-size: 14px; min-width: 80px; margin-right: 10px;">
+                            <option value="2000">2000</option>
+                            <option value="2001">2001</option>
+                            <option value="2002">2002</option>
+                            <option value="2003">2003</option>
+                            <option value="2004">2004</option>
+                            <option value="2005">2005</option>
+                            <option value="2006">2006</option>
+                            <option value="2007">2007</option>
+                            <option value="2008">2008</option>
+                            <option value="2009">2009</option>
+                            <option value="2010">2010</option>
+                            <option value="2011">2011</option>
+                            <option value="2012">2012</option>
+                            <option value="2013">2013</option>
+                            <option value="2014">2014</option>
+                            <option value="2015">2015</option>
+                            <option value="2016">2016</option>
+                            <option value="2017">2017</option>
+                            <option value="2018">2018</option>
+                            <option value="2019">2019</option>
+                            <option value="2020">2020</option>
+                            <option value="2021">2021</option>
+                            <option value="2022">2022</option>
+                            <option value="2023">2023</option>
+                            <option value="2024">2024</option>
+                            <option value="2025" selected>2025</option>
+                            <option value="2026">2026</option>
+                            <option value="2027">2027</option>
+                            <option value="2028">2028</option>
+                            <option value="2029">2029</option>
+                            <option value="2030">2030</option>
+                        </select>
+                        <select id="monthSelect" style="padding: 10px 15px; border: 1px solid #ddd; border-radius: 5px; background: white; font-size: 14px; min-width: 120px;">
+                            <option value="01">January</option>
+                            <option value="02">February</option>
+                            <option value="03">March</option>
+                            <option value="04">April</option>
+                            <option value="05">May</option>
+                            <option value="06">June</option>
+                            <option value="07">July</option>
+                            <option value="08">August</option>
+                            <option value="09" selected>September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Hidden file input for Excel upload -->
+                    <input type="file" id="excelFileInput" accept=".xlsx,.xls" style="display: none;">
+                    
+                    <!-- Row limit notice -->
+                    <div style="margin-bottom: 15px; padding: 10px; background: #e7f3ff; border: 1px solid #b3d9ff; border-radius: 5px; color: #0066cc; font-size: 14px;">
+                        <i class="fas fa-info-circle"></i> <strong>Note:</strong> Maximum 25 employees allowed per import. You can have 1-25 employees in your Excel file.
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="attendance-table">
+                            <thead>
+                                <!-- Row 1: Main Headers -->
+                                <tr id="header-rows"></tr>
+                                <tr id="weekdays-row"></tr>
+                                <tr id="days-row"></tr>
+                                <tr id="small-row"></tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="loading" id="loading">
+                    <i class="fas fa-spinner fa-spin"></i> Processing...
+                </div>
+                
+                <div class="error-message" id="errorMessage"></div>
+                <div class="success-message" id="successMessage"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// JavaScript functions for generating table headers
+function generateHeaderRows(n) {
+  const tr = document.getElementById("header-rows");
+  tr.innerHTML = "";
+  tr.style.background = "#f8f9fa";
+
+  const mk = (html, attrs={}) => {
+    const th = document.createElement("th");
+    Object.assign(th, attrs);
+    return Object.assign(th, { innerHTML: html });
+  };
+
+  tr.appendChild(mk("STT", { rowSpan: 4, style: "min-width:75px; height:200px; border: 1px; padding: 4px; text-align:center; position:sticky; left:0; background-color: #fef2cc" }));
+  tr.appendChild(mk("Nhân viên", { rowSpan: 4, style: "min-width:200px; height:200px; border: 1px; padding: 4px; text-align:center; position:sticky; left:75px; background-color: #fef2cc" }));
+
+  tr.appendChild(mk("Công chi tiết tháng", { colSpan: n, style: `height:50px; border:1px; padding: 4px; background-color: #fef2cc` }));
+
+  tr.appendChild(mk("Công<br>định mức", { rowSpan: 4, style: "min-width:100px; height:200px; border:1px; padding: 4px; background-color: #fef2cc" }));
+  tr.appendChild(mk("Công<br>hành chính", { rowSpan: 4, style: "min-width:100px; height:200px; border:1px; padding: 4px; text-align:center; background-color: #fef2cc" }));
+  tr.appendChild(mk("Công<br>đi đường", { rowSpan: 4, style: "min-width:100px; height:200px; border:1px; padding: 4px; background-color: #fef2cc" }));
+
+  tr.appendChild(mk("Công vượt định mức", { colSpan: 4, style: "height:50px; border:1px; padding: 4px; background-color: #fef2cc" }));
+  tr.appendChild(mk("Tổng công<br>đi làm", { rowSpan: 4, style: "min-width:100px; height:200px; border:1px; padding: 4px; background-color: #fef2cc" }));
+  tr.appendChild(mk("Công nghỉ hưởng lương", { colSpan: 4, style: "height:50px; border:1px; padding: 4px; background-color: #fef2cc" }));
+  tr.appendChild(mk("Các khoản công bị giảm trừ", { colSpan: 7, style: "height:50px; border:1px; padding: 4px; background-color: #fef2cc" }));
+  tr.appendChild(mk("Bù trừ công<br>hành chính sau<br>quyết toán<br>công tác", { rowSpan: 4, style: "min-width:125px; height:200px; border: 1px; padding: 4px; background-color: #fef2cc" }));
+  tr.appendChild(mk("Công<br>ca đêm", { rowSpan: 4, style: "min-width:100px; height:200px; border:1px; padding: 4px; background-color: #fef2cc" }));
+  tr.appendChild(mk("Tổng công<br>tính lương", { rowSpan: 4, style: "min-width:100px; height:200px; border:1px; padding: 4px; background-color: #fef2cc" }));
+  tr.appendChild(mk("Các ngày nghỉ không hưởng lương", { colSpan: 4, style: "height:50px; border:1px; padding: 4px; background-color: #fef2cc" }));
+  tr.appendChild(mk("Tổng ngày<br>nghỉ không<br>hưởng lương", { rowSpan: 4, style: "min-width:125px; height:200px; border:1px; padding: 4px; background-color: #fef2cc" }));
+}
+
+function generateWeekdaysRow(n, firstWeekDay) {
+  const row = document.getElementById("weekdays-row");
+  row.innerHTML = "";
+
+  const full2idx = { Monday:0, Tuesday:1, Wednesday:2, Thursday:3, Friday:4, Saturday:5, Sunday:6 };
+  const abbr = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+
+  const start = full2idx[firstWeekDay];
+  if (start === undefined) throw new Error("firstWeekDay must be one of: Monday..Sunday");
+
+  // weekday columns 1..n
+  for (let i = 0; i < n; i++) {
+    const th = document.createElement("th");
+    th.rowSpan = 1;
+    th.style = "min-width: 50px; height: 50px; border: 1px solid #ddd;";
+    th.textContent = abbr[(start + i) % 7];
+    row.appendChild(th);
+  }
+
+  // VĐM (rowspan=3)
+  const vdm = [
+    { html: "VĐM1<br>(x1.5)", w: 75 },
+    { html: "VĐM2<br>(x2)",   w: 75 },
+    { html: "VĐM3<br>(x3)",   w: 75 },
+    { html: "Tổng công VĐM quy đổi hệ số", w: 150 }
+  ];
+  vdm.forEach(item => {
+    const th = document.createElement("th");
+    th.rowSpan = 3;
+    th.style = `min-width: ${item.w}px; height: 150px; border: 1px solid #ddd;`;
+    if (item.html.includes("<br")) th.innerHTML = item.html; else th.textContent = item.html;
+    row.appendChild(th);
+  });
+
+  // NHL (no rowspan)
+  [
+    { text: "NHL1", w: 75 },
+    { text: "NHL2", w: 75 },
+    { text: "NHL3", w: 125 }
+  ].forEach(item => {
+    const th = document.createElement("th");
+    th.style = `min-width: ${item.w}px; height: 50px; border: 1px solid #ddd;`;
+    th.textContent = item.text;
+    row.appendChild(th);
+  });
+
+  // Tổng công NHL (rowspan=3)
+  {
+    const th = document.createElement("th");
+    th.rowSpan = 3;
+    th.style = "min-width: 100px; height: 150px; border: 1px solid #ddd;";
+    th.innerHTML = "Tổng<br>công NHL";
+    row.appendChild(th);
+  }
+
+  // GT1, GT2 groups (colspan=3)
+  ["GT1","GT2"].forEach(label => {
+    const th = document.createElement("th");
+    th.colSpan = 3;
+    th.style = "width: 300px; height: 50px; border: 1px solid #ddd;";
+    th.textContent = label;
+    row.appendChild(th);
+  });
+
+  // Tổng công bị giảm trừ (rowspan=3)
+  {
+    const th = document.createElement("th");
+    th.rowSpan = 3;
+    th.style = "min-width: 125px; height: 150px; border: 1px solid #ddd;";
+    th.innerHTML = "Tổng công<br>bị giảm trừ";
+    row.appendChild(th);
+  }
+
+  // NK1..NK4 (no rowspan)
+  ["NK1","NK2","NK3","NK4"].forEach(label => {
+    const th = document.createElement("th");
+    th.style = "width: 100px; height: 50px; border: 1px solid #ddd;";
+    th.textContent = label;
+    row.appendChild(th);
+  });
+}
+
+function generateDaysRow(n) {
+  const row = document.getElementById("days-row");
+  row.innerHTML = "";
+
+  // create day columns 1..n
+  for (let i = 1; i <= n; i++) {
+    const th = document.createElement("th");
+    th.rowSpan = 2;
+    th.style = "min-width: 50px; height: 100px; border: 1px solid #ddd;";
+    th.textContent = i;
+    row.appendChild(th);
+  }
+
+  // append fixed columns
+  const fixed = [
+    { text: "Phép", width: 75 },
+    { text: "Lễ, Tết", width: 75 },
+    { text: "Chế độ hưởng nguyên lương", width: 125 }
+  ];
+  fixed.forEach(item => {
+    const th = document.createElement("th");
+    th.rowSpan = 2;
+    th.style = `min-width: ${item.width}px; height: 100px; border: 1px solid #ddd;`;
+    th.textContent = item.text;
+    row.appendChild(th);
+  });
+
+  // group headers (colspan=3)
+  const groups = [
+    { text: "Đi muộn" },
+    { text: "Về sớm" }
+  ];
+  groups.forEach(item => {
+    const th = document.createElement("th");
+    th.colSpan = 3;
+    th.style = "width: 300px; height: 50px; border: 1px solid #ddd;";
+    th.textContent = item.text;
+    row.appendChild(th);
+  });
+
+  // nghỉ … headers (rowspan=2, with <br> inside)
+  const nghis = [
+    "Nghỉ<br>không<br>lý do",
+    "Nghỉ<br>không<br>lương",
+    "Nghỉ<br>hưởng<br>BHXH",
+    "Nghỉ<br>thai<br>sản"
+  ];
+  nghis.forEach(text => {
+    const th = document.createElement("th");
+    th.rowSpan = 2;
+    th.style = "min-width: 75px; height: 100px; border: 1px solid #ddd;";
+    th.innerHTML = text;
+    row.appendChild(th);
+  });
+}
+
+function generateSubColumns() {
+  const row = document.getElementById("small-row");
+  row.innerHTML = ""; // Clear existing content
+  
+  // Add only the 6 sub-columns for "Đi muộn" and "Về sớm"
+  const labels = ["Số lần", "Số phút", "Số công", "Số lần", "Số phút", "Số công"];
+
+  labels.forEach(text => {
+    const th = document.createElement("th");
+    th.style = "min-width: 75px; height: 50px; border: 1px solid #ddd;";
+    th.textContent = text;
+    row.appendChild(th);
+  });
+  
+  console.log(`DEBUG: Sub-row has ${row.children.length} columns (only 6 sub-columns)`);
+}
+
+// Function to load and display attendance data from database
+async function loadAttendanceData() {
+  const yearValue = document.getElementById('yearSelect').value;
+  const monthValue = document.getElementById('monthSelect').value;
+  
+  if (!yearValue || !monthValue) {
+    console.log('No year or month selected');
+    return;
+  }
+  
+  const monthYear = `${yearValue}-${monthValue}`;
+
+  try {
+    showLoading(true);
+    hideMessages();
+
+    const response = await fetch(`/attendance/api/monthly-data?month_year=${monthYear}`);
+    const data = await response.json();
+
+    if (data.success) {
+      console.log(`DEBUG FRONTEND: Received ${data.employees.length} employees`);
+      if (data.employees.length > 0) {
+        const sampleEmployee = data.employees[0];
+        console.log(`DEBUG FRONTEND: Sample employee - ${sampleEmployee.employee_no} - ${sampleEmployee.employee_name}`);
+        console.log(`DEBUG FRONTEND: Daily attendance length: ${sampleEmployee.daily_attendance ? sampleEmployee.daily_attendance.split(',').length : 0}`);
+        console.log(`DEBUG FRONTEND: Other data length: ${sampleEmployee.other_data ? sampleEmployee.other_data.length : 0}`);
+        console.log(`DEBUG FRONTEND: Other data sample: ${sampleEmployee.other_data ? sampleEmployee.other_data.substring(0, 200) : 'None'}...`);
+      }
+      generateTableBody(data.employees, data.daysInMonth);
+      showMessage(`Loaded ${data.employees.length} employees for ${monthYear}`, 'success');
+    } else {
+      showMessage(`Error loading data: ${data.error}`, 'error');
+    }
+  } catch (error) {
+    console.error('Error loading attendance data:', error);
+    showMessage(`Failed to load data: ${error.message}`, 'error');
+  } finally {
+    showLoading(false);
+  }
+}
+
+// Function to generate table body with employee data
+function generateTableBody(employees, daysInMonth) {
+  const tbody = document.querySelector('tbody');
+  tbody.innerHTML = ''; // Clear existing data
+
+  employees.forEach((employee, index) => {
+    const row = document.createElement('tr');
+    row.style.height = '40px';
+    
+    // Apply alternating row colors - all rows gray
+    row.style.backgroundColor = '#f8f9fa';
+
+    // Parse daily attendance data
+    const dailyAttendance = employee.daily_attendance ? 
+      employee.daily_attendance.split(',') : 
+      new Array(daysInMonth).fill('');
+
+    // Parse other data (overtime, leave, etc.)
+    let otherData = {};
+    try {
+      otherData = employee.other_data ? JSON.parse(employee.other_data) : {};
+    console.log(`DEBUG: Parsed other_data for ${employee.employee_name}:`, typeof otherData, Object.keys(otherData).length, 'keys');
+    console.log(`DEBUG: Sample other_data keys:`, Object.keys(otherData).slice(0, 10));
+    console.log(`DEBUG: Raw other_data string:`, employee.other_data);
+    console.log(`DEBUG: Parsed other_data object:`, otherData);
+    } catch (e) {
+      console.warn('Failed to parse other_data for employee:', employee.employee_no, e);
+      console.log('Raw other_data:', employee.other_data);
+    }
+
+    // STT (Row number) - Sticky first column
+    const sttCell = createCell(`${index + 1}`, 'text-align: center; min-width: 75px;', true, 0);
+    row.appendChild(sttCell);
+
+    // Employee Name - Sticky second column
+    const nameCell = createCell(employee.employee_name || 'N/A', 'min-width: 200px; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;', true, 75);
+    row.appendChild(nameCell);
+
+    // Daily attendance columns (days 1 to n)
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dayValue = dailyAttendance[day - 1] || '';
+      const dayCell = createCell(dayValue, 'text-align: center; min-width: 50px;');
+      row.appendChild(dayCell);
+    }
+
+    // Process all other data columns dynamically
+    // Get all column keys and sort them numerically
+    const otherDataKeys = Object.keys(otherData).filter(key => key.startsWith('col_'));
+    const sortedKeys = otherDataKeys.sort((a, b) => {
+      const numA = parseInt(a.split('_')[1]);
+      const numB = parseInt(b.split('_')[1]);
+      return numA - numB;
+    });
+
+    console.log(`Processing ${sortedKeys.length} other data columns for employee ${employee.employee_name}`);
+    console.log(`Column range: ${sortedKeys[0]} to ${sortedKeys[sortedKeys.length - 1]}`);
+    console.log(`Other data object keys:`, Object.keys(otherData));
+    console.log(`Filtered col_ keys:`, otherDataKeys);
+    console.log(`Sorted keys:`, sortedKeys);
+    console.log(`Other data sample:`, Object.keys(otherData).slice(0, 10));
+
+    // Add all other data columns
+    sortedKeys.forEach(key => {
+      const value = otherData[key] || '';
+      const cell = createCell(value, 'text-align: center; background-color: #f8f9fa;');
+      row.appendChild(cell);
+    });
+    
+    console.log(`Total columns in row after processing: ${row.children.length}`);
+    console.log(`Expected: 2 (STT + Name) + ${daysInMonth} (daily) + ${sortedKeys.length} (other) = ${2 + daysInMonth + sortedKeys.length}`);
+    
+    // Debug: Show what columns we actually have
+    console.log(`DEBUG: Row breakdown:`);
+    console.log(`  - STT + Name: 2 columns`);
+    console.log(`  - Daily attendance: ${daysInMonth} columns`);
+    console.log(`  - Other data: ${sortedKeys.length} columns`);
+    console.log(`  - Total: ${2 + daysInMonth + sortedKeys.length} columns`);
+    console.log(`  - Actual row children: ${row.children.length} columns`);
+
+    tbody.appendChild(row);
+  });
+
+  console.log(`Generated table body with ${employees.length} employees`);
+}
+
+// Helper function to create table cells
+function createCell(content, style = '', isSticky = false, stickyPosition = 0) {
+  const cell = document.createElement('td');
+  cell.textContent = content;
+  
+  let finalStyle = `border: 1px solid #ddd; padding: 4px; ${style}`;
+  
+  if (isSticky) {
+    finalStyle += `position: sticky; left: ${stickyPosition}px; background-color: #f8f9fa; z-index: 10; border-right: 2px solid #ddd;`;
+  }
+  
+  cell.style = finalStyle;
+  return cell;
+}
+
+// Update time display
+function updateTime() {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('en-US');
+    const dateString = now.toLocaleDateString('en-US');
+    
+    document.getElementById('current-time').textContent = timeString;
+    document.getElementById('current-date').textContent = dateString;
+}
+
+// Initialize and update time every second
+updateTime();
+setInterval(updateTime, 1000);
+
+// Year and month selector change events
+function handleDateChange() {
+    const yearValue = document.getElementById('yearSelect').value;
+    const monthValue = document.getElementById('monthSelect').value;
+    
+    if (yearValue && monthValue) {
+        const monthYear = `${yearValue}-${monthValue}`;
+        updateTableForMonth(monthYear);
+        // Automatically load data when date changes
+        loadAttendanceData();
+    }
+}
+
+document.getElementById('yearSelect').addEventListener('change', handleDateChange);
+document.getElementById('monthSelect').addEventListener('change', handleDateChange);
+
+// Load Data button event
+document.getElementById('loadDataBtn').addEventListener('click', function() {
+    loadAttendanceData();
+});
+
+// Excel import functionality
+document.getElementById('importExcelBtn').addEventListener('click', function() {
+    // Clear the file input first to ensure change event fires
+    document.getElementById('excelFileInput').value = '';
+    document.getElementById('excelFileInput').click();
+});
+
+document.getElementById('excelFileInput').addEventListener('change', function(event) {
+    console.log('File input changed, files:', event.target.files);
+    const file = event.target.files[0];
+    if (file) {
+        console.log('File selected:', file.name, file.size, 'bytes');
+        importExcelFile(file);
+    } else {
+        console.log('No file selected');
+    }
+});
+
+function importExcelFile(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    const yearValue = document.getElementById('yearSelect').value;
+    const monthValue = document.getElementById('monthSelect').value;
+    const monthYear = `${yearValue}-${monthValue}`;
+    formData.append('month_year', monthYear);
+    
+    showLoading(true);
+    hideMessages();
+    
+    // Clear the file input so the same file can be selected again
+    document.getElementById('excelFileInput').value = '';
+    
+    fetch('/attendance/api/import-excel', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+        
+        // Check if response is JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            return response.text().then(text => {
+                console.log('Non-JSON response:', text);
+                throw new Error(`Server returned non-JSON response: ${text.substring(0, 200)}`);
+            });
+        }
+        
+        return response.json();
+    })
+    .then(data => {
+        showLoading(false);
+        console.log('Response data:', data);
+        if (data.success) {
+            showMessage(`Import successful: ${data.message}`, 'success');
+        } else {
+            // Display detailed error information
+            let errorMessage = data.error;
+            if (data.validation_info) {
+                errorMessage += '\n\nFile Information:';
+                errorMessage += `\n• Expected columns: ${data.validation_info.expected_columns}`;
+                errorMessage += `\n• Actual columns: ${data.validation_info.actual_columns}`;
+                errorMessage += `\n• Expected rows: ${data.validation_info.expected_rows}`;
+                errorMessage += `\n• Actual rows: ${data.validation_info.actual_rows}`;
+                errorMessage += `\n• Days in month: ${data.validation_info.days_in_month}`;
+                errorMessage += `\n• Data rows found: ${data.validation_info.data_rows_found}`;
+            }
+            if (data.details && data.details.length > 0) {
+                errorMessage += '\n\nDetailed Errors:';
+                data.details.forEach((detail, index) => {
+                    errorMessage += `\n${index + 1}. ${detail}`;
+                });
+            }
+            showMessage(errorMessage, 'error');
+        }
+    })
+    .catch(error => {
+        showLoading(false);
+        console.error('Detailed error:', error);
+        
+        // Show more specific error messages
+        if (error.name === 'TypeError' && error.message.includes('fetch')) {
+            showMessage('Import failed: Cannot connect to server. Please check if the server is running.', 'error');
+        } else if (error.name === 'SyntaxError') {
+            showMessage('Import failed: Invalid response from server.', 'error');
+        } else {
+            showMessage(`Import failed: ${error.message}`, 'error');
+        }
+    })
+    .finally(() => {
+        // Always clear the file input after processing (success or error)
+        document.getElementById('excelFileInput').value = '';
+    });
+}
+
+function showMessage(message, type) {
+    const messageDiv = document.getElementById(type === 'success' ? 'successMessage' : 'errorMessage');
+    // Handle multi-line messages by converting \n to <br>
+    messageDiv.innerHTML = message.replace(/\n/g, '<br>');
+    messageDiv.style.display = 'block';
+    
+    // Scroll to the message
+    messageDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    
+    // Auto-hide after 10 seconds for error messages (longer for detailed errors)
+    const timeout = type === 'error' ? 10000 : 5000;
+    setTimeout(() => {
+        messageDiv.style.display = 'none';
+    }, timeout);
+}
+
+function showLoading(show) {
+    document.getElementById('loading').style.display = show ? 'block' : 'none';
+}
+
+function hideMessages() {
+    document.getElementById('errorMessage').style.display = 'none';
+    document.getElementById('successMessage').style.display = 'none';
+}
+
+function getDaysInSelectedMonth() {
+    const yearValue = document.getElementById('yearSelect').value;
+    const monthValue = document.getElementById('monthSelect').value;
+    
+    if (!yearValue || !monthValue) return 30;
+    
+    return new Date(parseInt(yearValue), parseInt(monthValue), 0).getDate();
+}
+
+function getFirstWeekdayOfMonth() {
+    const yearValue = document.getElementById('yearSelect').value;
+    const monthValue = document.getElementById('monthSelect').value;
+    
+    if (!yearValue || !monthValue) return 'Monday';
+    
+    const firstDay = new Date(parseInt(yearValue), parseInt(monthValue) - 1, 1);
+    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    return dayNames[firstDay.getDay()];
+}
+
+function updateTableForMonth(monthYear) {
+    const daysInMonth = getDaysInSelectedMonth();
+    const firstWeekday = getFirstWeekdayOfMonth();
+    
+    generateHeaderRows(daysInMonth);
+    generateWeekdaysRow(daysInMonth, firstWeekday);
+    generateDaysRow(daysInMonth);
+    generateSubColumns();
+    
+    console.log(`Updating table for ${monthYear} with ${daysInMonth} days, starting on ${firstWeekday}`);
+}
+
+// Sidebar functionality is now handled by base.html
+
+// Initialize table with current month and sidebar
+document.addEventListener('DOMContentLoaded', function() {
+    // Set current year and month as default
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = String(now.getMonth() + 1).padStart(2, '0');
+    
+    document.getElementById('yearSelect').value = currentYear;
+    document.getElementById('monthSelect').value = currentMonth;
+    
+    const monthYear = `${currentYear}-${currentMonth}`;
+    updateTableForMonth(monthYear);
+    
+    // Automatically load data for current month
+    loadAttendanceData();
+    
+    // Set active sidebar item
+    setActiveSidebarItem('/attendance/monthly_attendance_detail');
+    
+    // Generate sidebar for Attendance category
+    // Sidebar is handled by main sidebar component
+});
+</script>
+{% endblock %}

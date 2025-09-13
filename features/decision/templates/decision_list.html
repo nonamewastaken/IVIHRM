@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Decision List - HRM System{% endblock %}
+
+{% block page_title %}<i class="fas fa-list"></i> Decision List{% endblock %}
+
+{% block content %}
+    <div class="decision-container">
+        <div class="decision-card">
+            <div class="placeholder-content">
+                <i class="fas fa-list"></i>
+                <h2>Decision List</h2>
+                <p>Decision tracking and management interface will be implemented here.</p>
+                <p><em>Content coming soon...</em></p>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    setActiveSidebarItem('/decision/list');
+    // Sidebar is handled by main sidebar component
+});
+</script>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Calculate Salary - HRM System{% endblock %}
+
+{% block page_title %}<i class="fas fa-calculator"></i> Calculate Salary{% endblock %}
+
+{% block content %}
+    <div class="salary-container">
+        <div class="salary-card">
+            <div class="placeholder-content">
+                <i class="fas fa-calculator"></i>
+                <h2>Salary Calculator</h2>
+                <p>Salary calculation tools and forms will be implemented here.</p>
+                <p><em>Content coming soon...</em></p>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    setActiveSidebarItem('/salary/calculate');
+    // Sidebar is handled by main sidebar component
+});
+</script>
+{% endblock %}

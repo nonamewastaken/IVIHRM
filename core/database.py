@@ -8,5 +8,11 @@ def init_database(app):
     db.init_app(app)
     
     with app.app_context():
-        db.create_all()
-        print("Database initialized successfully!")
+        try:
+            # Create all tables
+            db.create_all()
+            print("Database initialized successfully!")
+            print("Tables created:", db.metadata.tables.keys())
+        except Exception as e:
+            print(f"Error initializing database: {e}")
+            raise e

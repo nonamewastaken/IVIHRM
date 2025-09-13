@@ -1,0 +1,35 @@
+/* Attendance table utilities */
+:root{
+    --border:#ddd;
+    --bg-header:#fef2cc;
+    --bg-top:#f8f9fa;
+    --sticky-col1:75px; /* width of first sticky column */
+  }
+  
+  /* table + cells */
+  .attendance-table{ border-collapse:collapse; table-layout:fixed; width:max-content; min-width:100%; }
+  .attendance-table th, .attendance-table td{ border:1px solid var(--border); padding:4px; text-align:center; background:#fff; }
+  .attendance-table thead th{ background:var(--bg-header); }
+  
+  /* heights */
+  .h-50{ height:50px; }
+  .h-100{ height:100px; }
+  .h-150{ height:150px; }
+  .h-200{ height:200px; }
+  
+  /* min-widths */
+  .mw-50{ min-width:50px; }
+  .mw-75{ min-width:75px; }
+  .mw-100{ min-width:100px; }
+  .mw-125{ min-width:125px; }
+  .mw-150{ min-width:150px; }
+  
+  /* sticky first two header cells with visible borders while scrolling */
+  .sticky-col-0{ position:sticky; left:0;    z-index:3; background:var(--bg-header); }
+  .sticky-col-1{ position:sticky; left:var(--sticky-col1); z-index:3; background:var(--bg-header); }
+  /* keep vertical gridline when overlapping due to sticky */
+  .sticky-border-fix{ box-shadow:-1px 0 0 var(--border), 1px 0 0 var(--border); }
+  
+  /* optional: visual strip for top header row */
+  #header-rows{ background:var(--bg-top); }
+  

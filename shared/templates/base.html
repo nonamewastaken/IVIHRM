@@ -5,12 +5,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}HRM System{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    {% block content %}{% endblock %}
+    <!-- Top Header -->
+    <div class="top-header">
+        <div class="header-left">
+            <h1>{% block page_title %}{% endblock %}</h1>
+        </div>
+        <div class="header-right">
+            <div class="time-display">
+                <div id="current-time"></div>
+                <div id="current-date"></div>
+            </div>
+            <div class="user-info">
+                <i class="fas fa-user-circle"></i>
+                <span>{% block user_name %}{{ user.first_name }} {{ user.last_name }}{% endblock %}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-left">
+            <a href="/dashboard" class="nav-item" onclick="updateSidebarForCategory('Home')">Home</a>
+            <a href="/personnel" class="nav-item" onclick="updateSidebarForCategory('Administrative Personnel')">Administrative Personnel</a>
+            <a href="/attendance" class="nav-item" onclick="updateSidebarForCategory('Attendance')">Attendance</a>
+            <a href="/salary" class="nav-item" onclick="updateSidebarForCategory('Salary')">Salary</a>
+            <a href="/decision" class="nav-item" onclick="updateSidebarForCategory('Decision')">Decision</a>
+        </div>
+    </nav>
+
+    <!-- Dynamic Sidebar -->
+    {% include 'sidebar.html' %}
+
+    <!-- Main Content Area -->
+    <div class="main-content-with-sidebar">
+        <div class="content-area">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
     
     <script src="{{ url_for('static', filename='js/translations.js') }}"></script>
+    
+    <!-- Time display script -->
+    <script>
+    function updateTime() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('en-US');
+        const dateString = now.toLocaleDateString('en-US');
+        
+        const timeElement = document.getElementById('current-time');
+        const dateElement = document.getElementById('current-date');
+        
+        if (timeElement) timeElement.textContent = timeString;
+        if (dateElement) dateElement.textContent = dateString;
+    }
+
+    // Initialize and update time every second
+    updateTime();
+    setInterval(updateTime, 1000);
+    </script>
+    
     {% block extra_js %}{% endblock %}
 </body>
 </html>

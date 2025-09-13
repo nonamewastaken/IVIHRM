@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Salary Slips - HRM System{% endblock %}
+
+{% block page_title %}<i class="fas fa-file-pdf"></i> Salary Slips{% endblock %}
+
+{% block content %}
+    <div class="salary-container">
+        <div class="salary-card">
+            <div class="placeholder-content">
+                <i class="fas fa-file-pdf"></i>
+                <h2>Salary Slips</h2>
+                <p>Salary slip generation and management will be implemented here.</p>
+                <p><em>Content coming soon...</em></p>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    setActiveSidebarItem('/salary/slips');
+    // Sidebar is handled by main sidebar component
+});
+</script>
+{% endblock %}

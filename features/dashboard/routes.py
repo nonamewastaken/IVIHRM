@@ -37,7 +37,7 @@ def home_page():
         return redirect('/complete-profile')
     
     company_name = user.organization.name if user.organization else "Your Company"
-    return render_template('dashboard.html', user_name=user.name, company_name=company_name)
+    return render_template('dashboard.html', user=user, user_name=user.name, company_name=company_name)
 
 @dashboard_bp.route('/dashboard')
 @login_required
@@ -49,4 +49,4 @@ def dashboard():
         return redirect('/complete-profile')
     
     company_name = user.organization.name if user.organization else "Your Company"
-    return render_template('dashboard.html', user_name=user.name, company_name=company_name)
+    return render_template('dashboard.html', user=user, user_name=user.name, company_name=company_name)

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Payroll List - HRM System{% endblock %}
+
+{% block page_title %}<i class="fas fa-list"></i> Payroll List{% endblock %}
+
+{% block content %}
+    <div class="salary-container">
+        <div class="salary-card">
+            <div class="placeholder-content">
+                <i class="fas fa-list"></i>
+                <h2>Payroll Management</h2>
+                <p>Payroll processing and management interface will be implemented here.</p>
+                <p><em>Content coming soon...</em></p>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    setActiveSidebarItem('/salary/payroll');
+    // Sidebar is handled by main sidebar component
+});
+</script>
+{% endblock %}
