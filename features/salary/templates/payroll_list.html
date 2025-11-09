@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}Payroll List - HRM System{% endblock %}
+
+{% block page_title %}<i class="fas fa-list"></i> Payroll List{% endblock %}
+
+{% block extra_css %}
+<style>
+    .payroll-wrapper {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .panel-header .btn.btn-primary {
+        background: #4c6ef5;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        padding: 10px 18px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .panel-header .btn.btn-primary:hover {
+        background: #384ddf;
+    }
+
+    .attendance-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 14px 32px rgba(15, 23, 42, 0.12);
+    }
+
+    .attendance-table thead {
+        background: #f1f5f9;
+    }
+
+    .attendance-table th,
+    .attendance-table td {
+        padding: 16px 18px;
+        border-bottom: 1px solid #e2e8f0;
+        text-align: left;
+    }
+
+    .attendance-table th {
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: 0.75rem;
+        color: #64748b;
+    }
+
+    .attendance-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .employee-name {
+        font-weight: 700;
+        color: #1f2937;
+    }
+
+    .employee-position {
+        color: #64748b;
+        font-size: 0.9rem;
+        margin-top: 4px;
+    }
+
+    .attendance-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: rgba(76, 110, 245, 0.12);
+        color: #4c6ef5;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% set attendance_data = attendance_data|default([]) %}
+{% if attendance_data|length == 0 %}
+    {% set attendance_data = [
+        {
+            'label': 'July 2025',
+            'rows': [
+                {'index': 1, 'employee': 'Lan Pham', 'position': 'HR Business Partner', 'days': 22},
+                {'index': 2, 'employee': 'Hanh Do', 'position': 'Engineering Manager', 'days': 21},
+                {'index': 3, 'employee': 'Linh Hoang', 'position': 'Client Success Lead', 'days': 20},
+                {'index': 4, 'employee': 'Bao Le', 'position': 'Platform Lead', 'days': 19}
+            ]
+        }
+    ] %}
+{% endif %}
+<div class="payroll-wrapper">
+    <section class="panel" style="padding:24px; background:white; border-radius:18px; box-shadow:0 14px 32px rgba(15, 23, 42, 0.12);">
+        <div class="panel-header" style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+                <h3 style="margin:0;"><i class="fas fa-money-check"></i> Payroll Management</h3>
+                <p style="margin-top:4px; color:#6b7280;">Payroll processing and management interface will be implemented here.</p>
+            </div>
+            <button type="button" class="btn btn-primary" id="attendanceSelectorBtn">
+                <i class="fas fa-calendar-days"></i> Choose Monthly Attendance Detail
+            </button>
+        </div>
+        <div id="attendanceSelectorNote" style="margin-top:18px; padding:16px; background:#f8fafc; border:1px dashed #cbd5f5; color:#475569; border-radius:12px;">
+            <strong>Attendance Source:</strong> Mock data for Monthly Attendance Detail. Selector will open a detailed picker in future iterations.
+        </div>
+        <div style="margin-top:18px;">
+            <h4 style="margin:0 0 12px;">Attendance Summary (Pseudo Data)</h4>
+            <table class="attendance-table" id="attendanceSummaryTable">
+                <thead>
+                    <tr>
+                        <th style="width:80px;">#</th>
+                        <th>Employee</th>
+                        <th>Position</th>
+                        <th>Total Days Worked</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in attendance_data[0].rows %}
+                    <tr>
+                        <td>{{ row.index }}</td>
+                        <td>
+                            <div class="employee-name">{{ row.employee }}</div>
+                            <div class="employee-position">{{ row.position }}</div>
+                        </td>
+                        <td><span class="attendance-pill"><i class="fas fa-id-badge"></i> {{ row.position }}</span></td>
+                        <td><strong>{{ row.days }}</strong></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <p id="attendanceMonthLabel" style="margin-top:14px; color:#64748b;">Showing: {{ attendance_data[0].label }}</p>
+        </div>
+        <p style="margin-top:16px; color:#94a3b8; font-style:italic;">Content coming soon...</p>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script id="attendance-data" type="application/json">{{ attendance_data | tojson | safe }}</script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const selectorBtn = document.getElementById('attendanceSelectorBtn');
+    const tableBody = document.querySelector('#attendanceSummaryTable tbody');
+    const monthLabel = document.getElementById('attendanceMonthLabel');
+    const dataNode = document.getElementById('attendance-data');
+    const attendanceMonths = dataNode ? JSON.parse(dataNode.textContent) : [];
+    if (dataNode) dataNode.remove();
+
+    function renderMonth(index) {
+        const month = attendanceMonths[index];
+        if (!month) return;
+        tableBody.innerHTML = '';
+        month.rows.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${row.index}</td>
+                <td>${row.employee}</td>
+                <td>${row.position || ''}</td>
+                <td>${row.days}</td>
+            `;
+            tableBody.appendChild(tr);
+        });
+        monthLabel.textContent = `Showing: ${month.label}`;
+    }
+
+    if (selectorBtn) {
+        selectorBtn.addEventListener('click', () => {
+            if (!attendanceMonths.length) {
+                alert('No attendance data available yet.');
+                return;
+            }
+            const options = attendanceMonths.map((month, idx) => `${idx + 1}. ${month.label}`).join('\n');
+            const selection = prompt(`Choose Monthly Attendance Detail (enter number)\n${options}`, '1');
+            const idx = parseInt(selection, 10) - 1;
+            if (!Number.isNaN(idx) && idx >= 0 && idx < attendanceMonths.length) {
+                renderMonth(idx);
+            } else {
+                alert('Invalid selection.');
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

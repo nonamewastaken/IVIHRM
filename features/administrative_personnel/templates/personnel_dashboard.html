@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Administrative Personnel - HRM System{% endblock %}
+
+{% block page_title %}<i class="fas fa-users"></i> Administrative Personnel{% endblock %}
+
+{% block extra_css %}
+<style>
+    .personnel-container {
+        max-width: 100%;
+    }
+
+    .personnel-card {
+        background: white;
+        border-radius: 8px;
+        padding: 30px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .placeholder-content {
+        text-align: center;
+        padding: 60px 20px;
+        color: #666;
+    }
+
+    .placeholder-content i {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        opacity: 0.3;
+    }
+
+    .placeholder-content h2 {
+        margin-bottom: 15px;
+        color: #333;
+    }
+
+    .placeholder-content p {
+        font-size: 1.1rem;
+        line-height: 1.6;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <div class="personnel-container">
+        <div class="personnel-card">
+            <div class="placeholder-content">
+                <i class="fas fa-users"></i>
+                <h2>Administrative Personnel Management</h2>
+                <p>This section will contain employee management features including:</p>
+                <ul style="text-align: left; max-width: 400px; margin: 20px auto;">
+                    <li>Employee registration and profiles</li>
+                    <li>Department management</li>
+                    <li>Organizational chart</li>
+                    <li>Employee reports and analytics</li>
+                </ul>
+                <p><em>Content coming soon...</em></p>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Initialize sidebar for Administrative Personnel category
+document.addEventListener('DOMContentLoaded', function() {
+    // Set active sidebar item
+    setActiveSidebarItem('/personnel');
+    
+    // Generate sidebar for Administrative Personnel category
+    // Sidebar is handled by main sidebar component
+});
+</script>
+{% endblock %}

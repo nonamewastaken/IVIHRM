@@ -1,0 +1,355 @@
+{% extends "base.html" %}
+
+{% block title %}Personnel Overview - HRM System{% endblock %}
+
+{% block page_title %}<i class="fas fa-users-cog"></i> Personnel Overview{% endblock %}
+
+{% block extra_css %}
+<style>
+    .personnel-overview {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .hero {
+        background: linear-gradient(135deg, #4c6ef5, #8367f3);
+        color: white;
+        padding: 30px;
+        border-radius: 18px;
+        box-shadow: 0 18px 40px rgba(76, 110, 245, 0.25);
+    }
+
+    .hero h1 {
+        margin: 0 0 6px;
+        font-size: 2.3rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .hero p {
+        margin: 0;
+        font-size: 1rem;
+        opacity: 0.85;
+    }
+
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 18px;
+    }
+
+    .summary-card {
+        background: #f7f8ff;
+        border: 1px solid #e1e7ff;
+        border-radius: 16px;
+        padding: 22px;
+        box-shadow: 0 12px 32px rgba(79, 70, 229, 0.15);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .summary-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 16px 36px rgba(79, 70, 229, 0.25);
+    }
+
+    .summary-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        background: rgba(79, 70, 229, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #4338ca;
+        font-size: 1.15rem;
+    }
+
+    .summary-title {
+        margin-top: 12px;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #636a83;
+        font-weight: 600;
+    }
+
+    .summary-value {
+        font-size: 1.9rem;
+        font-weight: 700;
+        color: #111827;
+    }
+
+    .panel {
+        background: white;
+        border-radius: 18px;
+        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+        padding: 24px;
+    }
+
+    .panel h3 {
+        margin: 0 0 18px;
+        font-size: 1.15rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #1f2937;
+    }
+
+    .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
+    }
+
+    .quick-action {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 14px 18px;
+        color: #334155;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .quick-action i {
+        color: #4c51bf;
+        font-size: 1.1rem;
+    }
+
+    .quick-action:hover {
+        background: #4c51bf;
+        color: white;
+        border-color: #4c51bf;
+        box-shadow: 0 16px 32px rgba(76, 81, 191, 0.28);
+    }
+
+    .two-column {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 24px;
+    }
+
+    .list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .list-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .list-item:last-child {
+        border-bottom: none;
+    }
+
+    .bullet {
+        width: 34px;
+        height: 34px;
+        border-radius: 12px;
+        background: rgba(79, 70, 229, 0.18);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #4338ca;
+        font-size: 0.95rem;
+    }
+
+    .attention-entry {
+        padding: 14px 16px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .attention-entry .meta {
+        font-size: 0.85rem;
+        color: #64748b;
+    }
+
+    .attention-entry .status {
+        font-size: 0.78rem;
+        font-weight: 700;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: rgba(239, 68, 68, 0.15);
+        color: #b91c1c;
+    }
+
+    .recent-activity .activity-entry {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .recent-activity .activity-entry:last-child {
+        border-bottom: none;
+    }
+
+    .recent-activity .meta {
+        color: #64748b;
+        font-size: 0.85rem;
+    }
+
+    .empty-state {
+        color: #94a3b8;
+        font-style: italic;
+        text-align: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="personnel-overview">
+    <section class="hero">
+        <h1><i class="fas fa-users-cog"></i> Personnel Overview</h1>
+        <p>Monitor headcount, onboarding progress, and compliance readiness for your organization.</p>
+    </section>
+
+    <section class="summary-grid">
+        {% for card in overview.summary_cards %}
+        <div class="summary-card">
+            <div class="summary-icon"><i class="{{ card.icon }}"></i></div>
+            <div class="summary-title">{{ card.label }}</div>
+            <div class="summary-value">{{ card.value }}</div>
+        </div>
+        {% endfor %}
+    </section>
+
+    <section class="panel">
+        <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+        <div class="quick-actions">
+            {% for action in overview.quick_actions %}
+            <a href="{{ action.href }}" class="quick-action">
+                <i class="{{ action.icon }}"></i> {{ action.label }}
+            </a>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="two-column">
+        <div class="panel">
+            <h3><i class="fas fa-lightbulb"></i> Workforce Highlights</h3>
+            <ul class="list">
+                {% if overview.highlights %}
+                    {% for highlight in overview.highlights %}
+                    <li class="list-item">
+                        <span class="bullet"><i class="fas fa-circle"></i></span>
+                        <span>{{ highlight }}</span>
+                    </li>
+                    {% endfor %}
+                {% else %}
+                    <li class="empty-state">Highlights will appear once personnel data is available.</li>
+                {% endif %}
+            </ul>
+        </div>
+        <div class="panel">
+            <h3><i class="fas fa-file-shield"></i> Records Requiring Attention</h3>
+            {% if overview.attention %}
+                {% for item in overview.attention %}
+                <div class="attention-entry">
+                    <div>
+                        <div class="name">{{ item.name }}</div>
+                        <div class="meta">{{ item.meta }}</div>
+                    </div>
+                    <div class="status">{{ item.status }}</div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="empty-state">All personnel files are currently compliant.</p>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="two-column">
+        <div class="panel">
+            <h3><i class="fas fa-user-plus"></i> Recent Onboarding</h3>
+            <ul class="list">
+                {% if overview.onboarding %}
+                    {% for item in overview.onboarding %}
+                    <li class="list-item">
+                        <span class="bullet"><i class="fas fa-user"></i></span>
+                        <span>
+                            <strong>{{ item.name }}</strong><br>
+                            <span class="meta">{{ item.started }} · {{ item.status }}</span>
+                        </span>
+                    </li>
+                    {% endfor %}
+                {% else %}
+                    <li class="empty-state">New hires will appear here once added.</li>
+                {% endif %}
+            </ul>
+        </div>
+        <div class="panel">
+            <h3><i class="fas fa-chart-pie"></i> Personnel Composition</h3>
+            {% if overview.composition %}
+            <ul class="list">
+                <li class="list-item">
+                    <span class="bullet"><i class="fas fa-id-card-alt"></i></span>
+                    <span><strong>Profiles Complete:</strong> {{ overview.composition.profiles_complete }} / {{ overview.summary_cards[0].value }}</span>
+                </li>
+                <li class="list-item">
+                    <span class="bullet"><i class="fas fa-file-signature"></i></span>
+                    <span><strong>Documents Pending:</strong> {{ overview.composition.documents_pending }}</span>
+                </li>
+                <li class="list-item">
+                    <span class="bullet"><i class="fas fa-venus-mars"></i></span>
+                    <span>
+                        <strong>Gender Mix:</strong>
+                        Female {{ overview.composition.gender.female }},
+                        Male {{ overview.composition.gender.male }},
+                        Other {{ overview.composition.gender.other }},
+                        Unspecified {{ overview.composition.gender.unspecified }}
+                    </span>
+                </li>
+            </ul>
+            {% else %}
+                <p class="empty-state">Personnel composition will appear once we have employee data.</p>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="panel">
+        <h3><i class="fas fa-clock"></i> Recent Employee Activity</h3>
+        <div class="recent-activity">
+            {% if overview.recent_activity %}
+                {% for activity in overview.recent_activity %}
+                <div class="activity-entry">
+                    <div>
+                        <strong>{{ activity.title }}</strong><br>
+                        <span class="meta">{{ activity.meta }}</span>
+                    </div>
+                    <span class="meta">{{ activity.time }}</span>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="empty-state">Recent activity will appear here as employees are added.</p>
+            {% endif %}
+        </div>
+    </section>
+</div>
+{% endblock %}
+

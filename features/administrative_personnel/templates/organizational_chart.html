@@ -1,0 +1,451 @@
+{% extends "base.html" %}
+
+{% block title %}Organizational Chart - HRM System{% endblock %}
+
+{% block page_title %}<i class="fas fa-sitemap"></i> Organizational Chart{% endblock %}
+
+{% block extra_css %}
+<style>
+    .chart-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        height: calc(100vh - 180px);
+    }
+
+    .chart-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        align-items: center;
+        justify-content: space-between;
+        background: white;
+        border-radius: 14px;
+        padding: 12px 16px;
+        box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+    }
+
+    .zoom-control {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+    .zoom-control input[type="range"] {
+        width: 180px;
+    }
+
+    .chart-canvas {
+        flex: 1;
+        border-radius: 18px;
+        border: 1px solid #e2e8f0;
+        background: linear-gradient(135deg, rgba(248, 250, 252, 0.9), rgba(241, 245, 249, 0.9));
+        box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.08);
+        overflow: auto;
+        position: relative;
+    }
+
+    .chart-content {
+        transform-origin: top left;
+        transition: transform 0.2s ease;
+        padding: 48px;
+        display: inline-block;
+        min-width: 600px;
+        min-height: 400px;
+    }
+
+    .tree-column {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        gap: 28px;
+        padding: 0 18px 18px;
+    }
+
+    .tree-column.has-children > .tree-node::after {
+        content: '';
+        position: absolute;
+        bottom: -24px;
+        left: 50%;
+        width: 2px;
+        height: 24px;
+        background: #cbd5f5;
+        transform: translateX(-50%);
+    }
+
+    .tree-children {
+        display: flex;
+        gap: 36px;
+        align-items: flex-start;
+        justify-content: center;
+        flex-wrap: wrap;
+        position: relative;
+        padding-top: 24px;
+    }
+
+    .root-column > .tree-children {
+        flex-wrap: nowrap;
+    }
+
+    .tree-column.has-children > .tree-children::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 10%;
+        right: 10%;
+        height: 2px;
+        background: #cbd5f5;
+    }
+
+    .tree-node {
+        padding: 18px 22px;
+        border-radius: 16px;
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        background: white;
+        box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+        min-width: 220px;
+        text-align: center;
+        position: relative;
+    }
+
+    .tree-node .tree-title {
+        font-weight: 700;
+        font-size: 1.05rem;
+        color: #1f2937;
+    }
+
+    .tree-node .tree-meta {
+        margin-top: 6px;
+        font-size: 0.85rem;
+        color: #575a66;
+    }
+
+    .tree-node .tree-extra {
+        margin-top: 8px;
+        font-size: 0.78rem;
+        color: #64748b;
+    }
+
+    .tree-node.root {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.16), rgba(96, 165, 250, 0.16));
+        border-color: rgba(59, 130, 246, 0.25);
+    }
+
+    .tree-node.company {
+        background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(14, 165, 233, 0.12));
+        border-color: rgba(14, 165, 233, 0.25);
+    }
+
+    .tree-node.division {
+        background: linear-gradient(135deg, rgba(168, 85, 247, 0.12), rgba(129, 140, 248, 0.12));
+        border-color: rgba(129, 140, 248, 0.25);
+    }
+
+    .tree-node.department {
+        background: linear-gradient(135deg, rgba(52, 211, 153, 0.12), rgba(16, 185, 129, 0.12));
+        border-color: rgba(16, 185, 129, 0.25);
+    }
+
+    .tree-node.sub {
+        background: linear-gradient(135deg, rgba(251, 191, 36, 0.12), rgba(253, 186, 116, 0.12));
+        border-color: rgba(251, 191, 36, 0.25);
+    }
+
+    .tree-node::before {
+        content: '';
+        position: absolute;
+        top: -20px;
+        left: 50%;
+        width: 2px;
+        height: 20px;
+        background: #cbd5f5;
+        transform: translateX(-50%);
+        display: none;
+    }
+
+    .tree-column:not(.root-column) > .tree-node::before {
+        display: block;
+    }
+
+    .chart-empty {
+        text-align: center;
+        color: #64748b;
+        padding: 48px;
+        background: white;
+        border-radius: 16px;
+        border: 1px dashed #cbd5f5;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="chart-wrapper">
+    <div class="chart-toolbar">
+        <div class="zoom-control">
+            <label for="chartZoom"><i class="fas fa-search"></i> Zoom</label>
+            <input type="range" id="chartZoom" min="50" max="200" step="10" value="100">
+            <span id="zoomValue">100%</span>
+        </div>
+        <div class="chart-summary" id="chartSummary" style="font-weight:600; color:#475569;"></div>
+    </div>
+    <div class="chart-canvas" id="chartCanvas">
+        <div class="chart-content" id="chartContent"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script id="org-chart-data" type="application/json">{{ {'structure': structure, 'root': root_info} | tojson | safe }}</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    setActiveSidebarItem('/personnel/org-chart');
+
+    const STORAGE_KEY = 'hrm_org_structure_v1';
+    const chartDataNode = document.getElementById('org-chart-data');
+    const payload = chartDataNode ? JSON.parse(chartDataNode.textContent) : { structure: { divisions: [], companies: [] }, root: { name: 'Company Headquarters', meta: null } };
+    if (chartDataNode) {
+        chartDataNode.remove();
+    }
+
+    const zoomSlider = document.getElementById('chartZoom');
+    const zoomValue = document.getElementById('zoomValue');
+    const chartContent = document.getElementById('chartContent');
+    const chartCanvas = document.getElementById('chartCanvas');
+    const chartSummary = document.getElementById('chartSummary');
+
+    function cloneInitial(data) {
+        return JSON.parse(JSON.stringify(data));
+    }
+
+    function loadStructure() {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+            try {
+                return JSON.parse(stored);
+            } catch (error) {
+                console.warn('Invalid stored organization structure, resetting to defaults.', error);
+            }
+        }
+        const fresh = cloneInitial(payload.structure);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(fresh));
+        return fresh;
+    }
+
+    let structure = loadStructure();
+
+    function saveStructure() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(structure));
+    }
+
+    function ensureStructureIntegrity() {
+        if (!Array.isArray(structure.companies)) {
+            structure.companies = cloneInitial(payload.structure.companies || []);
+            saveStructure();
+        }
+        if (!Array.isArray(structure.divisions)) {
+            structure.divisions = cloneInitial(payload.structure.divisions || []);
+            saveStructure();
+        }
+    }
+
+    ensureStructureIntegrity();
+
+    function buildCompanyMap() {
+        const map = new Map();
+        (structure.companies || []).forEach(company => {
+            map.set(company.name, company);
+        });
+        return map;
+    }
+
+    function buildHierarchy() {
+        const companyMetaMap = buildCompanyMap();
+        const companyNodes = new Map();
+
+        (structure.divisions || []).forEach(division => {
+            if (!companyNodes.has(division.company)) {
+                const baseMeta = companyMetaMap.get(division.company) || {};
+                companyNodes.set(division.company, {
+                    type: 'company',
+                    name: division.company,
+                    leader: baseMeta.leader || 'Branch Lead N/A',
+                    meta: baseMeta.address || baseMeta.focus || null,
+                    members: 0,
+                    children: []
+                });
+            }
+            const companyNode = companyNodes.get(division.company);
+
+            const divisionNode = {
+                type: 'division',
+                name: division.name,
+                leader: division.leader || 'Division Lead N/A',
+                focus: division.focus || null,
+                members: 0,
+                children: []
+            };
+
+            (division.departments || []).forEach(dept => {
+                const deptMembers = typeof dept.members === 'number' ? dept.members : (Array.isArray(dept.team) ? dept.team.length : 0);
+                const deptNode = {
+                    type: 'department',
+                    name: dept.name,
+                    leader: dept.leader || 'Department Lead N/A',
+                    focus: dept.focus || null,
+                    members: deptMembers,
+                    children: []
+                };
+
+                (dept.sub_departments || []).forEach(sub => {
+                    const subMembers = typeof sub.members === 'number' ? sub.members : (Array.isArray(sub.team) ? sub.team.length : 0);
+                    deptNode.children.push({
+                        type: 'sub',
+                        name: sub.name,
+                        leader: sub.leader || 'Manager N/A',
+                        focus: sub.focus || null,
+                        members: subMembers
+                    });
+                });
+
+                divisionNode.children.push(deptNode);
+                divisionNode.members += deptMembers;
+            });
+
+            companyNode.children.push(divisionNode);
+            companyNode.members += divisionNode.members;
+        });
+
+        const companyList = Array.from(companyNodes.values());
+
+        if (companyList.length === 0 && Array.isArray(structure.companies)) {
+            structure.companies.forEach(company => {
+                companyList.push({
+                    type: 'company',
+                    name: company.name,
+                    leader: company.leader || 'Branch Lead N/A',
+                    meta: company.address || company.focus || null,
+                    members: company.members || 0,
+                    children: []
+                });
+            });
+        }
+
+        return {
+            type: 'root',
+            name: payload.root?.name || 'Company Headquarters',
+            meta: payload.root?.meta || null,
+            children: companyList
+        };
+    }
+
+    function buildTreeColumn(node) {
+        const column = document.createElement('div');
+        column.className = 'tree-column';
+        if (node.type === 'root') {
+            column.classList.add('root-column');
+        }
+
+        const nodeEl = document.createElement('div');
+        nodeEl.className = `tree-node ${node.type}`;
+
+        const title = document.createElement('div');
+        title.className = 'tree-title';
+        title.textContent = node.name;
+        nodeEl.appendChild(title);
+
+        if (node.meta || node.leader || node.focus) {
+            const meta = document.createElement('div');
+            meta.className = 'tree-meta';
+            if (node.leader && node.type !== 'root') {
+                meta.textContent = node.leader;
+            } else if (node.meta) {
+                meta.textContent = node.meta;
+            } else if (node.focus) {
+                meta.textContent = node.focus;
+            }
+            nodeEl.appendChild(meta);
+        }
+
+        if (typeof node.members === 'number') {
+            const extra = document.createElement('div');
+            extra.className = 'tree-extra';
+            extra.textContent = `${node.members} member${node.members === 1 ? '' : 's'}`;
+            nodeEl.appendChild(extra);
+        }
+
+        column.appendChild(nodeEl);
+
+        if (Array.isArray(node.children) && node.children.length) {
+            column.classList.add('has-children');
+            const childrenWrapper = document.createElement('div');
+            childrenWrapper.className = 'tree-children';
+            if (node.type === 'root') {
+                childrenWrapper.style.flexWrap = 'nowrap';
+            }
+            node.children.forEach(child => {
+                childrenWrapper.appendChild(buildTreeColumn(child));
+            });
+            column.appendChild(childrenWrapper);
+        }
+
+        return column;
+    }
+
+    function countLeaves(node) {
+        if (!node.children || node.children.length === 0) {
+            return 1;
+        }
+        return node.children.reduce((sum, child) => sum + countLeaves(child), 0);
+    }
+
+    function measureDepth(node) {
+        if (!node.children || node.children.length === 0) {
+            return 1;
+        }
+        return 1 + Math.max(...node.children.map(measureDepth));
+    }
+
+    function adjustCanvasSizing(root) {
+        const leafCount = countLeaves(root);
+        const depth = measureDepth(root);
+        const minWidth = Math.max(leafCount * 240, chartCanvas.clientWidth);
+        const minHeight = Math.max(depth * 200, chartCanvas.clientHeight);
+        chartContent.style.minWidth = `${minWidth}px`;
+        chartContent.style.minHeight = `${minHeight}px`;
+        chartSummary.textContent = `${leafCount} terminal unit${leafCount === 1 ? '' : 's'} • Depth ${depth}`;
+    }
+
+    function renderChart() {
+        const hierarchy = buildHierarchy();
+        chartContent.innerHTML = '';
+
+        if (!hierarchy.children || hierarchy.children.length === 0) {
+            const empty = document.createElement('div');
+            empty.className = 'chart-empty';
+            empty.innerHTML = '<i class="fas fa-diagram-project"></i> No hierarchy data available yet.';
+            chartContent.appendChild(empty);
+            adjustCanvasSizing(hierarchy);
+            return;
+        }
+
+        chartContent.appendChild(buildTreeColumn(hierarchy));
+        adjustCanvasSizing(hierarchy);
+    }
+
+    function applyZoom(value) {
+        const scale = parseInt(value, 10) / 100;
+        chartContent.style.transform = `scale(${scale})`;
+        zoomValue.textContent = `${value}%`;
+    }
+
+    zoomSlider.addEventListener('input', (event) => applyZoom(event.target.value));
+
+    renderChart();
+    applyZoom(zoomSlider.value);
+});
+</script>
+{% endblock %}
+

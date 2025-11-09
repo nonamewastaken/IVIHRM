@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Create Decision - HRM System{% endblock %}
+
+{% block page_title %}<i class="fas fa-plus"></i> Create Decision{% endblock %}
+
+{% block content %}
+    <div class="decision-container">
+        <div class="decision-card">
+            <div class="placeholder-content">
+                <i class="fas fa-plus"></i>
+                <h2>Create New Decision</h2>
+                <p>Decision creation forms and workflows will be implemented here.</p>
+                <p><em>Content coming soon...</em></p>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    setActiveSidebarItem('/decision/create');
+    // Sidebar is handled by main sidebar component
+});
+</script>
+{% endblock %}

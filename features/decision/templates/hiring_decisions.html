@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Hiring Decisions - HRM System{% endblock %}
+
+{% block page_title %}<i class="fas fa-user-plus"></i> Hiring Decisions{% endblock %}
+
+{% block content %}
+    <div class="decision-container">
+        <div class="decision-card">
+            <div class="placeholder-content">
+                <i class="fas fa-user-plus"></i>
+                <h2>Hiring Decisions</h2>
+                <p>Hiring decision management and approval workflows will be implemented here.</p>
+                <p><em>Content coming soon...</em></p>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    setActiveSidebarItem('/decision/hiring');
+    // Sidebar is handled by main sidebar component
+});
+</script>
+{% endblock %}

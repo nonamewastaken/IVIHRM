@@ -1,0 +1,344 @@
+<!-- Dynamic Sidebar Component -->
+<div class="sidebar" id="sidebar">
+    <!-- Sidebar Header -->
+    <div class="sidebar-header">
+        <h2 class="sidebar-title" id="sidebarTitle">
+            <i class="fas fa-clock"></i>
+            <span id="sidebarTitleText">Loading...</span>
+        </h2>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar-nav" id="sidebarNav">
+        <!-- Dynamic content will be generated here -->
+    </nav>
+</div>
+
+<!-- Sidebar Toggle Button -->
+<button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">
+    <i class="fas fa-chevron-left"></i>
+</button>
+
+<script>
+// Sidebar data configuration
+const sidebarData = {
+    'Home': {
+        title: 'Dashboard Management',
+        icon: 'fas fa-home',
+        sections: [
+            {
+                title: 'Overview',
+                items: [
+                    { icon: 'fas fa-chart-pie', text: 'Dashboard Overview', href: '/dashboard' },
+                    { icon: 'fas fa-calendar-check', text: 'Today\'s Summary', href: '/dashboard/today' },
+                    { icon: 'fas fa-bell', text: 'Notifications', href: '/dashboard/notifications' }
+                ]
+            },
+            {
+                title: 'Quick Actions',
+                items: [
+                    { icon: 'fas fa-plus', text: 'Quick Add', href: '/dashboard/quick-add' },
+                    { icon: 'fas fa-search', text: 'Search', href: '/dashboard/search' },
+                    { icon: 'fas fa-cog', text: 'Settings', href: '/dashboard/settings' }
+                ]
+            }
+        ]
+    },
+    'Administrative Personnel': {
+        title: 'Personnel Management',
+        icon: 'fas fa-users',
+        sections: [
+            {
+                title: 'Overview',
+                items: [
+                    { icon: 'fas fa-chart-line', text: 'Overview', href: '/personnel' }
+                ]
+            },
+            {
+                title: 'Employee Management',
+                items: [
+                    { icon: 'fas fa-user-plus', text: 'Add Employee', href: '/personnel/add' },
+                    { icon: 'fas fa-users', text: 'All Employees', href: '/personnel/list' }
+                ]
+            },
+            {
+                title: 'Department Management',
+                items: [
+                    { icon: 'fas fa-building-columns', text: 'Companies', href: '/personnel/companies' },
+                    { icon: 'fas fa-network-wired', text: 'Divisions', href: '/personnel/divisions' },
+                    { icon: 'fas fa-building', text: 'Departments', href: '/personnel/departments' },
+                    { icon: 'fas fa-diagram-next', text: 'Sub-departments', href: '/personnel/sub-departments' },
+                    { icon: 'fas fa-sitemap', text: 'Organizational Chart', href: '/personnel/org-chart' },
+                    { icon: 'fas fa-user-tag', text: 'Roles & Positions', href: '/personnel/roles' }
+                ]
+            },
+            {
+                title: 'Reports',
+                items: [
+                    { icon: 'fas fa-file-alt', text: 'Personnel Reports', href: '/personnel/reports' },
+                    { icon: 'fas fa-chart-bar', text: 'Analytics', href: '/personnel/analytics' }
+                ]
+            }
+        ]
+    },
+    'Attendance': {
+        title: 'Attendance Management',
+        icon: 'fas fa-clock',
+        sections: [
+            {
+                title: 'Overview',
+                items: [
+                    { icon: 'fas fa-chart-line', text: 'Overview', href: '/attendance/overview' }
+                ]
+            },
+            {
+                title: 'Attendance Management',
+                items: [
+                    { icon: 'fas fa-calendar-alt', text: 'Monthly Attendance Detail', href: '/attendance/monthly_attendance_detail' },
+                    { icon: 'fas fa-chart-bar', text: 'Attendance Summary', href: '/attendance/attendance_summary' },
+                    { icon: 'fas fa-database', text: 'Work Data', href: '/attendance/work_data' },
+                    { icon: 'fas fa-history', text: 'Attendance History', href: '/attendance/history' }
+                ]
+            },
+            {
+                title: 'Time Tracking',
+                items: [
+                    { icon: 'fas fa-play', text: 'Check In/Out', href: '/attendance/checkin' },
+                    { icon: 'fas fa-clock', text: 'Time Clock', href: '/attendance/timeclock' },
+                    { icon: 'fas fa-mobile-alt', text: 'Mobile App', href: '/attendance/mobile' }
+                ]
+            },
+            {
+                title: 'Reports & Analytics',
+                items: [
+                    { icon: 'fas fa-file-excel', text: 'Export Data', href: '/attendance/export' },
+                    { icon: 'fas fa-chart-pie', text: 'Attendance Analytics', href: '/attendance/analytics' },
+                    { icon: 'fas fa-calendar-week', text: 'Weekly Reports', href: '/attendance/weekly' }
+                ]
+            }
+        ]
+    },
+    'Salary': {
+        title: 'Salary Management',
+        icon: 'fas fa-money-bill-wave',
+        sections: [
+            {
+                title: 'Payroll Management',
+                items: [
+                    { icon: 'fas fa-chart-pie', text: 'Overview', href: '/salary/overview' },
+                    { icon: 'fas fa-calculator', text: 'Calculate Salary', href: '/salary/calculate' },
+                    { icon: 'fas fa-list', text: 'Payroll List', href: '/salary/payroll' },
+                ]
+            },
+            {
+                title: 'Salary Components',
+                items: [
+                    { icon: 'fas fa-plus', text: 'Basic Salary', href: '/salary/basic' },
+                    { icon: 'fas fa-star', text: 'Allowances', href: '/salary/allowances' },
+                    { icon: 'fas fa-percentage', text: 'Deductions', href: '/salary/deductions' },
+                    { icon: 'fas fa-gift', text: 'Bonuses', href: '/salary/bonuses' }
+                ]
+            },
+            {
+                title: 'Reports & Documents',
+                items: [
+                    { icon: 'fas fa-file-pdf', text: 'Salary Slips', href: '/salary/slips' },
+                    { icon: 'fas fa-chart-line', text: 'Salary Reports', href: '/salary/reports' },
+                    { icon: 'fas fa-print', text: 'Print Documents', href: '/salary/print' }
+                ]
+            }
+        ]
+    },
+    'Decision': {
+        title: 'Decision Management',
+        icon: 'fas fa-gavel',
+        sections: [
+            {
+                title: 'Decision Making',
+                items: [
+                    { icon: 'fas fa-plus', text: 'New Decision', href: '/decision/create' },
+                    { icon: 'fas fa-list', text: 'All Decisions', href: '/decision/list' },
+                    { icon: 'fas fa-edit', text: 'Edit Decision', href: '/decision/edit' },
+                    { icon: 'fas fa-check', text: 'Approve Decision', href: '/decision/approve' }
+                ]
+            },
+            {
+                title: 'Decision Types',
+                items: [
+                    { icon: 'fas fa-user-plus', text: 'Hiring Decisions', href: '/decision/hiring' },
+                    { icon: 'fas fa-user-times', text: 'Termination Decisions', href: '/decision/termination' },
+                    { icon: 'fas fa-arrow-up', text: 'Promotion Decisions', href: '/decision/promotion' },
+                    { icon: 'fas fa-exchange-alt', text: 'Transfer Decisions', href: '/decision/transfer' }
+                ]
+            },
+            {
+                title: 'Review & Audit',
+                items: [
+                    { icon: 'fas fa-search', text: 'Search Decisions', href: '/decision/search' },
+                    { icon: 'fas fa-history', text: 'Decision History', href: '/decision/history' },
+                    { icon: 'fas fa-chart-bar', text: 'Decision Analytics', href: '/decision/analytics' }
+                ]
+            }
+        ]
+    }
+};
+
+// Function to generate sidebar based on category
+function generateSidebar(category) {
+    const sidebarData = getSidebarData();
+    const categoryData = sidebarData[category];
+    
+    if (!categoryData) {
+        console.error(`Sidebar data not found for category: ${category}`);
+        return;
+    }
+    
+    // Update sidebar title
+    const titleElement = document.getElementById('sidebarTitleText');
+    const iconElement = document.querySelector('#sidebarTitle i');
+    
+    if (titleElement) {
+        titleElement.textContent = categoryData.title;
+    }
+    
+    if (iconElement) {
+        iconElement.className = categoryData.icon;
+    }
+    
+    // Generate navigation content
+    const navElement = document.getElementById('sidebarNav');
+    if (navElement) {
+        navElement.innerHTML = '';
+        
+        categoryData.sections.forEach(section => {
+            // Create section
+            const sectionDiv = document.createElement('div');
+            sectionDiv.className = 'nav-section';
+            
+            // Create section title
+            const sectionTitle = document.createElement('h3');
+            sectionTitle.className = 'nav-section-title';
+            sectionTitle.textContent = section.title;
+            sectionDiv.appendChild(sectionTitle);
+            
+            // Create section items
+            section.items.forEach(item => {
+                const itemLink = document.createElement('a');
+                itemLink.className = 'nav-item';
+                itemLink.href = item.href;
+                
+                // Create item icon
+                const itemIcon = document.createElement('div');
+                itemIcon.className = 'nav-item-icon';
+                const icon = document.createElement('i');
+                icon.className = item.icon;
+                itemIcon.appendChild(icon);
+                
+                // Create item text
+                const itemText = document.createElement('span');
+                itemText.className = 'nav-item-text';
+                itemText.textContent = item.text;
+                
+                // Assemble item
+                itemLink.appendChild(itemIcon);
+                itemLink.appendChild(itemText);
+                sectionDiv.appendChild(itemLink);
+            });
+            
+            navElement.appendChild(sectionDiv);
+        });
+    }
+}
+
+// Function to get sidebar data (can be overridden by individual pages)
+function getSidebarData() {
+    return sidebarData;
+}
+
+// Function to set active sidebar item
+function setActiveSidebarItem(href) {
+    // Remove active class from all items
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    
+    // Add active class to current item
+    const currentItem = document.querySelector(`.nav-item[href="${href}"]`);
+    if (currentItem) {
+        currentItem.classList.add('active');
+    }
+}
+
+// Sidebar toggle functionality
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.querySelector('.main-content-with-sidebar');
+    const toggleButton = document.getElementById('sidebarToggle');
+    
+    sidebar.classList.toggle('collapsed');
+    mainContent.classList.toggle('sidebar-collapsed');
+    toggleButton.classList.toggle('collapsed');
+}
+
+// Initialize sidebar when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Get current category from page data or URL
+    const currentCategory = getCurrentCategory();
+    if (currentCategory) {
+        generateSidebar(currentCategory);
+        setActiveSidebarItem(window.location.pathname);
+    }
+});
+
+// Function to determine current category based on URL
+function getCurrentCategory() {
+    const path = window.location.pathname;
+    
+    if (path.startsWith('/attendance')) {
+        return 'Attendance';
+    } else if (path.startsWith('/personnel') || path.startsWith('/admin')) {
+        return 'Administrative Personnel';
+    } else if (path.startsWith('/salary')) {
+        return 'Salary';
+    } else if (path.startsWith('/decision')) {
+        return 'Decision';
+    } else if (path.startsWith('/dashboard') || path === '/') {
+        return 'Home';
+    }
+    
+    return 'Home'; // Default fallback
+}
+
+// Function to update sidebar when navigating
+function updateSidebarForCategory(category) {
+    // Always open sidebar when switching categories
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.querySelector('.main-content-with-sidebar');
+    const toggleButton = document.getElementById('sidebarToggle');
+    
+    // Remove collapsed classes to ensure sidebar is open
+    if (sidebar) sidebar.classList.remove('collapsed');
+    if (mainContent) mainContent.classList.remove('sidebar-collapsed');
+    if (toggleButton) toggleButton.classList.remove('collapsed');
+    
+    // Generate sidebar content
+    generateSidebar(category);
+    setActiveSidebarItem(window.location.pathname);
+}
+
+// Force sidebar initialization (can be called manually)
+function forceSidebarInit() {
+    const currentCategory = getCurrentCategory();
+    if (currentCategory) {
+        generateSidebar(currentCategory);
+        setActiveSidebarItem(window.location.pathname);
+    }
+}
+
+// Export functions for use in other scripts
+window.generateSidebar = generateSidebar;
+window.setActiveSidebarItem = setActiveSidebarItem;
+window.updateSidebarForCategory = updateSidebarForCategory;
+window.toggleSidebar = toggleSidebar;
+window.forceSidebarInit = forceSidebarInit;
+</script>

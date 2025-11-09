@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Decision Management - HRM System{% endblock %}
+
+{% block page_title %}<i class="fas fa-gavel"></i> Decision Management{% endblock %}
+
+{% block extra_css %}
+<style>
+    .decision-container {
+        max-width: 100%;
+    }
+
+    .decision-card {
+        background: white;
+        border-radius: 8px;
+        padding: 30px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .placeholder-content {
+        text-align: center;
+        padding: 60px 20px;
+        color: #666;
+    }
+
+    .placeholder-content i {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        opacity: 0.3;
+    }
+
+    .placeholder-content h2 {
+        margin-bottom: 15px;
+        color: #333;
+    }
+
+    .placeholder-content p {
+        font-size: 1.1rem;
+        line-height: 1.6;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <div class="decision-container">
+        <div class="decision-card">
+            <div class="placeholder-content">
+                <i class="fas fa-gavel"></i>
+                <h2>Decision Management System</h2>
+                <p>This section will contain decision management features including:</p>
+                <ul style="text-align: left; max-width: 400px; margin: 20px auto;">
+                    <li>Decision creation and approval workflows</li>
+                    <li>Hiring and termination decisions</li>
+                    <li>Promotion and transfer decisions</li>
+                    <li>Decision tracking and analytics</li>
+                </ul>
+                <p><em>Content coming soon...</em></p>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Initialize sidebar for Decision category
+document.addEventListener('DOMContentLoaded', function() {
+    // Set active sidebar item
+    setActiveSidebarItem('/decision');
+    
+    // Generate sidebar for Decision category
+    // Sidebar is handled by main sidebar component
+});
+</script>
+{% endblock %}

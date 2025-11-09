@@ -1,512 +1,350 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HR Dashboard - HRSolutions</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+{% extends "base.html" %}
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f7fa;
-            color: #333;
-        }
+{% block title %}HR Dashboard - HRSolutions{% endblock %}
 
-        /* Navigation Bar */
-        .navbar {
-            background: white;
-            padding: 0 2rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            height: 70px;
-        }
+{% block page_title %}<i class="fas fa-home"></i> HR Dashboard{% endblock %}
 
-        .navbar-left {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
+{% block extra_css %}
+<style>
+    /* Dashboard specific styles */
+    .dashboard-container {
+        max-width: 100%;
+    }
 
-        .company-section {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            cursor: pointer;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            transition: background-color 0.3s;
-            position: relative;
-        }
+    .dashboard-card {
+        background: white;
+        border-radius: 8px;
+        padding: 30px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
 
-        .company-section:hover {
-            background-color: #f8f9fa;
-        }
+    .welcome-section {
+        text-align: center;
+        margin-bottom: 40px;
+        padding: 30px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 12px;
+    }
 
-        .company-logo {
-            font-size: 1.5rem;
-            color: #007bff;
-        }
+    .welcome-section h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        font-weight: 700;
+    }
 
-        .company-name {
-            font-weight: 600;
-            font-size: 1.1rem;
-            color: #333;
-        }
+    .welcome-section p {
+        font-size: 1.2rem;
+        opacity: 0.9;
+    }
 
-        .dropdown-arrow {
-            color: #666;
-            transition: transform 0.3s;
-        }
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 40px;
+    }
 
-        .company-section:hover .dropdown-arrow {
-            transform: rotate(180deg);
-        }
+    .stat-card {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        text-align: center;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-left: 4px solid #007bff;
+    }
 
-        /* Dropdown Menu */
-        .dropdown-menu {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            background: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            min-width: 250px;
-            z-index: 1000;
-            display: none;
-            margin-top: 0.5rem;
-        }
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
 
-        .company-section:hover .dropdown-menu {
-            display: block;
-        }
+    .stat-card h3 {
+        color: #333;
+        margin-bottom: 15px;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
 
-        .dropdown-item {
-            padding: 0.75rem 1rem;
-            border-bottom: 1px solid #f0f0f0;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
+    .stat-card .value {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #007bff;
+        margin-bottom: 10px;
+    }
 
-        .dropdown-item:hover {
-            background-color: #f8f9fa;
-        }
+    .stat-card .label {
+        color: #666;
+        font-size: 0.9rem;
+    }
 
-        .dropdown-item:last-child {
-            border-bottom: none;
-        }
+    .stat-card .change {
+        font-size: 0.8rem;
+        margin-top: 8px;
+        padding: 4px 8px;
+        border-radius: 12px;
+        display: inline-block;
+    }
 
-        .create-company-btn {
-            background: white;
-            color: #333;
-            border: none;
-            padding: 0.75rem 1rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: background-color 0.3s;
-            width: 100%;
-            text-align: center;
-        }
+    .change.positive {
+        background: #d4edda;
+        color: #155724;
+    }
 
-        .create-company-btn:hover {
-            background: #f8f9fa;
-        }
+    .change.negative {
+        background: #f8d7da;
+        color: #721c24;
+    }
 
-        /* Navigation Menu */
-        .nav-menu {
-            display: flex;
-            gap: 2rem;
-            align-items: center;
-        }
+    .quick-actions {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
 
-        .nav-item {
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 500;
-            text-decoration: none;
-            color: #666;
-        }
+    .quick-actions h3 {
+        color: #333;
+        margin-bottom: 20px;
+        font-size: 1.3rem;
+        font-weight: 600;
+    }
 
-        .nav-item:hover {
-            background-color: #f8f9fa;
-            color: #333;
-        }
+    .actions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+    }
 
-        .nav-item.active {
-            background-color: #007bff;
-            color: white;
-        }
+    .action-btn {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 15px 20px;
+        background: #f8f9fa;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: #333;
+        font-weight: 500;
+    }
 
-        /* Right Side Utilities */
-        .navbar-right {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
+    .action-btn:hover {
+        background: #e9ecef;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
 
-        .search-bar {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
+    .action-btn i {
+        font-size: 1.2rem;
+        color: #007bff;
+    }
 
-        .search-input {
-            padding: 0.5rem 1rem 0.5rem 2.5rem;
-            border: 1px solid #e0e0e0;
-            border-radius: 20px;
-            width: 300px;
-            font-size: 0.9rem;
-            outline: none;
-            transition: border-color 0.3s;
-        }
+    .recent-activity {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
 
-        .search-input:focus {
-            border-color: #007bff;
-        }
+    .recent-activity h3 {
+        color: #333;
+        margin-bottom: 20px;
+        font-size: 1.3rem;
+        font-weight: 600;
+    }
 
-        .search-icon {
-            position: absolute;
-            left: 0.75rem;
-            color: #999;
-        }
+    .activity-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 15px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
 
-        .utility-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            color: #666;
-        }
+    .activity-item:last-child {
+        border-bottom: none;
+    }
 
-        .utility-icon:hover {
-            background-color: #f8f9fa;
-            color: #333;
-        }
+    .activity-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        color: white;
+    }
 
-        .user-profile {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            position: relative;
-        }
+    .activity-icon.check-in {
+        background: #28a745;
+    }
 
-        .user-profile:hover,
-        .user-profile.active {
-            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
-        }
+    .activity-icon.check-out {
+        background: #dc3545;
+    }
 
-        .user-profile::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            right: -2px;
-            width: 0;
-            height: 0;
-            border-left: 4px solid transparent;
-            border-right: 4px solid transparent;
-            border-top: 4px solid #fff;
-            opacity: 0.7;
-        }
+    .activity-icon.new-employee {
+        background: #007bff;
+    }
 
-        /* User Profile Dropdown */
-        .user-dropdown {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            background: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            min-width: 200px;
-            z-index: 1000;
-            display: none;
-            margin-top: 0.5rem;
-            opacity: 0;
-            transform: translateY(-10px);
-            transition: opacity 0.2s ease, transform 0.2s ease;
-        }
+    .activity-icon.leave-request {
+        background: #ffc107;
+        color: #333;
+    }
 
-        .user-profile:hover .user-dropdown,
-        .user-profile.active .user-dropdown {
-            display: block;
-            opacity: 1;
-            transform: translateY(0);
-        }
+    .activity-content {
+        flex: 1;
+    }
 
-        /* Create invisible bridge to prevent dropdown from disappearing */
-        .user-dropdown::before {
-            content: '';
-            position: absolute;
-            top: -15px;
-            left: -10px;
-            right: -10px;
-            height: 15px;
-        }
+    .activity-content h4 {
+        color: #333;
+        margin-bottom: 5px;
+        font-size: 0.95rem;
+    }
 
-        .user-dropdown-item {
-            padding: 0.75rem 1rem;
-            border-bottom: 1px solid #f0f0f0;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: #333;
-            text-decoration: none;
-        }
+    .activity-content p {
+        color: #666;
+        font-size: 0.85rem;
+    }
 
-        .user-dropdown-item:hover {
-            background-color: #f8f9fa;
-        }
+    .activity-time {
+        color: #999;
+        font-size: 0.8rem;
+    }
+</style>
+{% endblock %}
 
-        .user-dropdown-item:last-child {
-            border-bottom: none;
-        }
+{% block content %}
+    <div class="dashboard-container">
+        <div class="dashboard-card">
+            <!-- Welcome Section -->
+            <div class="welcome-section">
+                <h1>Welcome back, {{ user.first_name }}!</h1>
+                <p>Here's what's happening in your HR system today</p>
+            </div>
 
-        .user-dropdown-item.signout {
-            color: #dc3545;
-        }
+            <!-- Statistics Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Employees</h3>
+                    <div class="value">156</div>
+                    <div class="label">Active employees</div>
+                    <div class="change positive">+5 this month</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Present Today</h3>
+                    <div class="value">142</div>
+                    <div class="label">91% attendance rate</div>
+                    <div class="change positive">+2% from yesterday</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Pending Requests</h3>
+                    <div class="value">8</div>
+                    <div class="label">Leave requests</div>
+                    <div class="change negative">+3 new today</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Monthly Payroll</h3>
+                    <div class="value">$45,230</div>
+                    <div class="label">Total processed</div>
+                    <div class="change positive">+5.2% from last month</div>
+                </div>
+            </div>
 
-        .user-dropdown-item.signout:hover {
-            background-color: #fff5f5;
-        }
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+                <div class="actions-grid">
+                    <a href="/attendance" class="action-btn" onclick="updateSidebarForCategory('Attendance')">
+                        <i class="fas fa-clock"></i>
+                        <span>View Attendance</span>
+                    </a>
+                    <a href="/personnel" class="action-btn" onclick="updateSidebarForCategory('Administrative Personnel')">
+                        <i class="fas fa-users"></i>
+                        <span>Manage Personnel</span>
+                    </a>
+                    <a href="/salary" class="action-btn" onclick="updateSidebarForCategory('Salary')">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span>Process Payroll</span>
+                    </a>
+                    <a href="/decision" class="action-btn" onclick="updateSidebarForCategory('Decision')">
+                        <i class="fas fa-gavel"></i>
+                        <span>Make Decisions</span>
+                    </a>
+                    <a href="/attendance/monthly_attendance_detail" class="action-btn">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Monthly Report</span>
+                    </a>
+                    <a href="/personnel/add" class="action-btn">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Add Employee</span>
+                    </a>
+                </div>
+            </div>
 
-        /* Main Content */
-        .main-content {
-            padding: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .welcome-section {
-            background: white;
-            border-radius: 12px;
-            padding: 3rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            text-align: center;
-        }
-
-        .welcome-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 1rem;
-        }
-
-        .welcome-subtitle {
-            font-size: 1.1rem;
-            color: #7f8c8d;
-            line-height: 1.6;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .navbar {
-                padding: 0 1rem;
-                flex-direction: column;
-                height: auto;
-                gap: 1rem;
-            }
-
-            .nav-menu {
-                flex-wrap: wrap;
-                gap: 1rem;
-            }
-
-            .search-input {
-                width: 250px;
-            }
-
-            .welcome-title {
-                font-size: 2rem;
-            }
-
-            .main-content {
-                padding: 1rem;
-            }
-
-            .user-dropdown {
-                right: -50px;
-                min-width: 180px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <!-- Navigation Bar -->
-    <nav class="navbar">
-        <!-- Left Side - Company Section -->
-        <div class="navbar-left">
-            <div class="company-section">
-                <span class="company-name">{{ company_name }}</span>
-                <i class="fas fa-chevron-down dropdown-arrow"></i>
-                
-                <!-- Dropdown Menu -->
-                <div class="dropdown-menu">
-                    <div class="dropdown-item">
-                        <button class="create-company-btn">
-                            <i class="fas fa-plus"></i>
-                            Create New Company
-                        </button>
+            <!-- Recent Activity -->
+            <div class="recent-activity">
+                <h3><i class="fas fa-history"></i> Recent Activity</h3>
+                <div class="activity-item">
+                    <div class="activity-icon check-in">
+                        <i class="fas fa-sign-in-alt"></i>
                     </div>
+                    <div class="activity-content">
+                        <h4>John Doe checked in</h4>
+                        <p>Arrived at 9:15 AM</p>
+                    </div>
+                    <div class="activity-time">2 minutes ago</div>
                 </div>
-            </div>
-        </div>
-
-        <!-- Middle - Navigation Menu -->
-        <div class="nav-menu">
-            <a href="#" class="nav-item active">Home</a>
-            <a href="#" class="nav-item">Administrative Personnel</a>
-            <a href="/attendance" class="nav-item">Attendance</a>
-            <a href="#" class="nav-item">Salary</a>
-            <a href="#" class="nav-item">Decision</a>
-        </div>
-
-        <!-- Right Side - Utilities -->
-        <div class="navbar-right">
-            <div class="search-bar">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" class="search-input" placeholder="Search HR data...">
-            </div>
-            
-            <div class="utility-icon">
-                <i class="fas fa-bell"></i>
-            </div>
-            
-            <div class="utility-icon">
-                <i class="fas fa-cog"></i>
-            </div>
-            
-            <div class="user-profile">
-                <i class="fas fa-user"></i>
-                <!-- User Profile Dropdown -->
-                <div class="user-dropdown">
-                    <a href="#" class="user-dropdown-item">
-                        <i class="fas fa-user-circle"></i>
-                        Profile
-                    </a>
-                    <a href="#" class="user-dropdown-item">
-                        <i class="fas fa-cog"></i>
-                        Settings
-                    </a>
-                    <a href="/logout" class="user-dropdown-item signout">
+                <div class="activity-item">
+                    <div class="activity-icon new-employee">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="activity-content">
+                        <h4>New employee added</h4>
+                        <p>Sarah Wilson joined the Marketing team</p>
+                    </div>
+                    <div class="activity-time">1 hour ago</div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon leave-request">
+                        <i class="fas fa-calendar-times"></i>
+                    </div>
+                    <div class="activity-content">
+                        <h4>Leave request submitted</h4>
+                        <p>Mike Johnson requested 3 days off</p>
+                    </div>
+                    <div class="activity-time">3 hours ago</div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon check-out">
                         <i class="fas fa-sign-out-alt"></i>
-                        Sign Out
-                    </a>
+                    </div>
+                    <div class="activity-content">
+                        <h4>Jane Smith checked out</h4>
+                        <p>Left at 5:30 PM</p>
+                    </div>
+                    <div class="activity-time">Yesterday</div>
                 </div>
             </div>
-        </div>
-    </nav>
-
-    <!-- Main Content -->
-    <div class="main-content">
-        <div class="welcome-section">
-            <h1 class="welcome-title">Welcome back, {{ user_name }}!</h1>
-            <p class="welcome-subtitle">
-                Streamline your HR tasks and keep track of your team's performance with ease.
-            </p>
         </div>
     </div>
+{% endblock %}
 
-    <script>
-        // Add click event listeners for navigation items
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', function(e) {
-                const href = this.getAttribute('href');
-                
-                // Only prevent default for placeholder links (#)
-                if (href === '#') {
-                    e.preventDefault();
-                }
-                
-                // Remove active class from all nav items
-                document.querySelectorAll('.nav-item').forEach(nav => {
-                    nav.classList.remove('active');
-                });
-                
-                // Add active class to clicked item
-                this.classList.add('active');
-            });
-        });
-
-        // Add click event listener for create company button
-        document.querySelector('.create-company-btn').addEventListener('click', function(e) {
-            e.preventDefault();
-            alert('Create New Company functionality would be implemented here');
-        });
-
-        // Add click event listeners for utility icons
-        document.querySelectorAll('.utility-icon').forEach(icon => {
-            icon.addEventListener('click', function() {
-                const iconType = this.querySelector('i').className;
-                if (iconType.includes('bell')) {
-                    alert('Notifications would be displayed here');
-                } else if (iconType.includes('cog')) {
-                    alert('Settings would be displayed here');
-                }
-            });
-        });
-
-        // Click to open/close dropdown
-        document.querySelector('.user-profile').addEventListener('click', function(e) {
-            e.stopPropagation();
-            this.classList.toggle('active');
-        });
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function(e) {
-            const userProfile = document.querySelector('.user-profile');
-            const dropdown = document.querySelector('.user-dropdown');
-            
-            if (!userProfile.contains(e.target) && !dropdown.contains(e.target)) {
-                userProfile.classList.remove('active');
-            }
-        });
-
-        // Click handlers for dropdown items
-        document.querySelectorAll('.user-dropdown-item').forEach(item => {
-            item.addEventListener('click', function(e) {
-                const href = this.getAttribute('href');
-                if (href === '#') {
-                    e.preventDefault();
-                    const text = this.textContent.trim();
-                    if (text === 'Profile') {
-                        alert('Profile page would be displayed here');
-                    } else if (text === 'Settings') {
-                        alert('Settings page would be displayed here');
-                    }
-                }
-                // Close dropdown after clicking any item
-                document.querySelector('.user-profile').classList.remove('active');
-                // For logout, let the default link behavior handle the redirect
-            });
-        });
-
-
-    </script>
-</body>
-</html>
+{% block extra_js %}
+<script>
+// Initialize sidebar for Home category
+document.addEventListener('DOMContentLoaded', function() {
+    // Set active sidebar item
+    setActiveSidebarItem('/dashboard');
+    
+    // Generate sidebar for Home category
+    // Sidebar is handled by main sidebar component
+});
+</script>
+{% endblock %}

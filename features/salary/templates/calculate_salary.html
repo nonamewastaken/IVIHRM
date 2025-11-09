@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}Calculate Salary - HRM System{% endblock %}
+
+{% block page_title %}<i class="fas fa-calculator"></i> Calculate Salary{% endblock %}
+
+{% block extra_css %}
+<style>
+    .calc-wrapper {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .summary-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 14px 32px rgba(15, 23, 42, 0.12);
+    }
+
+    .summary-table thead {
+        background: #f1f5f9;
+    }
+
+    .summary-table th,
+    .summary-table td {
+        padding: 16px 18px;
+        border-bottom: 1px solid #e2e8f0;
+        text-align: left;
+    }
+
+    .summary-table th {
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: 0.75rem;
+        color: #64748b;
+    }
+
+    .component-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        margin: 4px;
+        border-radius: 999px;
+        background: rgba(76, 110, 245, 0.12);
+        color: #4c6ef5;
+        font-size: 0.82rem;
+        font-weight: 600;
+    }
+
+    .primary-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        border-radius: 10px;
+        background: #4c6ef5;
+        color: white;
+        text-decoration: none;
+        font-weight: 600;
+        transition: background 0.2s ease;
+    }
+
+    .primary-button:hover {
+        background: #384ddf;
+    }
+
+    .approve-checkbox {
+        width: 20px;
+        height: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="calc-wrapper">
+    <table class="summary-table">
+        <thead>
+            <tr>
+                <th>Group / Department</th>
+                <th>Salary Components</th>
+                <th>Total Spending</th>
+                <th>Actions</th>
+                <th>Approved</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Sales Department</strong><br><span style="color:#64748b;">Monthly Commission Cycle</span></td>
+                <td>
+                    <span class="component-pill"><i class="fas fa-plus"></i> Base Salary</span>
+                    <span class="component-pill"><i class="fas fa-gift"></i> Sales Bonus</span>
+                    <span class="component-pill"><i class="fas fa-star"></i> Travel Allowance</span>
+                </td>
+                <td><strong>$128,500</strong></td>
+                <td><a href="#" class="primary-button"><i class="fas fa-eye"></i> View Detail</a></td>
+                <td><input type="checkbox" class="approve-checkbox" checked></td>
+            </tr>
+            <tr>
+                <td><strong>Engineering Hub</strong><br><span style="color:#64748b;">Sprint Delivery Incentive</span></td>
+                <td>
+                    <span class="component-pill"><i class="fas fa-plus"></i> Base Salary</span>
+                    <span class="component-pill"><i class="fas fa-gift"></i> Delivery Bonus</span>
+                    <span class="component-pill"><i class="fas fa-clock"></i> Overtime</span>
+                </td>
+                <td><strong>$172,940</strong></td>
+                <td><a href="#" class="primary-button"><i class="fas fa-eye"></i> View Detail</a></td>
+                <td><input type="checkbox" class="approve-checkbox"></td>
+            </tr>
+            <tr>
+                <td><strong>Customer Success</strong><br><span style="color:#64748b;">Quarterly Renewal Plan</span></td>
+                <td>
+                    <span class="component-pill"><i class="fas fa-plus"></i> Base Salary</span>
+                    <span class="component-pill"><i class="fas fa-handshake"></i> Retention Bonus</span>
+                    <span class="component-pill"><i class="fas fa-heart"></i> Wellness Allowance</span>
+                </td>
+                <td><strong>$94,320</strong></td>
+                <td><a href="#" class="primary-button"><i class="fas fa-eye"></i> View Detail</a></td>
+                <td><input type="checkbox" class="approve-checkbox" checked></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    setActiveSidebarItem('/salary/calculate');
+    // Sidebar is handled by main sidebar component
+});
+</script>
+{% endblock %}

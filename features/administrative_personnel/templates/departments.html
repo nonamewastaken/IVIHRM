@@ -1,0 +1,692 @@
+{% extends "base.html" %}
+
+{% block title %}Departments - HRM System{% endblock %}
+
+{% block page_title %}<i class="fas fa-building"></i> Departments{% endblock %}
+
+{% block extra_css %}
+<style>
+    .unit-wrapper {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .actions-bar {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .primary-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        border-radius: 12px;
+        background: #0ea5e9;
+        color: white;
+        text-decoration: none;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+    }
+
+    .primary-button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .unit-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
+        overflow: hidden;
+    }
+
+    .unit-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+    }
+
+    .unit-title {
+        display: flex;
+        flex-direction: column;
+        cursor: pointer;
+    }
+
+    .unit-title span:first-child {
+        font-weight: 700;
+        color: #1f2937;
+    }
+
+    .unit-title span:last-child {
+        font-size: 0.85rem;
+        color: #6b7280;
+    }
+
+    .unit-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .secondary-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 14px;
+        border-radius: 10px;
+        background: #e0f2fe;
+        color: #0ea5e9;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+    }
+
+    .unit-body {
+        display: none;
+        padding: 12px 20px 20px;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .unit-body.open {
+        display: block;
+    }
+
+    .member-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 12px;
+        border-radius: 10px;
+        background: #f8fafc;
+        margin-top: 10px;
+    }
+
+    .remove-member {
+        border: none;
+        background: none;
+        color: #ef4444;
+        cursor: pointer;
+        font-size: 1rem;
+    }
+
+    .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.55);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .modal {
+        background: white;
+        border-radius: 18px;
+        padding: 24px;
+        width: 460px;
+        max-width: 90%;
+        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.25);
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .modal header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .close-button {
+        background: none;
+        border: none;
+        font-size: 1.2rem;
+        cursor: pointer;
+        color: #6b7280;
+    }
+
+    .modal form {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .modal input,
+    .modal textarea,
+    .modal select {
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid #d1d5db;
+        font-size: 0.95rem;
+    }
+
+    .modal textarea {
+        min-height: 80px;
+        resize: vertical;
+    }
+
+    .employee-list {
+        max-height: 220px;
+        overflow-y: auto;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+    }
+
+    .employee-option {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 14px;
+        border-bottom: 1px solid #e5e7eb;
+        cursor: pointer;
+    }
+
+    .employee-option:last-child {
+        border-bottom: none;
+    }
+
+    .employee-option input {
+        margin-left: 12px;
+    }
+
+    .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+    .ghost-button {
+        padding: 10px 16px;
+        border-radius: 12px;
+        border: 1px solid #d1d5db;
+        background: white;
+        cursor: pointer;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="unit-wrapper">
+    <div class="actions-bar">
+        <button class="primary-button" id="addDepartmentBtn"><i class="fas fa-plus"></i> Add Department</button>
+    </div>
+    {% for dept in departments %}
+    <div class="unit-card">
+        <div class="unit-header">
+            <div class="unit-title" data-dept="{{ loop.index0 }}">
+                <span>{{ dept.name }}</span>
+                <span>
+                    <span class="member-count" data-dept-index="{{ loop.index0 }}">{{ dept.members }}</span>
+                    <span class="member-word" data-dept-index="{{ loop.index0 }}">{{ dept.members == 1 and 'member' or 'members' }}</span>
+                    · Head: {{ dept.leader }}
+                </span>
+                <span>Division: {{ dept.division }} · Company: {{ dept.company }}</span>
+            </div>
+            <div class="unit-actions">
+                <button class="secondary-button view-dept-btn"
+                        data-name="{{ dept.name }}"
+                        data-head="{{ dept.leader }}"
+                        data-company="{{ dept.company }}"
+                        data-division="{{ dept.division }}"
+                        data-focus="{{ dept.focus }}"
+                        data-members="{{ dept.members }}"
+                        data-index="{{ loop.index0 }}">
+                    <i class="fas fa-eye"></i> View Detail
+                </button>
+                <button class="secondary-button add-member-btn"
+                        data-index="{{ loop.index0 }}">
+                    <i class="fas fa-user-plus"></i> Add New Member
+                </button>
+                <i class="fas fa-chevron-down dept-chevron" id="dept-chevron-{{ loop.index0 }}" data-dept="{{ loop.index0 }}"></i>
+            </div>
+        </div>
+        <div class="unit-body" id="dept-body-{{ loop.index0 }}">
+            <p style="color:#4b5563;">Focus: {{ dept.focus }}</p>
+            <div id="dept-members-{{ loop.index0 }}">
+                {% for member in dept.team %}
+                <div class="member-row" data-member="{{ member }}">
+                    <span>{{ member }}</span>
+                    <button type="button" class="remove-member" data-member="{{ member }}" data-index="{{ loop.index0 }}" title="Remove {{ member }}">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="modal-backdrop" id="departmentModal">
+    <div class="modal">
+        <header>
+            <h3>Add Department</h3>
+            <button class="close-button" data-close>&times;</button>
+        </header>
+        <form id="departmentForm">
+            <input type="text" name="department_name" placeholder="Department name">
+            <input type="text" name="department_head" placeholder="Department head">
+            <select name="department_division">
+                {% for division in divisions %}
+                <option>{{ division }}</option>
+                {% endfor %}
+            </select>
+            <textarea name="department_focus" placeholder="Focus / responsibilities"></textarea>
+        </form>
+        <div class="modal-actions">
+            <button class="ghost-button" data-close>Cancel</button>
+            <button class="primary-button" id="saveDepartmentBtn"><i class="fas fa-save"></i> Save</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-backdrop" id="deptMemberModal">
+    <div class="modal">
+        <header>
+            <h3>Add Member</h3>
+            <button class="close-button" data-close>&times;</button>
+        </header>
+        <div class="employee-list" id="deptEmployeeList">
+            {% for employee in employees %}
+            <label class="employee-option">
+                <span>{{ employee }}</span>
+                <input type="radio" name="deptMemberChoice" value="{{ employee }}">
+            </label>
+            {% endfor %}
+            {% if employees|length == 0 %}
+            <div style="padding:14px; color:#6b7280;">No employees available.</div>
+            {% endif %}
+        </div>
+        <div class="modal-actions">
+            <button class="ghost-button" data-close type="button">Cancel</button>
+            <button class="primary-button" id="confirmDeptMemberBtn" type="button" disabled><i class="fas fa-user-plus"></i> Add Member</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-backdrop" id="deptDetailModal">
+    <div class="modal">
+        <header>
+            <h3 id="deptDetailTitle">Department Detail</h3>
+            <button class="close-button" data-close>&times;</button>
+        </header>
+        <p><strong>Head:</strong> <span id="deptDetailHead"></span></p>
+        <p><strong>Division:</strong> <span id="deptDetailDivision"></span></p>
+        <p><strong>Company:</strong> <span id="deptDetailCompany"></span></p>
+        <p><strong>Members:</strong> <span id="deptDetailMembers"></span></p>
+        <p><strong>Sub-departments:</strong> <span id="deptDetailSubCount"></span></p>
+        <ul id="deptDetailSubList" style="margin:0 0 12px 18px; padding:0; list-style:disc; color:#4b5563;"></ul>
+        <p><strong>Focus:</strong></p>
+        <p id="deptDetailFocus" style="color:#4b5563;"></p>
+        <div class="modal-actions">
+            <button class="primary-button" data-close><i class="fas fa-check"></i> Close</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script id="org-structure-data" type="application/json">{{ structure | tojson | safe }}</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    setActiveSidebarItem('/personnel/departments');
+
+    const STORAGE_KEY = 'hrm_org_structure_v1';
+    const dataNode = document.getElementById('org-structure-data');
+    const initialStructure = dataNode ? JSON.parse(dataNode.textContent) : { divisions: [] };
+    if (dataNode) {
+        dataNode.remove();
+    }
+    const addDeptBtn = document.getElementById('addDepartmentBtn');
+    const deptModal = document.getElementById('departmentModal');
+    const departmentForm = document.getElementById('departmentForm');
+    const memberModal = document.getElementById('deptMemberModal');
+    const detailModal = document.getElementById('deptDetailModal');
+    const confirmMemberBtn = document.getElementById('confirmDeptMemberBtn');
+    const wrapper = document.querySelector('.unit-wrapper');
+    const memberChoiceRadios = Array.from(document.querySelectorAll('input[name="deptMemberChoice"]'));
+    const cssEscape = (window.CSS && window.CSS.escape) ? window.CSS.escape : (value) => value.replace(/["\\]/g, '\\$&');
+
+    function cloneInitial(data) {
+        return JSON.parse(JSON.stringify(data));
+    }
+
+    function loadStructure() {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+            try {
+                return JSON.parse(stored);
+            } catch (error) {
+                console.warn('Invalid stored organization structure, resetting.', error);
+            }
+        }
+        const fresh = cloneInitial(initialStructure);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(fresh));
+        return fresh;
+    }
+
+    let structure = loadStructure();
+    let departmentsData = [];
+
+    structure.divisions.forEach(division => {
+        division.departments.forEach(dept => {
+            if (!dept.division) {
+                dept.division = division.name;
+            }
+            if (!dept.company) {
+                dept.company = division.company;
+            }
+            if (!Array.isArray(dept.team)) {
+                dept.team = [];
+            }
+            if (!Array.isArray(dept.sub_departments)) {
+                dept.sub_departments = [];
+            }
+            if (typeof dept.members !== 'number') {
+                dept.members = dept.team.length;
+            }
+            departmentsData.push(dept);
+        });
+    });
+
+    function saveStructure() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(structure));
+    }
+
+    let currentDeptIndex = null;
+    let selectedEmployee = null;
+
+    function openModal(modal) {
+        modal.style.display = 'flex';
+    }
+
+    function closeModal(modal) {
+        modal.style.display = 'none';
+    }
+
+    function toggleDepartment(index) {
+        const card = wrapper.querySelector(`.unit-card[data-dept-index="${index}"]`);
+        if (!card) return;
+        const body = card.querySelector('.unit-body');
+        const chevron = card.querySelector('.dept-chevron');
+        if (!body || !chevron) return;
+        const open = body.classList.toggle('open');
+        chevron.style.transform = open ? 'rotate(180deg)' : 'rotate(0deg)';
+    }
+
+    function renderMemberRows(dept, container, index) {
+        container.innerHTML = '';
+        if (!dept.team || dept.team.length === 0) {
+            const empty = document.createElement('div');
+            empty.className = 'member-row';
+            empty.style.justifyContent = 'center';
+            empty.style.color = '#94a3b8';
+            empty.textContent = 'No members recorded.';
+            container.appendChild(empty);
+            return;
+        }
+
+        dept.team.forEach(member => {
+            const row = document.createElement('div');
+            row.className = 'member-row';
+            row.dataset.member = member;
+            row.innerHTML = `
+                <span>${member}</span>
+                <button type="button" class="remove-member" title="Remove ${member}">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            container.appendChild(row);
+            const removeBtn = row.querySelector('.remove-member');
+            removeBtn.addEventListener('click', (event) => {
+                event.stopPropagation();
+                removeMember(index, member, row);
+            });
+        });
+    }
+
+    function updateDepartmentUI(index) {
+        const dept = departmentsData[index];
+        const card = wrapper.querySelector(`.unit-card[data-dept-index="${index}"]`);
+        if (!dept || !card) return;
+
+        const memberCount = card.querySelector('.member-count');
+        const memberWord = card.querySelector('.member-word');
+        const viewButton = card.querySelector('.view-dept-btn');
+        const memberContainer = card.querySelector('.member-container');
+
+        if (memberCount) memberCount.textContent = dept.members;
+        if (memberWord) memberWord.textContent = dept.members === 1 ? 'member' : 'members';
+        if (viewButton) viewButton.dataset.members = dept.members;
+        if (memberContainer) renderMemberRows(dept, memberContainer, index);
+    }
+
+    function refreshDetailModal(dept) {
+        document.getElementById('deptDetailTitle').textContent = dept.name;
+        document.getElementById('deptDetailHead').textContent = dept.leader || 'Unassigned';
+        document.getElementById('deptDetailDivision').textContent = dept.division || 'N/A';
+        document.getElementById('deptDetailCompany').textContent = dept.company || 'N/A';
+        document.getElementById('deptDetailMembers').textContent = dept.members || 0;
+        document.getElementById('deptDetailFocus').textContent = dept.focus || 'Focus pending definition.';
+
+        const subCountEl = document.getElementById('deptDetailSubCount');
+        const subListEl = document.getElementById('deptDetailSubList');
+        const subs = dept.sub_departments || [];
+
+        if (subCountEl) {
+            subCountEl.textContent = `${subs.length}`;
+        }
+        if (subListEl) {
+            subListEl.innerHTML = '';
+            if (subs.length === 0) {
+                const li = document.createElement('li');
+                li.style.color = '#94a3b8';
+                li.textContent = 'No sub-departments yet.';
+                subListEl.appendChild(li);
+            } else {
+                subs.forEach(sub => {
+                    const memberLabel = sub.members || (Array.isArray(sub.team) ? sub.team.length : 0);
+                    const li = document.createElement('li');
+                    li.textContent = `${sub.name} · ${sub.leader || 'Unassigned'} · ${memberLabel} member${memberLabel === 1 ? '' : 's'}`;
+                    subListEl.appendChild(li);
+                });
+            }
+        }
+    }
+
+    function createDepartmentCard(dept, index) {
+        const card = document.createElement('div');
+        card.className = 'unit-card';
+        card.dataset.deptIndex = index;
+        card.innerHTML = `
+            <div class="unit-header">
+                <div class="unit-title">
+                    <span>${dept.name}</span>
+                    <span>
+                        <span class="member-count">${dept.members}</span>
+                        <span class="member-word">${dept.members === 1 ? 'member' : 'members'}</span>
+                        · Head: ${dept.leader || 'Unassigned'}
+                    </span>
+                    <span>Division: ${dept.division} · Company: ${dept.company}</span>
+                </div>
+                <div class="unit-actions">
+                    <button class="secondary-button view-dept-btn" type="button"
+                            data-name="${dept.name}"
+                            data-head="${dept.leader || 'Unassigned'}"
+                            data-company="${dept.company || ''}"
+                            data-division="${dept.division || ''}"
+                            data-focus="${dept.focus || ''}"
+                            data-members="${dept.members}">
+                        <i class="fas fa-eye"></i> View Detail
+                    </button>
+                    <button class="secondary-button add-member-btn" type="button">
+                        <i class="fas fa-user-plus"></i> Add New Member
+                    </button>
+                    <i class="fas fa-chevron-down dept-chevron"></i>
+                </div>
+            </div>
+            <div class="unit-body">
+                <p style="color:#4b5563;">Focus: ${dept.focus || 'Focus pending definition.'}</p>
+                <div class="member-container"></div>
+            </div>
+        `;
+        renderMemberRows(dept, card.querySelector('.member-container'), index);
+        attachDepartmentHandlers(card, index);
+        wrapper.appendChild(card);
+    }
+
+    function renderDepartments() {
+        wrapper.querySelectorAll('.unit-card').forEach(card => card.remove());
+        departmentsData.forEach((dept, index) => createDepartmentCard(dept, index));
+    }
+
+    function resetMemberModal(disabledNames) {
+        selectedEmployee = null;
+        confirmMemberBtn.disabled = true;
+        memberChoiceRadios.forEach(radio => {
+            radio.checked = false;
+            radio.disabled = disabledNames.includes(radio.value);
+        });
+    }
+
+    function removeMember(index, memberName, rowElement) {
+        const dept = departmentsData[index];
+        if (!dept) return;
+        dept.team = (dept.team || []).filter(name => name !== memberName);
+        dept.members = Math.max(0, dept.members - 1);
+        saveStructure();
+        if (rowElement) rowElement.remove();
+        updateDepartmentUI(index);
+        const radio = document.querySelector(`input[name="deptMemberChoice"][value="${cssEscape(memberName)}"]`);
+        if (radio) radio.disabled = false;
+    }
+
+    memberChoiceRadios.forEach(radio => {
+        radio.addEventListener('change', () => {
+            if (radio.disabled) return;
+            selectedEmployee = radio.value;
+            confirmMemberBtn.disabled = false;
+        });
+    });
+
+    function attachDepartmentHandlers(card, index) {
+        const title = card.querySelector('.unit-title');
+        const chevron = card.querySelector('.dept-chevron');
+        const addMemberBtn = card.querySelector('.add-member-btn');
+        const viewButton = card.querySelector('.view-dept-btn');
+
+        if (title) {
+            title.addEventListener('click', () => toggleDepartment(index));
+        }
+        if (chevron) {
+            chevron.addEventListener('click', (event) => {
+                event.stopPropagation();
+                toggleDepartment(index);
+            });
+        }
+        if (addMemberBtn) {
+            addMemberBtn.addEventListener('click', (event) => {
+                event.stopPropagation();
+                currentDeptIndex = index;
+                const dept = departmentsData[index];
+                resetMemberModal(dept.team || []);
+                openModal(memberModal);
+            });
+        }
+        if (viewButton) {
+            viewButton.addEventListener('click', (event) => {
+                event.stopPropagation();
+                const dept = departmentsData[index];
+                refreshDetailModal(dept);
+                openModal(detailModal);
+            });
+        }
+    }
+
+    renderDepartments();
+
+    addDeptBtn.addEventListener('click', () => {
+        departmentForm.reset();
+        openModal(deptModal);
+    });
+
+    document.getElementById('saveDepartmentBtn').addEventListener('click', () => {
+        const formData = new FormData(departmentForm);
+        const name = (formData.get('department_name') || '').toString().trim();
+        const head = (formData.get('department_head') || '').toString().trim() || 'Unassigned';
+        const divisionName = (formData.get('department_division') || '').toString().trim();
+        const focus = (formData.get('department_focus') || '').toString().trim() || 'Focus pending definition.';
+
+        if (!name) {
+            alert('Please enter a department name.');
+            return;
+        }
+
+        const parentDivision = structure.divisions.find(div => div.name === divisionName);
+        if (!parentDivision) {
+            alert('Invalid division selected.');
+            return;
+        }
+
+        const newDepartment = {
+            name,
+            leader: head,
+            company: parentDivision.company,
+            division: divisionName,
+            focus,
+            members: 0,
+            team: [],
+            sub_departments: []
+        };
+
+        parentDivision.departments.push(newDepartment);
+        departmentsData.push(newDepartment);
+        saveStructure();
+        renderDepartments();
+        closeModal(deptModal);
+        alert('Department saved (demo only).');
+    });
+
+    confirmMemberBtn.addEventListener('click', () => {
+        if (currentDeptIndex === null || currentDeptIndex < 0) return;
+        const dept = departmentsData[currentDeptIndex];
+        if (!dept) return;
+        if (!selectedEmployee) {
+            alert('Please choose an employee.');
+            return;
+        }
+        if (!dept.team.includes(selectedEmployee)) {
+            dept.team.push(selectedEmployee);
+            dept.members += 1;
+            saveStructure();
+            updateDepartmentUI(currentDeptIndex);
+        }
+        closeModal(memberModal);
+    });
+
+    document.querySelectorAll('[data-close]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            closeModal(deptModal);
+            closeModal(memberModal);
+            closeModal(detailModal);
+        });
+    });
+
+    [deptModal, memberModal, detailModal].forEach(modal => {
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                closeModal(modal);
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
