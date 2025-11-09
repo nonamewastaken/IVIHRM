@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Basic Salary - HRM System{% endblock %}
+
+{% block page_title %}<i class="fas fa-plus"></i> Basic Salary{% endblock %}
+
+{% block extra_css %}
+<style>
+    .basic-salary-wrapper {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .panel {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 12px 32px rgba(15, 23, 42, 0.1);
+    }
+
+    .panel h3 {
+        margin: 0 0 18px;
+        font-size: 1.15rem;
+        color: #1f2937;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .grade-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .grade-table th,
+    .grade-table td {
+        padding: 14px;
+        border-bottom: 1px solid #e5e7eb;
+        text-align: left;
+    }
+
+    .grade-table th {
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: 0.75rem;
+        color: #6b7280;
+    }
+
+    .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: rgba(76, 110, 245, 0.1);
+        color: #4c6ef5;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="basic-salary-wrapper">
+    <section class="panel">
+        <h3><i class="fas fa-layer-group"></i> Grade-by-Grade Hourly Rates</h3>
+        <p style="margin-top:0; color:#6b7280;">Pseudo breakdown of hourly pay and monthly base salary across personnel grades.</p>
+        <table class="grade-table">
+            <thead>
+                <tr>
+                    <th>Grade</th>
+                    <th>Hourly Rate</th>
+                    <th>Monthly Base</th>
+                    <th>Band</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for grade in grades %}
+                <tr>
+                    <td><strong>{{ grade.grade }}</strong></td>
+                    <td>{{ grade.hourly_rate }}</td>
+                    <td>{{ grade.monthly_base }}</td>
+                    <td><span class="pill">{{ grade.band }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    setActiveSidebarItem('/salary/basic');
+});
+</script>
+{% endblock %}
+

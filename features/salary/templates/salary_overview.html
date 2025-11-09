@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+
+{% block title %}Salary Overview - HRM System{% endblock %}
+
+{% block page_title %}<i class="fas fa-chart-pie"></i> Salary Overview{% endblock %}
+
+{% block extra_css %}
+<style>
+    .salary-overview-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .summary-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .summary-card .title {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #6b7280;
+        margin-bottom: 10px;
+    }
+
+    .summary-card .value {
+        font-size: 1.85rem;
+        font-weight: 700;
+        color: #1f2937;
+    }
+
+    .summary-card .delta {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 12px;
+        font-weight: 600;
+        border-radius: 999px;
+        padding: 6px 12px;
+    }
+
+    .delta.up {
+        background: rgba(34, 197, 94, 0.15);
+        color: #15803d;
+    }
+
+    .delta.down {
+        background: rgba(239, 68, 68, 0.15);
+        color: #b91c1c;
+    }
+
+    .grid {
+        display: grid;
+        gap: 20px;
+    }
+
+    .grid.two-columns {
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    }
+
+    .panel {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    }
+
+    .panel h3 {
+        margin-top: 0;
+        margin-bottom: 16px;
+        font-size: 1.1rem;
+        color: #1f2937;
+    }
+
+    .trend-list,
+    .department-list,
+    .alert-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .trend-item,
+    .department-item,
+    .alert-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 0;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .trend-item:last-child,
+    .department-item:last-child,
+    .alert-item:last-child {
+        border-bottom: none;
+    }
+
+    .trend-amount {
+        font-weight: 600;
+        color: #1d4ed8;
+    }
+
+    .department-meta {
+        text-align: right;
+    }
+
+    .department-meta strong {
+        display: block;
+        color: #111827;
+    }
+
+    .department-meta small {
+        color: #6b7280;
+    }
+
+    .alert-item.warning {
+        border-left: 4px solid #facc15;
+        padding-left: 16px;
+    }
+
+    .alert-item.info {
+        border-left: 4px solid #3b82f6;
+        padding-left: 16px;
+    }
+
+    .alert-item h4 {
+        margin: 0 0 4px 0;
+        font-size: 0.95rem;
+        color: #111827;
+    }
+
+    .alert-item p {
+        margin: 0;
+        color: #6b7280;
+        font-size: 0.9rem;
+    }
+
+    .component-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .component-tag {
+        border-radius: 999px;
+        padding: 8px 14px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        background: #f3f4f6;
+        color: #111827;
+    }
+
+    @media (max-width: 768px) {
+        .summary-card .value {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="salary-overview-container">
+    <div class="summary-grid">
+        {% for card in overview.summary_cards %}
+        <div class="summary-card">
+            <div class="title">{{ card.title }}</div>
+            <div class="value">{{ card.value }}</div>
+            <div class="delta {{ card.trend }}">
+                {% if card.trend == 'up' %}
+                    <i class="fas fa-arrow-trend-up"></i>
+                {% else %}
+                    <i class="fas fa-arrow-trend-down"></i>
+                {% endif %}
+                {{ card.delta }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="grid two-columns">
+        <div class="panel">
+            <h3><i class="fas fa-chart-line"></i> Monthly Payroll Trend ({{ overview.as_of_year }})</h3>
+            <ul class="trend-list">
+                {% for record in overview.monthly_trend %}
+                <li class="trend-item">
+                    <span>{{ record.month }}</span>
+                    <span class="trend-amount">${{ "{:,.0f}".format(record.amount) }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="panel">
+            <h3><i class="fas fa-sitemap"></i> Top Department Spend</h3>
+            <ul class="department-list">
+                {% for department in overview.department_breakdown %}
+                <li class="department-item">
+                    <div>
+                        <strong>{{ department.name }}</strong>
+                        <div style="color:#6b7280;">{{ department.headcount }} employees</div>
+                    </div>
+                    <div class="department-meta">
+                        <strong>${{ "{:,.0f}".format(department.amount) }}</strong>
+                        <small>Monthly total</small>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="grid two-columns" style="margin-top: 20px;">
+        <div class="panel">
+            <h3><i class="fas fa-bell"></i> Payroll Alerts</h3>
+            <ul class="alert-list">
+                {% for alert in overview.alerts %}
+                <li class="alert-item {{ alert.severity }}">
+                    <div>
+                        <h4>{{ alert.title }}</h4>
+                        <p>{{ alert.description }}</p>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="panel">
+            <h3><i class="fas fa-layer-group"></i> Component Allocation Snapshot</h3>
+            <p style="margin:0; color:#6b7280;">Latest component mix across organization:</p>
+            <div class="component-tags">
+                {% for component in component_preview %}
+                <span class="component-tag" style="background: {{ component.color }}1a; color: {{ component.color }};">
+                    {{ component.label }} · {{ component.percentage }}%
+                </span>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    setActiveSidebarItem('/salary/overview');
+});
+</script>
+{% endblock %}
+

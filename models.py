@@ -146,6 +146,11 @@ class Employee(db.Model):
             'passport_issue_date': self.passport_issue_date,
             'passport_expiry_date': self.passport_expiry_date,
             'passport_issue_place': self.passport_issue_place,
+            'cv_file': self.cv_file,
+            'portrait_file': self.portrait_file,
+            'health_file': self.health_file,
+            'id_card_file': self.id_card_file,
+            'passport_file': self.passport_file,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }

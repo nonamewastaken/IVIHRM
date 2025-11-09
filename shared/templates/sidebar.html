@@ -51,22 +51,23 @@ const sidebarData = {
             {
                 title: 'Overview',
                 items: [
-                    { icon: 'fas fa-chart-line', text: 'Personnel Overview', href: '/personnel' }
+                    { icon: 'fas fa-chart-line', text: 'Overview', href: '/personnel' }
                 ]
             },
             {
                 title: 'Employee Management',
                 items: [
                     { icon: 'fas fa-user-plus', text: 'Add Employee', href: '/personnel/add' },
-                    { icon: 'fas fa-users', text: 'All Employees', href: '/personnel/list' },
-                    { icon: 'fas fa-user-edit', text: 'Edit Employee', href: '/personnel/edit' },
-                    { icon: 'fas fa-user-times', text: 'Remove Employee', href: '/personnel/remove' }
+                    { icon: 'fas fa-users', text: 'All Employees', href: '/personnel/list' }
                 ]
             },
             {
                 title: 'Department Management',
                 items: [
+                    { icon: 'fas fa-building-columns', text: 'Companies', href: '/personnel/companies' },
+                    { icon: 'fas fa-network-wired', text: 'Divisions', href: '/personnel/divisions' },
                     { icon: 'fas fa-building', text: 'Departments', href: '/personnel/departments' },
+                    { icon: 'fas fa-diagram-next', text: 'Sub-departments', href: '/personnel/sub-departments' },
                     { icon: 'fas fa-sitemap', text: 'Organizational Chart', href: '/personnel/org-chart' },
                     { icon: 'fas fa-user-tag', text: 'Roles & Positions', href: '/personnel/roles' }
                 ]
@@ -124,10 +125,9 @@ const sidebarData = {
             {
                 title: 'Payroll Management',
                 items: [
+                    { icon: 'fas fa-chart-pie', text: 'Overview', href: '/salary/overview' },
                     { icon: 'fas fa-calculator', text: 'Calculate Salary', href: '/salary/calculate' },
                     { icon: 'fas fa-list', text: 'Payroll List', href: '/salary/payroll' },
-                    { icon: 'fas fa-edit', text: 'Edit Payroll', href: '/salary/edit' },
-                    { icon: 'fas fa-check', text: 'Approve Payroll', href: '/salary/approve' }
                 ]
             },
             {

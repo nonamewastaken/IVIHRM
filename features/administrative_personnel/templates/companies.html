@@ -1,0 +1,315 @@
+{% extends "base.html" %}
+
+{% block title %}Companies - HRM System{% endblock %}
+
+{% block page_title %}<i class="fas fa-building-columns"></i> Branch Companies{% endblock %}
+
+{% block extra_css %}
+<style>
+    .company-wrapper {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .action-bar {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .add-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #4c6ef5;
+        color: white;
+        padding: 10px 16px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: background 0.2s ease;
+    }
+
+    .add-button:hover {
+        background: #384ddf;
+    }
+
+    .company-card {
+        background: white;
+        border-radius: 18px;
+        padding: 22px;
+        box-shadow: 0 14px 32px rgba(15, 23, 42, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .company-info h3 {
+        margin: 0;
+        font-size: 1.2rem;
+    }
+
+    .company-info span {
+        color: #6b7280;
+        font-size: 0.9rem;
+    }
+
+    .company-meta {
+        text-align: right;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .company-meta strong {
+        display: block;
+        font-size: 1.1rem;
+    }
+
+    .secondary-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 14px;
+        border-radius: 10px;
+        background: #f3f4ff;
+        color: #4c6ef5;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background 0.2s ease;
+    }
+
+    .secondary-button:hover {
+        background: #e0e7ff;
+    }
+
+    .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.55);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .modal {
+        background: white;
+        border-radius: 18px;
+        padding: 24px;
+        width: 420px;
+        max-width: 90%;
+        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.25);
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .modal header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal header h3 {
+        margin: 0;
+    }
+
+    .close-button {
+        background: none;
+        border: none;
+        font-size: 1.2rem;
+        cursor: pointer;
+        color: #6b7280;
+    }
+
+    .modal form {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .modal label {
+        font-size: 0.85rem;
+        color: #475569;
+        font-weight: 600;
+    }
+
+    .modal input,
+    .modal textarea {
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid #d1d5db;
+        font-size: 0.95rem;
+        width: 100%;
+    }
+
+    .modal textarea {
+        resize: vertical;
+        min-height: 80px;
+    }
+
+    .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 8px;
+    }
+
+    .ghost-button {
+        padding: 10px 16px;
+        border-radius: 12px;
+        border: 1px solid #d1d5db;
+        background: white;
+        cursor: pointer;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="company-wrapper">
+    <div class="action-bar">
+        <button type="button" class="add-button" id="addCompanyBtn"><i class="fas fa-plus"></i> Add Company</button>
+    </div>
+    {% for company in companies %}
+    <div class="company-card">
+        <div class="company-info">
+            <h3>{{ company.name }}</h3>
+            <span>{{ company.address }}</span>
+        </div>
+        <div class="company-meta">
+            <strong>{{ company.members }} member{{ company.members == 1 and '' or 's' }}</strong>
+            <span>Established {{ company.founded }}</span>
+            <button type="button"
+                    class="secondary-button view-detail-btn"
+                    data-name="{{ company.name }}"
+                    data-address="{{ company.address }}"
+                    data-members="{{ company.members }}"
+                    data-founded="{{ company.founded }}"
+                    data-leader="{{ company.leader }}"
+                    data-contact="{{ company.contact }}"
+                    data-focus="{{ company.focus }}">
+                <i class="fas fa-eye"></i> View Detail
+            </button>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="modal-backdrop" id="addModal">
+    <div class="modal">
+        <header>
+            <h3>Add New Company</h3>
+            <button class="close-button" data-close>&times;</button>
+        </header>
+        <form id="addCompanyForm">
+            <div>
+                <label for="companyName">Company Name</label>
+                <input type="text" id="companyName" placeholder="e.g. Da Nang Branch">
+            </div>
+            <div>
+                <label for="companyAddress">Address</label>
+                <input type="text" id="companyAddress" placeholder="Street, City">
+            </div>
+            <div>
+                <label for="companyLeader">Head of Company</label>
+                <input type="text" id="companyLeader" placeholder="Name of head">
+            </div>
+            <div>
+                <label for="companyMembers">Estimated Headcount</label>
+                <input type="number" id="companyMembers" placeholder="e.g. 45">
+            </div>
+            <div>
+                <label for="companyFocus">Focus / Notes</label>
+                <textarea id="companyFocus" placeholder="Short description"></textarea>
+            </div>
+        </form>
+        <div class="modal-actions">
+            <button class="ghost-button" data-close>Cancel</button>
+            <button class="add-button" id="saveCompanyBtn" style="padding:10px 16px;"><i class="fas fa-save"></i> Save</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-backdrop" id="detailModal">
+    <div class="modal">
+        <header>
+            <h3 id="detailTitle">Company Detail</h3>
+            <button class="close-button" data-close>&times;</button>
+        </header>
+        <div>
+            <p><strong>Address:</strong> <span id="detailAddress"></span></p>
+            <p><strong>Headcount:</strong> <span id="detailMembers"></span></p>
+            <p><strong>Established:</strong> <span id="detailFounded"></span></p>
+            <p><strong>Leader:</strong> <span id="detailLeader"></span></p>
+            <p><strong>Contact:</strong> <span id="detailContact"></span></p>
+            <p><strong>Focus:</strong></p>
+            <p id="detailFocus" style="color:#4b5563;"></p>
+        </div>
+        <div class="modal-actions">
+            <button class="add-button" data-close style="padding:10px 16px;"><i class="fas fa-check"></i> Close</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    setActiveSidebarItem('/personnel/companies');
+
+    const addModal = document.getElementById('addModal');
+    const detailModal = document.getElementById('detailModal');
+    const openAddBtn = document.getElementById('addCompanyBtn');
+    const saveCompanyBtn = document.getElementById('saveCompanyBtn');
+
+    function openModal(modal) {
+        modal.style.display = 'flex';
+    }
+
+    function closeModal(modal) {
+        modal.style.display = 'none';
+    }
+
+    openAddBtn.addEventListener('click', () => openModal(addModal));
+
+    document.querySelectorAll('[data-close]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            closeModal(addModal);
+            closeModal(detailModal);
+        });
+    });
+
+    document.getElementById('addModal').addEventListener('click', (e) => {
+        if (e.target === addModal) closeModal(addModal);
+    });
+    document.getElementById('detailModal').addEventListener('click', (e) => {
+        if (e.target === detailModal) closeModal(detailModal);
+    });
+
+    saveCompanyBtn.addEventListener('click', () => {
+        alert('Company saved (demo only).');
+        closeModal(addModal);
+    });
+
+    document.querySelectorAll('.view-detail-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.getElementById('detailTitle').textContent = btn.dataset.name;
+            document.getElementById('detailAddress').textContent = btn.dataset.address;
+            document.getElementById('detailMembers').textContent = btn.dataset.members;
+            document.getElementById('detailFounded').textContent = btn.dataset.founded;
+            document.getElementById('detailLeader').textContent = btn.dataset.leader;
+            document.getElementById('detailContact').textContent = btn.dataset.contact;
+            document.getElementById('detailFocus').textContent = btn.dataset.focus;
+            openModal(detailModal);
+        });
+    });
+});
+</script>
+{% endblock %}
+

@@ -1,8 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Add Employee - HRM System{% endblock %}
+{% block title %}{{ 'Edit Employee' if mode == 'edit' else 'Add Employee' }} - HRM System{% endblock %}
 
-{% block page_title %}<i class="fas fa-user-plus"></i> Add Employee{% endblock %}
+{% block page_title %}
+    <i class="fas {{ 'fa-user-edit' if mode == 'edit' else 'fa-user-plus' }}"></i>
+    {{ 'Edit Employee' if mode == 'edit' else 'Add Employee' }}
+{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -618,7 +621,16 @@
 {% endblock %}
 
 {% block extra_js %}
+<script type="application/json" id="initialEmployeeData">
+{{ employee_data|default({})|tojson }}
+</script>
 <script>
+const PAGE_MODE = "{{ mode|default('add') }}";
+const IS_EDIT_MODE = PAGE_MODE === 'edit';
+const EMPLOYEE_ID = "{{ employee_id if employee_id is not none else '' }}";
+const initialEmployeeDataScript = document.getElementById('initialEmployeeData');
+const INITIAL_EMPLOYEE_DATA = initialEmployeeDataScript ? JSON.parse(initialEmployeeDataScript.textContent || '{}') : {};
+
 let currentStep = 1;
 let cvFile = null;
 let portraitFile = null;
@@ -627,8 +639,13 @@ let idCardFile = null;
 let passportFile = null;
 
 document.addEventListener('DOMContentLoaded', function() {
-    setActiveSidebarItem('/personnel/add');
+    const activeNavHref = IS_EDIT_MODE ? '/personnel/list' : '/personnel/add';
+    setActiveSidebarItem(activeNavHref);
     // Sidebar is handled by main sidebar component
+
+    if (IS_EDIT_MODE) {
+        initializeEditMode();
+    }
     
     // CV Upload functionality
     document.getElementById('cvFileInput').addEventListener('change', function(e) {
@@ -652,8 +669,7 @@ document.addEventListener('DOMContentLoaded', function() {
             portraitFile = file;
             const reader = new FileReader();
             reader.onload = function(e) {
-                const preview = document.getElementById('portraitPreview');
-                preview.innerHTML = `<img src="${e.target.result}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+                updatePortraitPreview(e.target.result);
             };
             reader.readAsDataURL(file);
         }
@@ -714,14 +730,82 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Form validation result:', isValid);
         
         if (isValid) {
-            console.log('Form is valid, calling saveEmployeeData()');
-            saveEmployeeData();
+            console.log('Form is valid, calling submitEmployeeData()');
+            submitEmployeeData();
         } else {
             console.log('Form is invalid, showing validation summary');
             showValidationSummary();
         }
     }
 });
+
+function initializeEditMode() {
+    console.log('initializeEditMode() called');
+
+    currentStep = 2;
+    const step1 = document.getElementById('step1');
+    const step2 = document.getElementById('step2');
+    const cvStep = document.getElementById('cvUploadStep');
+    const personalStep = document.getElementById('personalInfoStep');
+
+    if (step1 && step2 && cvStep && personalStep) {
+        step1.classList.remove('active');
+        step1.classList.add('completed');
+        step2.classList.add('active');
+        cvStep.classList.add('hidden');
+        personalStep.classList.remove('hidden');
+    }
+
+    populateFormWithEmployeeData(INITIAL_EMPLOYEE_DATA || {});
+
+    if (INITIAL_EMPLOYEE_DATA && INITIAL_EMPLOYEE_DATA.portrait_file) {
+        updatePortraitPreview(INITIAL_EMPLOYEE_DATA.portrait_file);
+    }
+}
+
+function populateFormWithEmployeeData(data) {
+    if (!data) {
+        return;
+    }
+
+    const form = document.getElementById('personalInfoForm');
+    Object.entries(data).forEach(([key, rawValue]) => {
+        let value = rawValue;
+        if (value === null || typeof value === 'undefined') {
+            value = '';
+        }
+
+        const elements = form.querySelectorAll(`[name="${key}"]`);
+        if (!elements.length) {
+            return;
+        }
+
+        elements.forEach(element => {
+            if (element.type === 'radio') {
+                element.checked = element.value === value;
+            } else if (element.tagName === 'SELECT' || element.tagName === 'TEXTAREA') {
+                element.value = value;
+            } else if (element.type === 'checkbox') {
+                element.checked = value === true || value === 'true';
+            } else {
+                element.value = value;
+            }
+        });
+    });
+}
+
+function updatePortraitPreview(source) {
+    const preview = document.getElementById('portraitPreview');
+    if (!preview) {
+        return;
+    }
+
+    if (source) {
+        preview.innerHTML = `<img src="${source}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+    } else {
+        preview.innerHTML = '<i class="fas fa-user" style="color: #999;"></i>';
+    }
+}
 
 function nextStep() {
     console.log('nextStep() called');
@@ -916,7 +1000,7 @@ function resetFormAndReturnToCVUpload() {
     passportFile = null;
     
     // Reset previews
-    document.getElementById('portraitPreview').innerHTML = '<i class="fas fa-user" style="color: #999;"></i>';
+    updatePortraitPreview(null);
     document.getElementById('uploadArea').classList.remove('hidden');
     document.getElementById('previewArea').classList.add('hidden');
     
@@ -941,10 +1025,10 @@ function resetFormAndReturnToCVUpload() {
     console.log('Form reset and returned to CV upload phase');
 }
 
-// Function to save employee data to database
-async function saveEmployeeData() {
+// Function to save/update employee data to database
+async function submitEmployeeData() {
     try {
-        console.log('saveEmployeeData() function called');
+        console.log('submitEmployeeData() function called');
         showLoading(true);
         hideMessages();
         
@@ -958,27 +1042,47 @@ async function saveEmployeeData() {
         }
         console.log('Collected form data:', employeeData);
         
-        // Handle file uploads
+        const fileFieldNames = ['cv_file', 'portrait_file', 'health_file', 'id_card_file', 'passport_file'];
+        fileFieldNames.forEach(name => {
+            delete employeeData[name];
+        });
+
+        // Handle file uploads (only add when present)
+        const fileConversions = [];
         if (cvFile) {
-            employeeData.cv_file = await fileToBase64(cvFile);
+            fileConversions.push(fileToBase64(cvFile).then(result => {
+                employeeData.cv_file = result;
+            }));
         }
         if (portraitFile) {
-            employeeData.portrait_file = await fileToBase64(portraitFile);
+            fileConversions.push(fileToBase64(portraitFile).then(result => {
+                employeeData.portrait_file = result;
+            }));
         }
         if (healthFile) {
-            employeeData.health_file = await fileToBase64(healthFile);
+            fileConversions.push(fileToBase64(healthFile).then(result => {
+                employeeData.health_file = result;
+            }));
         }
         if (idCardFile) {
-            employeeData.id_card_file = await fileToBase64(idCardFile);
+            fileConversions.push(fileToBase64(idCardFile).then(result => {
+                employeeData.id_card_file = result;
+            }));
         }
         if (passportFile) {
-            employeeData.passport_file = await fileToBase64(passportFile);
+            fileConversions.push(fileToBase64(passportFile).then(result => {
+                employeeData.passport_file = result;
+            }));
         }
-        
+
+        await Promise.all(fileConversions);
+
         // Send data to backend
         console.log('Sending data to API:', employeeData);
-        const response = await fetch('/personnel/api/employee', {
-            method: 'POST',
+        const url = IS_EDIT_MODE ? `/personnel/api/employee/${EMPLOYEE_ID}` : '/personnel/api/employee';
+        const method = IS_EDIT_MODE ? 'PUT' : 'POST';
+        const response = await fetch(url, {
+            method,
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -991,17 +1095,23 @@ async function saveEmployeeData() {
         
         if (result.success) {
             showMessage(result.message, 'success');
-            // Reset form and return to CV upload phase after successful submission
-            setTimeout(() => {
-                resetFormAndReturnToCVUpload();
-            }, 2000);
+            if (IS_EDIT_MODE) {
+                setTimeout(() => {
+                    window.location.href = '/personnel/list';
+                }, 1500);
+            } else {
+                // Reset form and return to CV upload phase after successful submission
+                setTimeout(() => {
+                    resetFormAndReturnToCVUpload();
+                }, 2000);
+            }
         } else {
             showMessage(`Error: ${result.error}`, 'error');
         }
         
     } catch (error) {
-        console.error('Error saving employee data:', error);
-        showMessage(`Failed to save employee data: ${error.message}`, 'error');
+        console.error('Error submitting employee data:', error);
+        showMessage(`Failed to submit employee data: ${error.message}`, 'error');
     } finally {
         showLoading(false);
     }

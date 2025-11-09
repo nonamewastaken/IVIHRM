@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Deductions - HRM System{% endblock %}
+
+{% block page_title %}<i class="fas fa-percentage"></i> Deductions{% endblock %}
+
+{% block extra_css %}
+<style>
+    .deductions-wrapper {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .panel {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
+    }
+
+    .panel h3 {
+        margin: 0 0 18px;
+        font-size: 1.12rem;
+        color: #1f2937;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .deduction-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .deduction-table th,
+    .deduction-table td {
+        padding: 14px;
+        border-bottom: 1px solid #e5e7eb;
+        text-align: left;
+    }
+
+    .deduction-table th {
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: 0.75rem;
+        color: #6b7280;
+    }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: rgba(59, 130, 246, 0.15);
+        color: #1d4ed8;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="deductions-wrapper">
+    <section class="panel">
+        <h3><i class="fas fa-scale-balanced"></i> Mandatory & Optional Deductions</h3>
+        <table class="deduction-table">
+            <thead>
+                <tr>
+                    <th>Deduction</th>
+                    <th>Applied On</th>
+                    <th>Rate</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for deduction in deductions %}
+                <tr>
+                    <td><strong>{{ deduction.name }}</strong></td>
+                    <td>{{ deduction.basis }}</td>
+                    <td>{{ deduction.percentage }}</td>
+                    <td><span class="badge">{{ deduction.notes }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    setActiveSidebarItem('/salary/deductions');
+});
+</script>
+{% endblock %}
+

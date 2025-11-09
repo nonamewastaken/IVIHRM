@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}Departments - HRM System{% endblock %}
+{% block title %}Sub-departments - HRM System{% endblock %}
 
-{% block page_title %}<i class="fas fa-building"></i> Departments{% endblock %}
+{% block page_title %}<i class="fas fa-diagram-next"></i> Sub-departments{% endblock %}
 
 {% block extra_css %}
 <style>
-    .unit-wrapper {
+    .sub-wrapper {
         max-width: 1000px;
         margin: 0 auto;
         padding: 20px;
@@ -26,7 +26,7 @@
         gap: 8px;
         padding: 10px 16px;
         border-radius: 12px;
-        background: #0ea5e9;
+        background: #10b981;
         color: white;
         text-decoration: none;
         font-weight: 600;
@@ -39,37 +39,36 @@
         cursor: not-allowed;
     }
 
-    .unit-card {
+    .sub-card {
         background: white;
         border-radius: 16px;
-        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.1);
         overflow: hidden;
     }
 
-    .unit-header {
+    .sub-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
         padding: 16px 20px;
     }
 
-    .unit-title {
+    .sub-title {
         display: flex;
         flex-direction: column;
         cursor: pointer;
     }
 
-    .unit-title span:first-child {
-        font-weight: 700;
-        color: #1f2937;
+    .sub-title strong {
+        font-size: 1.05rem;
     }
 
-    .unit-title span:last-child {
-        font-size: 0.85rem;
+    .sub-title span {
         color: #6b7280;
+        font-size: 0.85rem;
     }
 
-    .unit-actions {
+    .sub-actions {
         display: flex;
         align-items: center;
         gap: 10px;
@@ -81,21 +80,27 @@
         gap: 6px;
         padding: 8px 14px;
         border-radius: 10px;
-        background: #e0f2fe;
-        color: #0ea5e9;
+        background: #d1fae5;
+        color: #0f766e;
         font-weight: 600;
         border: none;
         cursor: pointer;
     }
 
-    .unit-body {
+    .sub-body {
+        padding: 0 20px 18px;
         display: none;
-        padding: 12px 20px 20px;
         border-top: 1px solid #e5e7eb;
     }
 
-    .unit-body.open {
+    .sub-body.open {
         display: block;
+    }
+
+    .sub-notes {
+        color: #4b5563;
+        font-size: 0.9rem;
+        margin-top: 10px;
     }
 
     .member-row {
@@ -214,30 +219,30 @@
 {% endblock %}
 
 {% block content %}
-<div class="unit-wrapper">
+<div class="sub-wrapper">
     <div class="actions-bar">
-        <button class="primary-button" id="addDepartmentBtn"><i class="fas fa-plus"></i> Add Department</button>
+        <button class="primary-button" id="addSubBtn"><i class="fas fa-plus"></i> Add Sub-department</button>
     </div>
-    {% for dept in departments %}
-    <div class="unit-card">
-        <div class="unit-header">
-            <div class="unit-title" data-dept="{{ loop.index0 }}">
-                <span>{{ dept.name }}</span>
+    {% for sub in sub_departments %}
+    <div class="sub-card">
+        <div class="sub-header">
+            <div class="sub-title" data-sub="{{ loop.index0 }}">
+                <strong>{{ sub.name }}</strong>
                 <span>
-                    <span class="member-count" data-dept-index="{{ loop.index0 }}">{{ dept.members }}</span>
-                    <span class="member-word" data-dept-index="{{ loop.index0 }}">{{ dept.members == 1 and 'member' or 'members' }}</span>
-                    · Head: {{ dept.leader }}
+                    <span class="member-count" data-sub-index="{{ loop.index0 }}">{{ sub.members }}</span>
+                    <span class="member-word" data-sub-index="{{ loop.index0 }}">{{ sub.members == 1 and 'member' or 'members' }}</span>
+                    · Head: {{ sub.leader }}
                 </span>
-                <span>Division: {{ dept.division }} · Company: {{ dept.company }}</span>
+                <span>Part of {{ sub.department }} ({{ sub.division }})</span>
             </div>
-            <div class="unit-actions">
-                <button class="secondary-button view-dept-btn"
-                        data-name="{{ dept.name }}"
-                        data-head="{{ dept.leader }}"
-                        data-company="{{ dept.company }}"
-                        data-division="{{ dept.division }}"
-                        data-focus="{{ dept.focus }}"
-                        data-members="{{ dept.members }}"
+            <div class="sub-actions">
+                <button class="secondary-button view-sub-btn"
+                        data-name="{{ sub.name }}"
+                        data-head="{{ sub.leader }}"
+                        data-department="{{ sub.department }}"
+                        data-division="{{ sub.division }}"
+                        data-focus="{{ sub.focus }}"
+                        data-members="{{ sub.members }}"
                         data-index="{{ loop.index0 }}">
                     <i class="fas fa-eye"></i> View Detail
                 </button>
@@ -245,13 +250,13 @@
                         data-index="{{ loop.index0 }}">
                     <i class="fas fa-user-plus"></i> Add New Member
                 </button>
-                <i class="fas fa-chevron-down dept-chevron" id="dept-chevron-{{ loop.index0 }}" data-dept="{{ loop.index0 }}"></i>
+                <i class="fas fa-chevron-down sub-chevron" id="sub-chevron-{{ loop.index0 }}" data-sub="{{ loop.index0 }}"></i>
             </div>
         </div>
-        <div class="unit-body" id="dept-body-{{ loop.index0 }}">
-            <p style="color:#4b5563;">Focus: {{ dept.focus }}</p>
-            <div id="dept-members-{{ loop.index0 }}">
-                {% for member in dept.team %}
+        <div class="sub-body" id="sub-body-{{ loop.index0 }}">
+            <p class="sub-notes">Focus: {{ sub.focus }}</p>
+            <div id="sub-members-{{ loop.index0 }}">
+                {% for member in sub.team %}
                 <div class="member-row" data-member="{{ member }}">
                     <span>{{ member }}</span>
                     <button type="button" class="remove-member" data-member="{{ member }}" data-index="{{ loop.index0 }}" title="Remove {{ member }}">
@@ -265,40 +270,45 @@
     {% endfor %}
 </div>
 
-<div class="modal-backdrop" id="departmentModal">
+<div class="modal-backdrop" id="subModal">
     <div class="modal">
         <header>
-            <h3>Add Department</h3>
+            <h3>Add Sub-department</h3>
             <button class="close-button" data-close>&times;</button>
         </header>
-        <form id="departmentForm">
-            <input type="text" name="department_name" placeholder="Department name">
-            <input type="text" name="department_head" placeholder="Department head">
-            <select name="department_division">
+        <form id="subForm">
+            <input type="text" name="sub_name" placeholder="Sub-department name">
+            <input type="text" name="sub_head" placeholder="Sub-department head">
+            <select name="sub_department">
+                {% for department in departments %}
+                <option>{{ department }}</option>
+                {% endfor %}
+            </select>
+            <select name="sub_division">
                 {% for division in divisions %}
                 <option>{{ division }}</option>
                 {% endfor %}
             </select>
-            <textarea name="department_focus" placeholder="Focus / responsibilities"></textarea>
+            <textarea name="sub_focus" placeholder="Focus / responsibilities"></textarea>
         </form>
         <div class="modal-actions">
             <button class="ghost-button" data-close>Cancel</button>
-            <button class="primary-button" id="saveDepartmentBtn"><i class="fas fa-save"></i> Save</button>
+            <button class="primary-button" id="saveSubBtn"><i class="fas fa-save"></i> Save</button>
         </div>
     </div>
 </div>
 
-<div class="modal-backdrop" id="deptMemberModal">
+<div class="modal-backdrop" id="subMemberModal">
     <div class="modal">
         <header>
             <h3>Add Member</h3>
             <button class="close-button" data-close>&times;</button>
         </header>
-        <div class="employee-list" id="deptEmployeeList">
+        <div class="employee-list">
             {% for employee in employees %}
             <label class="employee-option">
                 <span>{{ employee }}</span>
-                <input type="radio" name="deptMemberChoice" value="{{ employee }}">
+                <input type="radio" name="subMemberChoice" value="{{ employee }}">
             </label>
             {% endfor %}
             {% if employees|length == 0 %}
@@ -307,25 +317,23 @@
         </div>
         <div class="modal-actions">
             <button class="ghost-button" data-close type="button">Cancel</button>
-            <button class="primary-button" id="confirmDeptMemberBtn" type="button" disabled><i class="fas fa-user-plus"></i> Add Member</button>
+            <button class="primary-button" id="confirmSubMemberBtn" type="button" disabled><i class="fas fa-user-plus"></i> Add Member</button>
         </div>
     </div>
 </div>
 
-<div class="modal-backdrop" id="deptDetailModal">
+<div class="modal-backdrop" id="subDetailModal">
     <div class="modal">
         <header>
-            <h3 id="deptDetailTitle">Department Detail</h3>
+            <h3 id="subDetailTitle">Sub-department Detail</h3>
             <button class="close-button" data-close>&times;</button>
         </header>
-        <p><strong>Head:</strong> <span id="deptDetailHead"></span></p>
-        <p><strong>Division:</strong> <span id="deptDetailDivision"></span></p>
-        <p><strong>Company:</strong> <span id="deptDetailCompany"></span></p>
-        <p><strong>Members:</strong> <span id="deptDetailMembers"></span></p>
-        <p><strong>Sub-departments:</strong> <span id="deptDetailSubCount"></span></p>
-        <ul id="deptDetailSubList" style="margin:0 0 12px 18px; padding:0; list-style:disc; color:#4b5563;"></ul>
+        <p><strong>Head:</strong> <span id="subDetailHead"></span></p>
+        <p><strong>Department:</strong> <span id="subDetailDepartment"></span></p>
+        <p><strong>Division:</strong> <span id="subDetailDivision"></span></p>
+        <p><strong>Members:</strong> <span id="subDetailMembers"></span></p>
         <p><strong>Focus:</strong></p>
-        <p id="deptDetailFocus" style="color:#4b5563;"></p>
+        <p id="subDetailFocus" style="color:#4b5563;"></p>
         <div class="modal-actions">
             <button class="primary-button" data-close><i class="fas fa-check"></i> Close</button>
         </div>
@@ -337,7 +345,7 @@
 <script id="org-structure-data" type="application/json">{{ structure | tojson | safe }}</script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    setActiveSidebarItem('/personnel/departments');
+    setActiveSidebarItem('/personnel/sub-departments');
 
     const STORAGE_KEY = 'hrm_org_structure_v1';
     const dataNode = document.getElementById('org-structure-data');
@@ -345,14 +353,14 @@ document.addEventListener('DOMContentLoaded', function() {
     if (dataNode) {
         dataNode.remove();
     }
-    const addDeptBtn = document.getElementById('addDepartmentBtn');
-    const deptModal = document.getElementById('departmentModal');
-    const departmentForm = document.getElementById('departmentForm');
-    const memberModal = document.getElementById('deptMemberModal');
-    const detailModal = document.getElementById('deptDetailModal');
-    const confirmMemberBtn = document.getElementById('confirmDeptMemberBtn');
-    const wrapper = document.querySelector('.unit-wrapper');
-    const memberChoiceRadios = Array.from(document.querySelectorAll('input[name="deptMemberChoice"]'));
+    const addSubBtn = document.getElementById('addSubBtn');
+    const subModal = document.getElementById('subModal');
+    const subForm = document.getElementById('subForm');
+    const memberModal = document.getElementById('subMemberModal');
+    const detailModal = document.getElementById('subDetailModal');
+    const confirmMemberBtn = document.getElementById('confirmSubMemberBtn');
+    const wrapper = document.querySelector('.sub-wrapper');
+    const memberChoiceRadios = Array.from(document.querySelectorAll('input[name="subMemberChoice"]'));
     const cssEscape = (window.CSS && window.CSS.escape) ? window.CSS.escape : (value) => value.replace(/["\\]/g, '\\$&');
 
     function cloneInitial(data) {
@@ -374,26 +382,28 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     let structure = loadStructure();
-    let departmentsData = [];
+    let subDepartmentsData = [];
 
     structure.divisions.forEach(division => {
         division.departments.forEach(dept => {
-            if (!dept.division) {
-                dept.division = division.name;
-            }
-            if (!dept.company) {
-                dept.company = division.company;
-            }
-            if (!Array.isArray(dept.team)) {
-                dept.team = [];
-            }
             if (!Array.isArray(dept.sub_departments)) {
                 dept.sub_departments = [];
             }
-            if (typeof dept.members !== 'number') {
-                dept.members = dept.team.length;
-            }
-            departmentsData.push(dept);
+            dept.sub_departments.forEach(sub => {
+                if (!sub.division) {
+                    sub.division = division.name;
+                }
+                if (!sub.department) {
+                    sub.department = dept.name;
+                }
+                if (!Array.isArray(sub.team)) {
+                    sub.team = [];
+                }
+                if (typeof sub.members !== 'number') {
+                    sub.members = sub.team.length;
+                }
+                subDepartmentsData.push(sub);
+            });
         });
     });
 
@@ -401,7 +411,7 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(structure));
     }
 
-    let currentDeptIndex = null;
+    let currentSubIndex = null;
     let selectedEmployee = null;
 
     function openModal(modal) {
@@ -412,19 +422,19 @@ document.addEventListener('DOMContentLoaded', function() {
         modal.style.display = 'none';
     }
 
-    function toggleDepartment(index) {
-        const card = wrapper.querySelector(`.unit-card[data-dept-index="${index}"]`);
+    function toggleSub(index) {
+        const card = wrapper.querySelector(`.sub-card[data-sub-index="${index}"]`);
         if (!card) return;
-        const body = card.querySelector('.unit-body');
-        const chevron = card.querySelector('.dept-chevron');
-        if (!body || !chevron) return;
+        const body = card.querySelector('.sub-body');
+        const icon = card.querySelector('.sub-chevron');
+        if (!body || !icon) return;
         const open = body.classList.toggle('open');
-        chevron.style.transform = open ? 'rotate(180deg)' : 'rotate(0deg)';
+        icon.style.transform = open ? 'rotate(180deg)' : 'rotate(0deg)';
     }
 
-    function renderMemberRows(dept, container, index) {
+    function renderMemberRows(sub, container, index) {
         container.innerHTML = '';
-        if (!dept.team || dept.team.length === 0) {
+        if (!sub.team || sub.team.length === 0) {
             const empty = document.createElement('div');
             empty.className = 'member-row';
             empty.style.justifyContent = 'center';
@@ -434,7 +444,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        dept.team.forEach(member => {
+        sub.team.forEach(member => {
             const row = document.createElement('div');
             row.className = 'member-row';
             row.dataset.member = member;
@@ -445,107 +455,82 @@ document.addEventListener('DOMContentLoaded', function() {
                 </button>
             `;
             container.appendChild(row);
-            const removeBtn = row.querySelector('.remove-member');
-            removeBtn.addEventListener('click', (event) => {
+            row.querySelector('.remove-member').addEventListener('click', (event) => {
                 event.stopPropagation();
                 removeMember(index, member, row);
             });
         });
     }
 
-    function updateDepartmentUI(index) {
-        const dept = departmentsData[index];
-        const card = wrapper.querySelector(`.unit-card[data-dept-index="${index}"]`);
-        if (!dept || !card) return;
+    function updateSubUI(index) {
+        const sub = subDepartmentsData[index];
+        const card = wrapper.querySelector(`.sub-card[data-sub-index="${index}"]`);
+        if (!sub || !card) return;
 
         const memberCount = card.querySelector('.member-count');
         const memberWord = card.querySelector('.member-word');
-        const viewButton = card.querySelector('.view-dept-btn');
+        const viewButton = card.querySelector('.view-sub-btn');
         const memberContainer = card.querySelector('.member-container');
 
-        if (memberCount) memberCount.textContent = dept.members;
-        if (memberWord) memberWord.textContent = dept.members === 1 ? 'member' : 'members';
-        if (viewButton) viewButton.dataset.members = dept.members;
-        if (memberContainer) renderMemberRows(dept, memberContainer, index);
+        if (memberCount) memberCount.textContent = sub.members;
+        if (memberWord) memberWord.textContent = sub.members === 1 ? 'member' : 'members';
+        if (viewButton) viewButton.dataset.members = sub.members;
+        if (memberContainer) renderMemberRows(sub, memberContainer, index);
     }
 
-    function refreshDetailModal(dept) {
-        document.getElementById('deptDetailTitle').textContent = dept.name;
-        document.getElementById('deptDetailHead').textContent = dept.leader || 'Unassigned';
-        document.getElementById('deptDetailDivision').textContent = dept.division || 'N/A';
-        document.getElementById('deptDetailCompany').textContent = dept.company || 'N/A';
-        document.getElementById('deptDetailMembers').textContent = dept.members || 0;
-        document.getElementById('deptDetailFocus').textContent = dept.focus || 'Focus pending definition.';
-
-        const subCountEl = document.getElementById('deptDetailSubCount');
-        const subListEl = document.getElementById('deptDetailSubList');
-        const subs = dept.sub_departments || [];
-
-        if (subCountEl) {
-            subCountEl.textContent = `${subs.length}`;
-        }
-        if (subListEl) {
-            subListEl.innerHTML = '';
-            if (subs.length === 0) {
-                const li = document.createElement('li');
-                li.style.color = '#94a3b8';
-                li.textContent = 'No sub-departments yet.';
-                subListEl.appendChild(li);
-            } else {
-                subs.forEach(sub => {
-                    const memberLabel = sub.members || (Array.isArray(sub.team) ? sub.team.length : 0);
-                    const li = document.createElement('li');
-                    li.textContent = `${sub.name} · ${sub.leader || 'Unassigned'} · ${memberLabel} member${memberLabel === 1 ? '' : 's'}`;
-                    subListEl.appendChild(li);
-                });
-            }
-        }
+    function refreshDetailModal(sub) {
+        document.getElementById('subDetailTitle').textContent = sub.name;
+        document.getElementById('subDetailHead').textContent = sub.leader || 'Unassigned';
+        document.getElementById('subDetailDepartment').textContent = sub.department || 'N/A';
+        document.getElementById('subDetailDivision').textContent = sub.division || 'N/A';
+        document.getElementById('subDetailMembers').textContent = sub.members || 0;
+        document.getElementById('subDetailFocus').textContent = sub.focus || 'Focus pending definition.';
     }
 
-    function createDepartmentCard(dept, index) {
+    function createSubCard(sub, index) {
         const card = document.createElement('div');
-        card.className = 'unit-card';
-        card.dataset.deptIndex = index;
+        card.className = 'sub-card';
+        card.dataset.subIndex = index;
         card.innerHTML = `
-            <div class="unit-header">
-                <div class="unit-title">
-                    <span>${dept.name}</span>
+            <div class="sub-header">
+                <div class="sub-title">
+                    <strong>${sub.name}</strong>
                     <span>
-                        <span class="member-count">${dept.members}</span>
-                        <span class="member-word">${dept.members === 1 ? 'member' : 'members'}</span>
-                        · Head: ${dept.leader || 'Unassigned'}
+                        <span class="member-count">${sub.members}</span>
+                        <span class="member-word">${sub.members === 1 ? 'member' : 'members'}</span>
+                        · Head: ${sub.leader || 'Unassigned'}
                     </span>
-                    <span>Division: ${dept.division} · Company: ${dept.company}</span>
+                    <span>Part of ${sub.department} (${sub.division})</span>
                 </div>
-                <div class="unit-actions">
-                    <button class="secondary-button view-dept-btn" type="button"
-                            data-name="${dept.name}"
-                            data-head="${dept.leader || 'Unassigned'}"
-                            data-company="${dept.company || ''}"
-                            data-division="${dept.division || ''}"
-                            data-focus="${dept.focus || ''}"
-                            data-members="${dept.members}">
+                <div class="sub-actions">
+                    <button class="secondary-button view-sub-btn" type="button"
+                            data-name="${sub.name}"
+                            data-head="${sub.leader || 'Unassigned'}"
+                            data-department="${sub.department || ''}"
+                            data-division="${sub.division || ''}"
+                            data-focus="${sub.focus || ''}"
+                            data-members="${sub.members}">
                         <i class="fas fa-eye"></i> View Detail
                     </button>
                     <button class="secondary-button add-member-btn" type="button">
                         <i class="fas fa-user-plus"></i> Add New Member
                     </button>
-                    <i class="fas fa-chevron-down dept-chevron"></i>
+                    <i class="fas fa-chevron-down sub-chevron"></i>
                 </div>
             </div>
-            <div class="unit-body">
-                <p style="color:#4b5563;">Focus: ${dept.focus || 'Focus pending definition.'}</p>
+            <div class="sub-body">
+                <p class="sub-notes">Focus: ${sub.focus || 'Focus pending definition.'}</p>
                 <div class="member-container"></div>
             </div>
         `;
-        renderMemberRows(dept, card.querySelector('.member-container'), index);
-        attachDepartmentHandlers(card, index);
+        renderMemberRows(sub, card.querySelector('.member-container'), index);
+        attachSubHandlers(card, index);
         wrapper.appendChild(card);
     }
 
-    function renderDepartments() {
-        wrapper.querySelectorAll('.unit-card').forEach(card => card.remove());
-        departmentsData.forEach((dept, index) => createDepartmentCard(dept, index));
+    function renderSubDepartments() {
+        wrapper.querySelectorAll('.sub-card').forEach(card => card.remove());
+        subDepartmentsData.forEach((sub, index) => createSubCard(sub, index));
     }
 
     function resetMemberModal(disabledNames) {
@@ -558,14 +543,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function removeMember(index, memberName, rowElement) {
-        const dept = departmentsData[index];
-        if (!dept) return;
-        dept.team = (dept.team || []).filter(name => name !== memberName);
-        dept.members = Math.max(0, dept.members - 1);
+        const sub = subDepartmentsData[index];
+        if (!sub) return;
+        sub.team = (sub.team || []).filter(name => name !== memberName);
+        sub.members = Math.max(0, sub.members - 1);
         saveStructure();
         if (rowElement) rowElement.remove();
-        updateDepartmentUI(index);
-        const radio = document.querySelector(`input[name="deptMemberChoice"][value="${cssEscape(memberName)}"]`);
+        updateSubUI(index);
+        const radio = document.querySelector(`input[name="subMemberChoice"][value="${cssEscape(memberName)}"]`);
         if (radio) radio.disabled = false;
     }
 
@@ -577,56 +562,57 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    function attachDepartmentHandlers(card, index) {
-        const title = card.querySelector('.unit-title');
-        const chevron = card.querySelector('.dept-chevron');
+    function attachSubHandlers(card, index) {
+        const title = card.querySelector('.sub-title');
+        const chevron = card.querySelector('.sub-chevron');
         const addMemberBtn = card.querySelector('.add-member-btn');
-        const viewButton = card.querySelector('.view-dept-btn');
+        const viewButton = card.querySelector('.view-sub-btn');
 
         if (title) {
-            title.addEventListener('click', () => toggleDepartment(index));
+            title.addEventListener('click', () => toggleSub(index));
         }
         if (chevron) {
             chevron.addEventListener('click', (event) => {
                 event.stopPropagation();
-                toggleDepartment(index);
+                toggleSub(index);
             });
         }
         if (addMemberBtn) {
             addMemberBtn.addEventListener('click', (event) => {
                 event.stopPropagation();
-                currentDeptIndex = index;
-                const dept = departmentsData[index];
-                resetMemberModal(dept.team || []);
+                currentSubIndex = index;
+                const sub = subDepartmentsData[index];
+                resetMemberModal(sub.team || []);
                 openModal(memberModal);
             });
         }
         if (viewButton) {
             viewButton.addEventListener('click', (event) => {
                 event.stopPropagation();
-                const dept = departmentsData[index];
-                refreshDetailModal(dept);
+                const sub = subDepartmentsData[index];
+                refreshDetailModal(sub);
                 openModal(detailModal);
             });
         }
     }
 
-    renderDepartments();
+    renderSubDepartments();
 
-    addDeptBtn.addEventListener('click', () => {
-        departmentForm.reset();
-        openModal(deptModal);
+    addSubBtn.addEventListener('click', () => {
+        subForm.reset();
+        openModal(subModal);
     });
 
-    document.getElementById('saveDepartmentBtn').addEventListener('click', () => {
-        const formData = new FormData(departmentForm);
-        const name = (formData.get('department_name') || '').toString().trim();
-        const head = (formData.get('department_head') || '').toString().trim() || 'Unassigned';
-        const divisionName = (formData.get('department_division') || '').toString().trim();
-        const focus = (formData.get('department_focus') || '').toString().trim() || 'Focus pending definition.';
+    document.getElementById('saveSubBtn').addEventListener('click', () => {
+        const formData = new FormData(subForm);
+        const name = (formData.get('sub_name') || '').toString().trim();
+        const head = (formData.get('sub_head') || '').toString().trim() || 'Unassigned';
+        const departmentName = (formData.get('sub_department') || '').toString().trim();
+        const divisionName = (formData.get('sub_division') || '').toString().trim();
+        const focus = (formData.get('sub_focus') || '').toString().trim() || 'Focus pending definition.';
 
         if (!name) {
-            alert('Please enter a department name.');
+            alert('Please enter a sub-department name.');
             return;
         }
 
@@ -636,51 +622,58 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        const newDepartment = {
+        const parentDepartment = parentDivision.departments.find(dept => dept.name === departmentName);
+        if (!parentDepartment) {
+            alert('Invalid department selected.');
+            return;
+        }
+
+        const memberCount = parseInt(prompt('Enter member count (optional):') || '0', 10);
+
+        const newSub = {
             name,
             leader: head,
-            company: parentDivision.company,
+            department: departmentName,
             division: divisionName,
             focus,
-            members: 0,
-            team: [],
-            sub_departments: []
+            members: Number.isNaN(memberCount) ? 0 : memberCount,
+            team: []
         };
 
-        parentDivision.departments.push(newDepartment);
-        departmentsData.push(newDepartment);
+        parentDepartment.sub_departments.push(newSub);
+        subDepartmentsData.push(newSub);
         saveStructure();
-        renderDepartments();
-        closeModal(deptModal);
-        alert('Department saved (demo only).');
+        renderSubDepartments();
+        closeModal(subModal);
+        alert('Sub-department saved (demo only).');
     });
 
     confirmMemberBtn.addEventListener('click', () => {
-        if (currentDeptIndex === null || currentDeptIndex < 0) return;
-        const dept = departmentsData[currentDeptIndex];
-        if (!dept) return;
+        if (currentSubIndex === null || currentSubIndex < 0) return;
+        const sub = subDepartmentsData[currentSubIndex];
+        if (!sub) return;
         if (!selectedEmployee) {
             alert('Please choose an employee.');
             return;
         }
-        if (!dept.team.includes(selectedEmployee)) {
-            dept.team.push(selectedEmployee);
-            dept.members += 1;
+        if (!sub.team.includes(selectedEmployee)) {
+            sub.team.push(selectedEmployee);
+            sub.members += 1;
             saveStructure();
-            updateDepartmentUI(currentDeptIndex);
+            updateSubUI(currentSubIndex);
         }
         closeModal(memberModal);
     });
 
     document.querySelectorAll('[data-close]').forEach(btn => {
         btn.addEventListener('click', () => {
-            closeModal(deptModal);
+            closeModal(subModal);
             closeModal(memberModal);
             closeModal(detailModal);
         });
     });
 
-    [deptModal, memberModal, detailModal].forEach(modal => {
+    [subModal, memberModal, detailModal].forEach(modal => {
         modal.addEventListener('click', (event) => {
             if (event.target === modal) {
                 closeModal(modal);
@@ -690,3 +683,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 {% endblock %}
+

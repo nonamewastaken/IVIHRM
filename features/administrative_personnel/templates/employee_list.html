@@ -658,7 +658,11 @@ function debounce(func, wait) {
 
 // Placeholder functions for actions
 function viewEmployee(id) {
-    alert(`View employee ${id} - Feature coming soon!`);
+    if (!id) {
+        console.warn('viewEmployee called without an ID');
+        return;
+    }
+    window.location.href = `/personnel/${id}/edit`;
 }
 
 function deleteEmployee(id) {
