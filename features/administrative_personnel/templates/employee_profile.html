@@ -1,0 +1,486 @@
+{% extends "base.html" %}
+
+{% block title %}Employee Profile - HRM System{% endblock %}
+
+{% block page_title %}
+    <i class="fas fa-id-badge"></i> Employee Profile
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .profile-layout {
+        display: grid;
+        grid-template-columns: 320px 1fr;
+        gap: 20px;
+        align-items: flex-start;
+    }
+
+    @media (max-width: 992px) {
+        .profile-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .profile-card {
+        background: linear-gradient(135deg, #f7f8ff 0%, #ffffff 60%);
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        padding: 24px;
+        margin-bottom: 20px;
+    }
+
+    .profile-card.profile-summary {
+        padding-top: 32px;
+        padding-bottom: 28px;
+        min-height: 380px;
+    }
+
+    .profile-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .profile-header h2 {
+        margin: 0;
+        font-size: 20px;
+        color: #2c3e50;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .profile-avatar-wrapper {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #e0e0e0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .profile-name {
+        margin-top: 12px;
+        font-size: 20px;
+        font-weight: 700;
+        color: #2c3e50;
+    }
+
+    .profile-meta {
+        margin-top: 4px;
+        font-size: 13px;
+        color: #7f8c8d;
+    }
+
+    .badge-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .badge-male {
+        background: #e3f2fd;
+        color: #1565c0;
+    }
+
+    .badge-female {
+        background: #fce4ec;
+        color: #ad1457;
+    }
+
+    .badge-other {
+        background: #ede7f6;
+        color: #5e35b1;
+    }
+
+    .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px 24px;
+    }
+
+    @media (max-width: 768px) {
+        .detail-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .detail-item {
+        font-size: 13px;
+    }
+
+    .detail-label {
+        font-weight: 600;
+        color: #7f8c8d;
+        margin-bottom: 2px;
+    }
+
+    .detail-value {
+        color: #2c3e50;
+    }
+
+    .detail-value.email {
+        word-break: break-all;
+    }
+
+    .detail-item.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .section-title {
+        font-size: 14px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #95a5a6;
+        margin-bottom: 16px;
+    }
+
+    .btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 999px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 13px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        background: transparent;
+    }
+
+    .btn-sm {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #4c6ef5 0%, #5f3dc4 100%);
+        color: #ffffff;
+        border: none;
+        box-shadow: 0 2px 6px rgba(76, 110, 245, 0.4);
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #384ddf 0%, #4b32a3 100%);
+        box-shadow: 0 3px 10px rgba(76, 110, 245, 0.5);
+        transform: translateY(-1px);
+    }
+
+    .btn-primary i {
+        font-size: 12px;
+    }
+
+    .back-button {
+        padding: 8px 14px;
+        border-radius: 999px;
+        border: 1px solid #d0d7de;
+        background: #ffffff;
+        color: #34495e;
+        font-size: 13px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background 0.2s, border-color 0.2s;
+    }
+
+    .back-button:hover {
+        background: #f6f8fa;
+        border-color: #b3beca;
+    }
+
+    .meta-row {
+        margin-top: 14px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: center;
+    }
+
+    .meta-chip {
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 600;
+        background: #e9f2ff;
+        color: #1d4ed8;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .meta-chip.muted {
+        background: #f1f5f9;
+        color: #64748b;
+    }
+
+    .meta-chip.warning {
+        background: #fff4e5;
+        color: #c05621;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="profile-header">
+        <h2>
+            <i class="fas fa-user-circle"></i>
+            {{ employee.full_name or 'Employee Profile' }}
+        </h2>
+        <a href="/personnel/list" class="back-button">
+            <i class="fas fa-arrow-left"></i> Back to Directory
+        </a>
+    </div>
+
+    <div class="profile-layout">
+        <!-- Left: Summary -->
+        <div>
+            <div class="profile-card profile-summary">
+                <div class="profile-avatar-wrapper">
+                    <img src="{{ employee.portrait_file or '/static/images/user.png' }}"
+                         alt="Avatar"
+                         class="profile-avatar"
+                         onerror="this.src='/static/images/user.png'">
+                    <div class="profile-name">
+                        {{ employee.full_name or 'N/A' }}
+                    </div>
+                    <div class="profile-meta">
+                        {% if employee.date_of_birth %}
+                            DOB: {{ employee.date_of_birth }}
+                        {% else %}
+                            DOB: N/A
+                        {% endif %}
+                    </div>
+                    <div class="profile-meta">
+                        {% if employee.hometown %}
+                            Hometown: {{ employee.hometown }}
+                        {% endif %}
+                    </div>
+                    <div style="margin-top: 10px;">
+                        {% if employee.gender == 'male' %}
+                            <span class="badge-pill badge-male">
+                                <i class="fas fa-mars"></i> Male
+                            </span>
+                        {% elif employee.gender == 'female' %}
+                            <span class="badge-pill badge-female">
+                                <i class="fas fa-venus"></i> Female
+                            </span>
+                        {% else %}
+                            <span class="badge-pill badge-other">
+                                <i class="fas fa-genderless"></i> {{ employee.gender or 'Unspecified' }}
+                            </span>
+                        {% endif %}
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-chip muted">
+                            <i class="fas fa-calendar-plus"></i>
+                            Added: {{ employee.created_at.strftime('%b %d, %Y') if employee.created_at else 'N/A' }}
+                        </span>
+                        <span class="meta-chip muted">
+                            <i class="fas fa-clock"></i>
+                            Updated: {{ employee.updated_at.strftime('%b %d, %Y') if employee.updated_at else 'N/A' }}
+                        </span>
+                        <span class="meta-chip {{ 'warning' if 'Missing' in docs_status else '' }}">
+                            <i class="fas fa-file-medical"></i>
+                            {{ docs_status }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-card">
+                <div class="section-title">Contact</div>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">Personal Phone</div>
+                        <div class="detail-value">{{ employee.personal_phone or 'N/A' }}</div>
+                    </div>
+                    <div class="detail-item full-width">
+                        <div class="detail-label">Personal Email</div>
+                        <div class="detail-value email">{{ employee.personal_email or 'N/A' }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Emergency Contact</div>
+                        <div class="detail-value">{{ employee.emergency_contact or 'N/A' }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Health Status</div>
+                        <div class="detail-value">{{ employee.health_status or 'N/A' }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Detailed information -->
+        <div>
+            <div class="profile-card">
+                <div class="section-title">Personal Information</div>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">Place of Birth</div>
+                        <div class="detail-value">{{ employee.place_of_birth or 'N/A' }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Marital Status</div>
+                        <div class="detail-value">{{ employee.marital_status or 'N/A' }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Ethnicity</div>
+                        <div class="detail-value">{{ employee.ethnicity or 'N/A' }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Religion</div>
+                        <div class="detail-value">{{ employee.religion or 'N/A' }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Personal Tax Code</div>
+                        <div class="detail-value">{{ employee.personal_tax_code or 'N/A' }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Social Insurance Code</div>
+                        <div class="detail-value">{{ employee.social_insurance_code or 'N/A' }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Party Join Date</div>
+                        <div class="detail-value">{{ employee.party_join_date or 'N/A' }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Party Join Place</div>
+                        <div class="detail-value">{{ employee.party_join_place or 'N/A' }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-card">
+                <div class="section-title">Address</div>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">Permanent Address</div>
+                        <div class="detail-value">{{ employee.permanent_address or 'N/A' }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Current Address</div>
+                        <div class="detail-value">{{ employee.current_address or 'N/A' }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Permanent Province</div>
+                        <div class="detail-value">{{ employee.permanent_province or 'N/A' }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Current Province</div>
+                        <div class="detail-value">{{ employee.current_province or 'N/A' }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Permanent Ward</div>
+                        <div class="detail-value">{{ employee.permanent_ward or 'N/A' }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Current Ward</div>
+                        <div class="detail-value">{{ employee.current_ward or 'N/A' }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Permanent Street</div>
+                        <div class="detail-value">{{ employee.permanent_street or 'N/A' }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Current Street</div>
+                        <div class="detail-value">{{ employee.current_street or 'N/A' }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-card">
+                <div class="section-title">ID Card &amp; Passport</div>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">ID Card Number</div>
+                        <div class="detail-value">{{ employee.id_card_number or 'N/A' }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">ID Issue Date</div>
+                        <div class="detail-value">{{ employee.id_card_issue_date or 'N/A' }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">ID Expiry Date</div>
+                        <div class="detail-value">{{ employee.id_card_expiry_date or 'N/A' }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">ID Issue Place</div>
+                        <div class="detail-value">{{ employee.id_card_issue_place or 'N/A' }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Passport Number</div>
+                        <div class="detail-value">{{ employee.passport_number or 'N/A' }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Passport Issue Date</div>
+                        <div class="detail-value">{{ employee.passport_issue_date or 'N/A' }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Passport Expiry Date</div>
+                        <div class="detail-value">{{ employee.passport_expiry_date or 'N/A' }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Passport Issue Place</div>
+                        <div class="detail-value">{{ employee.passport_issue_place or 'N/A' }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-card">
+                <div class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>Files</span>
+                    <form id="uploadFilesForm" action="/personnel/{{ employee.id }}/files/upload" method="post" enctype="multipart/form-data" style="margin: 0;">
+                        <input type="file" id="extraFilesInput" name="files" multiple style="display: none;" onchange="document.getElementById('uploadFilesForm').submit();">
+                        <button type="button" class="btn btn-sm btn-primary" onclick="document.getElementById('extraFilesInput').click()">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>Upload</span>
+                        </button>
+                    </form>
+                </div>
+                <div class="detail-grid">
+                    {% if employee_files and employee_files|length > 0 %}
+                        {% for f in employee_files %}
+                            <div class="detail-item full-width">
+                                <div class="detail-value">
+                                    <a href="{{ f.url }}" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-file-archive"></i> {{ f.name }}
+                                    </a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="detail-item full-width">
+                            <div class="detail-value">No files here</div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

@@ -149,7 +149,7 @@
     .btn {
         padding: 12px 24px;
         border: none;
-        border-radius: 5px;
+        border-radius: 10px;
         cursor: pointer;
         font-weight: 600;
         display: inline-flex;
@@ -160,12 +160,13 @@
     }
 
     .btn-primary {
-        background: #007bff;
-        color: white;
+        background: #4c6ef5;
+        color: #ffffff;
+        box-shadow: none;
     }
 
     .btn-primary:hover {
-        background: #0056b3;
+        background: #384ddf;
     }
 
     .btn-success {
@@ -188,9 +189,12 @@
 
     .btn-upload {
         background: #28a745;
-        color: white;
-        padding: 8px 16px;
-        font-size: 12px;
+        color: #ffffff;
+        padding: 10px 16px;
+        font-size: 14px;
+        border-radius: 10px;
+        font-weight: 600;
+        margin-top: 12px;
     }
 
     .btn-upload:hover {
@@ -253,15 +257,15 @@
         <!-- Step 1: CV Upload -->
         <div class="personnel-card" id="cvUploadStep">
             <h2 style="text-align: center; color: #2c3e50; margin-bottom: 30px;">
-                <i class="fas fa-upload"></i> Upload CV Image
+                <i class="fas fa-upload"></i> Upload CV (Image or PDF)
             </h2>
             
             <div class="upload-section">
                 <div id="uploadArea">
                     <i class="fas fa-cloud-upload-alt" style="font-size: 48px; color: #ddd; margin-bottom: 15px;"></i>
-                    <h4>Upload CV Image</h4>
-                    <p>You can upload a CV image or skip this step</p>
-                    <input type="file" id="cvFileInput" accept="image/*" style="display: none;">
+                    <h4>Upload CV (Image or PDF)</h4>
+                    <p>You can upload a CV file (image or PDF) or skip this step — Max 10 files, 100MB each</p>
+                    <input type="file" id="cvFileInput" accept="image/*,.pdf,application/pdf" style="display: none;">
                     <button class="btn btn-upload" onclick="document.getElementById('cvFileInput').click()">
                         <i class="fas fa-upload"></i> Upload
                     </button>
@@ -269,7 +273,7 @@
                 
                 <div id="previewArea" class="hidden">
                     <img id="cvPreview" class="upload-preview" src="" alt="CV Preview">
-                    <p>CV Image Uploaded</p>
+                    <p id="cvPreviewLabel">CV Uploaded</p>
                     <button class="btn btn-secondary" onclick="removeCV()">
                         <i class="fas fa-trash"></i> Remove
                     </button>
@@ -277,8 +281,14 @@
             </div>
             
             <div class="form-actions">
+                <button class="btn btn-secondary" style="margin-right: 10px;" onclick="goBackToAddModeSelection()">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
+                <button id="resetSessionBtn" class="btn btn-secondary hidden" style="margin-right: 10px;" onclick="resetCvSession()">
+                    <i class="fas fa-undo"></i> Reset
+                </button>
                 <button class="btn btn-primary" onclick="nextStep()">
-                    <i class="fas fa-arrow-right"></i> Tiếp tục
+                    <i class="fas fa-arrow-right"></i> Continue
                 </button>
             </div>
         </div>
@@ -286,13 +296,13 @@
         <!-- Step 2: Personal Information Form -->
         <div class="personnel-card hidden" id="personalInfoStep">
             <h2 style="text-align: center; color: #2c3e50; margin-bottom: 30px;">
-                <i class="fas fa-user"></i> Thông tin bản thân
+                <i class="fas fa-user"></i> Personal Information
             </h2>
             
             <form id="personalInfoForm">
                 <!-- Validation Summary -->
                 <div id="validationSummary" class="validation-summary">
-                    <strong><i class="fas fa-exclamation-triangle"></i> Vui lòng điền đầy đủ thông tin bắt buộc:</strong>
+                    <strong><i class="fas fa-exclamation-triangle"></i> Please fill in all required fields:</strong>
                     <ul id="validationErrors"></ul>
                 </div>
                 
@@ -300,12 +310,12 @@
                 <div class="form-section">
                     <div class="section-header">
                         <i class="fas fa-user"></i>
-                        <span>THÔNG TIN BẢN THÂN</span>
+                        <span>PERSONAL INFORMATION</span>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="required">Ảnh chân dung</label>
+                            <label class="required">Portrait Photo</label>
                             <div style="display: flex; align-items: center; gap: 10px;">
                                 <button type="button" class="btn btn-upload" onclick="document.getElementById('portraitFileInput').click()">
                                     <i class="fas fa-upload"></i> Upload
@@ -320,59 +330,59 @@
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="required">Họ và tên</label>
-                            <input type="text" class="form-control" name="full_name" placeholder="Họ và tên đầy đủ">
-                            <div class="error-message">Vui lòng nhập họ và tên</div>
+                            <label class="required">Full Name</label>
+                            <input type="text" class="form-control" name="full_name" placeholder="Full name">
+                            <div class="error-message">Please enter full name</div>
                         </div>
                         <div class="form-group">
-                            <label class="required">Giới tính</label>
+                            <label class="required">Gender</label>
                             <div class="radio-group">
                                 <div class="radio-item">
                                     <input type="radio" name="gender" value="male" id="gender_male">
-                                    <label for="gender_male">Nam</label>
+                                    <label for="gender_male">Male</label>
                                 </div>
                                 <div class="radio-item">
                                     <input type="radio" name="gender" value="female" id="gender_female">
-                                    <label for="gender_female">Nữ</label>
+                                    <label for="gender_female">Female</label>
                                 </div>
                             </div>
-                            <div class="error-message">Vui lòng chọn giới tính</div>
+                            <div class="error-message">Please select gender</div>
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="required">Ngày sinh</label>
+                            <label class="required">Date of Birth</label>
                             <input type="text" class="form-control" name="date_of_birth" placeholder="dd/mm/yyyy">
-                            <div class="error-message">Vui lòng nhập ngày sinh</div>
+                            <div class="error-message">Please enter date of birth</div>
                         </div>
                         <div class="form-group">
-                            <label class="required">Nơi sinh</label>
-                            <input type="text" class="form-control" name="place_of_birth" placeholder="Nhập nơi sinh">
-                            <div class="error-message">Vui lòng nhập nơi sinh</div>
+                            <label class="required">Place of Birth</label>
+                            <input type="text" class="form-control" name="place_of_birth" placeholder="Enter place of birth">
+                            <div class="error-message">Please enter place of birth</div>
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="required">Quê quán</label>
-                            <input type="text" class="form-control" name="hometown" placeholder="Nhập quê quán">
-                            <div class="error-message">Vui lòng nhập quê quán</div>
+                            <label class="required">Hometown</label>
+                            <input type="text" class="form-control" name="hometown" placeholder="Enter hometown">
+                            <div class="error-message">Please enter hometown</div>
                         </div>
                         <div class="form-group">
-                            <label>Tình trạng hôn nhân</label>
+                            <label>Marital Status</label>
                             <div class="radio-group">
                                 <div class="radio-item">
                                     <input type="radio" name="marital_status" value="single" id="marital_single">
-                                    <label for="marital_single">Độc thân</label>
+                                    <label for="marital_single">Single</label>
                                 </div>
                                 <div class="radio-item">
                                     <input type="radio" name="marital_status" value="married" id="marital_married">
-                                    <label for="marital_married">Kết hôn</label>
+                                    <label for="marital_married">Married</label>
                                 </div>
                                 <div class="radio-item">
                                     <input type="radio" name="marital_status" value="other" id="marital_other">
-                                    <label for="marital_other">Khác</label>
+                                    <label for="marital_other">Other</label>
                                 </div>
                             </div>
                         </div>
@@ -380,64 +390,64 @@
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Dân tộc</label>
-                            <input type="text" class="form-control" name="ethnicity" placeholder="Nhập dân tộc">
+                            <label>Ethnicity</label>
+                            <input type="text" class="form-control" name="ethnicity" placeholder="Enter ethnicity">
                         </div>
                         <div class="form-group">
-                            <label>Tôn giáo</label>
-                            <input type="text" class="form-control" name="religion" placeholder="Nhập tôn giáo">
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>MST cá nhân</label>
-                            <input type="text" class="form-control" name="personal_tax_code" placeholder="Nhập mã số thuế cá nhân">
-                        </div>
-                        <div class="form-group">
-                            <label>Mã BHXH</label>
-                            <input type="text" class="form-control" name="social_insurance_code" placeholder="Nhập mã bảo hiểm xã hội">
+                            <label>Religion</label>
+                            <input type="text" class="form-control" name="religion" placeholder="Enter religion">
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="required">Số đt cá nhân</label>
-                            <input type="tel" class="form-control" name="personal_phone" placeholder="Nhập số điện thoại cá nhân">
-                            <div class="error-message">Vui lòng nhập số điện thoại cá nhân</div>
+                            <label>Personal Tax Code</label>
+                            <input type="text" class="form-control" name="personal_tax_code" placeholder="Enter personal tax code">
                         </div>
                         <div class="form-group">
-                            <label class="required">Email cá nhân</label>
-                            <input type="email" class="form-control" name="personal_email" placeholder="Nhập email cá nhân">
-                            <div class="error-message">Vui lòng nhập email cá nhân</div>
+                            <label>Social Insurance Code</label>
+                            <input type="text" class="form-control" name="social_insurance_code" placeholder="Enter social insurance code">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="required">Personal Phone Number</label>
+                            <input type="tel" class="form-control" name="personal_phone" placeholder="Enter personal phone number">
+                            <div class="error-message">Please enter personal phone number</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="required">Personal Email</label>
+                            <input type="email" class="form-control" name="personal_email" placeholder="Enter personal email">
+                            <div class="error-message">Please enter personal email</div>
                         </div>
                     </div>
                     
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Ngày vào đảng</label>
+                            <label>Party Join Date</label>
                             <input type="text" class="form-control" name="party_join_date" placeholder="dd/mm/yyyy">
                         </div>
                         <div class="form-group">
-                            <label>Nơi kết nạp</label>
-                            <input type="text" class="form-control" name="party_join_place" placeholder="Nhập nơi kết nạp">
+                            <label>Party Join Place</label>
+                            <input type="text" class="form-control" name="party_join_place" placeholder="Enter party join place">
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Tình trạng sức khỏe</label>
+                            <label>Health Status</label>
                             <select class="form-control" name="health_status">
-                                <option value="">Chọn tình trạng sức khỏe</option>
-                                <option value="excellent">Tốt</option>
-                                <option value="good">Khá tốt</option>
-                                <option value="fair">Trung bình</option>
-                                <option value="poor">Kém</option>
+                                <option value="">Select health status</option>
+                                <option value="excellent">Excellent</option>
+                                <option value="good">Good</option>
+                                <option value="fair">Fair</option>
+                                <option value="poor">Poor</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Giấy khám SK</label>
+                            <label>Health Certificate</label>
                             <div style="display: flex; align-items: center; gap: 10px;">
                                 <button type="button" class="btn btn-upload" onclick="document.getElementById('healthFileInput').click()">
                                     <i class="fas fa-upload"></i> Upload
@@ -449,8 +459,8 @@
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Số liên hệ khẩn cấp (tên + số)</label>
-                            <input type="text" class="form-control" name="emergency_contact" placeholder="Tên và số điện thoại liên hệ khẩn cấp">
+                            <label>Emergency Contact (name + phone)</label>
+                            <input type="text" class="form-control" name="emergency_contact" placeholder="Name and phone number for emergency contact">
                         </div>
                     </div>
                 </div>
@@ -459,74 +469,74 @@
                 <div class="form-section">
                     <div class="section-header">
                         <i class="fas fa-home"></i>
-                        <span>HỘ KHẨU THƯỜNG TRÚ & NƠI Ở HIỆN TẠI</span>
+                        <span>PERMANENT RESIDENCE & CURRENT ADDRESS</span>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label><strong>Hộ khẩu thường trú VD: "144 Phường Nghĩa Đô, Thành phố Hà Nội"</strong></label>
-                            <textarea class="form-control" name="permanent_address" rows="3" placeholder="Nhập địa chỉ thường trú"></textarea>
+                            <label><strong>Permanent residence e.g., "144 Nghia Do Ward, Hanoi City"</strong></label>
+                            <textarea class="form-control" name="permanent_address" rows="3" placeholder="Enter permanent address"></textarea>
                         </div>
                         <div class="form-group">
-                            <label><strong>Nơi ở hiện tại VD: "144 Phường Nghĩa Đô, Thành phố Hà Nội"</strong></label>
-                            <textarea class="form-control" name="current_address" rows="3" placeholder="Nhập địa chỉ hiện tại"></textarea>
+                            <label><strong>Current address e.g., "144 Nghia Do Ward, Hanoi City"</strong></label>
+                            <textarea class="form-control" name="current_address" rows="3" placeholder="Enter current address"></textarea>
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Tỉnh/Thành phố</label>
+                            <label>Province/City</label>
                             <select class="form-control" name="permanent_province">
-                                <option value="">Chọn Tỉnh/Thành phố</option>
-                                <option value="hanoi">Hà Nội</option>
-                                <option value="hcm">TP. Hồ Chí Minh</option>
-                                <option value="danang">Đà Nẵng</option>
-                                <option value="haiphong">Hải Phòng</option>
-                                <option value="cantho">Cần Thơ</option>
+                                <option value="">Select Province/City</option>
+                                <option value="hanoi">Hanoi</option>
+                                <option value="hcm">Ho Chi Minh City</option>
+                                <option value="danang">Da Nang</option>
+                                <option value="haiphong">Hai Phong</option>
+                                <option value="cantho">Can Tho</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Tỉnh/Thành phố</label>
+                            <label>Province/City</label>
                             <select class="form-control" name="current_province">
-                                <option value="">Chọn Tỉnh/Thành phố</option>
-                                <option value="hanoi">Hà Nội</option>
-                                <option value="hcm">TP. Hồ Chí Minh</option>
-                                <option value="danang">Đà Nẵng</option>
-                                <option value="haiphong">Hải Phòng</option>
-                                <option value="cantho">Cần Thơ</option>
+                                <option value="">Select Province/City</option>
+                                <option value="hanoi">Hanoi</option>
+                                <option value="hcm">Ho Chi Minh City</option>
+                                <option value="danang">Da Nang</option>
+                                <option value="haiphong">Hai Phong</option>
+                                <option value="cantho">Can Tho</option>
                             </select>
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Phường/Xã/Thị trấn</label>
+                            <label>Ward/District/Town</label>
                             <select class="form-control" name="permanent_ward">
-                                <option value="">Chọn Phường/Xã/Thị trấn</option>
-                                <option value="nghia_do">Nghĩa Đô</option>
-                                <option value="cau_giay">Cầu Giấy</option>
-                                <option value="dong_da">Đống Đa</option>
+                                <option value="">Select Ward/District/Town</option>
+                                <option value="nghia_do">Nghia Do</option>
+                                <option value="cau_giay">Cau Giay</option>
+                                <option value="dong_da">Dong Da</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Phường/Xã/Thị trấn</label>
+                            <label>Ward/District/Town</label>
                             <select class="form-control" name="current_ward">
-                                <option value="">Chọn Phường/Xã/Thị trấn</option>
-                                <option value="nghia_do">Nghĩa Đô</option>
-                                <option value="cau_giay">Cầu Giấy</option>
-                                <option value="dong_da">Đống Đa</option>
+                                <option value="">Select Ward/District/Town</option>
+                                <option value="nghia_do">Nghia Do</option>
+                                <option value="cau_giay">Cau Giay</option>
+                                <option value="dong_da">Dong Da</option>
                             </select>
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Số nhà, đường/xóm</label>
-                            <input type="text" class="form-control" name="permanent_street" placeholder="Nhập số nhà, đường/xóm">
+                            <label>House number, street/hamlet</label>
+                            <input type="text" class="form-control" name="permanent_street" placeholder="Enter house number, street/hamlet">
                         </div>
                         <div class="form-group">
-                            <label>Số nhà, đường/xóm</label>
-                            <input type="text" class="form-control" name="current_street" placeholder="Nhập số nhà, đường/xóm">
+                            <label>House number, street/hamlet</label>
+                            <input type="text" class="form-control" name="current_street" placeholder="Enter house number, street/hamlet">
                         </div>
                     </div>
                 </div>
@@ -535,59 +545,59 @@
                 <div class="form-section">
                     <div class="section-header">
                         <i class="fas fa-id-card"></i>
-                        <span>CĂN CƯỚC & HỘ CHIẾU</span>
+                        <span>ID CARD & PASSPORT</span>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="required"><strong>Số CCCD</strong></label>
-                            <input type="text" class="form-control" name="id_card_number" placeholder="Nhập số căn cước công dân">
-                            <div class="error-message">Vui lòng nhập số căn cước công dân</div>
+                            <label class="required"><strong>ID Card Number</strong></label>
+                            <input type="text" class="form-control" name="id_card_number" placeholder="Enter ID card number">
+                            <div class="error-message">Please enter ID card number</div>
                         </div>
                         <div class="form-group">
-                            <label><strong>Số Hộ chiếu</strong></label>
-                            <input type="text" class="form-control" name="passport_number" placeholder="Nhập số hộ chiếu">
+                            <label><strong>Passport Number</strong></label>
+                            <input type="text" class="form-control" name="passport_number" placeholder="Enter passport number">
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="required">Ngày cấp</label>
+                            <label class="required">Issue Date</label>
                             <input type="text" class="form-control" name="id_card_issue_date" placeholder="dd/mm/yyyy">
-                            <div class="error-message">Vui lòng nhập ngày cấp CCCD</div>
+                            <div class="error-message">Please enter ID card issue date</div>
                         </div>
                         <div class="form-group">
-                            <label>Ngày cấp</label>
+                            <label>Issue Date</label>
                             <input type="text" class="form-control" name="passport_issue_date" placeholder="dd/mm/yyyy">
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Ngày hết hạn</label>
+                            <label>Expiry Date</label>
                             <input type="text" class="form-control" name="id_card_expiry_date" placeholder="dd/mm/yyyy">
                         </div>
                         <div class="form-group">
-                            <label>Ngày hết hạn</label>
+                            <label>Expiry Date</label>
                             <input type="text" class="form-control" name="passport_expiry_date" placeholder="dd/mm/yyyy">
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="required">Nơi cấp</label>
-                            <input type="text" class="form-control" name="id_card_issue_place" placeholder="Nhập nơi cấp CCCD">
-                            <div class="error-message">Vui lòng nhập nơi cấp CCCD</div>
+                            <label class="required">Issue Place</label>
+                            <input type="text" class="form-control" name="id_card_issue_place" placeholder="Enter ID card issue place">
+                            <div class="error-message">Please enter ID card issue place</div>
                         </div>
                         <div class="form-group">
-                            <label>Nơi cấp</label>
-                            <input type="text" class="form-control" name="passport_issue_place" placeholder="Nhập nơi cấp hộ chiếu">
+                            <label>Issue Place</label>
+                            <input type="text" class="form-control" name="passport_issue_place" placeholder="Enter passport issue place">
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Đính kèm (2 mặt)</label>
+                            <label>Attach (both sides)</label>
                             <div style="display: flex; align-items: center; gap: 10px;">
                                 <button type="button" class="btn btn-upload" onclick="document.getElementById('idCardFileInput').click()">
                                     <i class="fas fa-upload"></i> Upload
@@ -596,7 +606,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label>Đính kèm (2 mặt)</label>
+                            <label>Attach (both sides)</label>
                             <div style="display: flex; align-items: center; gap: 10px;">
                                 <button type="button" class="btn btn-upload" onclick="document.getElementById('passportFileInput').click()">
                                     <i class="fas fa-upload"></i> Upload
@@ -609,10 +619,10 @@
                 
                 <div class="form-actions">
                     <button type="button" class="btn btn-secondary" onclick="prevStep()">
-                        <i class="fas fa-arrow-left"></i> Quay lại
+                        <i class="fas fa-arrow-left"></i> Back
                     </button>
                     <button type="submit" class="btn btn-success" onclick="handleFormSubmission(); return false;">
-                        <i class="fas fa-check"></i> Hoàn thành
+                        <i class="fas fa-check"></i> Finish
                     </button>
                 </div>
             </form>
@@ -654,9 +664,26 @@ document.addEventListener('DOMContentLoaded', function() {
             cvFile = file;
             const reader = new FileReader();
             reader.onload = function(e) {
-                document.getElementById('cvPreview').src = e.target.result;
-                document.getElementById('uploadArea').classList.add('hidden');
-                document.getElementById('previewArea').classList.remove('hidden');
+                const uploadArea = document.getElementById('uploadArea');
+                const previewArea = document.getElementById('previewArea');
+                const previewImg = document.getElementById('cvPreview');
+                const previewLabel = document.getElementById('cvPreviewLabel');
+
+                if (file.type === 'application/pdf' || file.name.toLowerCase().endswith('.pdf')) {
+                    // For PDF, don't try to render in <img>; just show an icon/label
+                    previewImg.src = '';
+                    previewImg.style.display = 'none';
+                    previewLabel.textContent = `CV PDF Uploaded: ${file.name}`;
+                } else {
+                    previewImg.style.display = 'block';
+                    previewImg.src = e.target.result;
+                    previewLabel.textContent = 'CV Image Uploaded';
+                }
+
+                uploadArea.classList.add('hidden');
+                previewArea.classList.remove('hidden');
+                const resetBtn = document.getElementById('resetSessionBtn');
+                if (resetBtn) resetBtn.classList.remove('hidden');
             };
             reader.readAsDataURL(file);
         }
@@ -819,6 +846,31 @@ function nextStep() {
     
     console.log('Form should now be visible');
     console.log('Form element:', document.getElementById('personalInfoForm'));
+
+    // If a CV was uploaded, call backend to extract fields with Gemini and prefill
+    if (cvFile) {
+        showMessage('Reading CV to prefill your info...', 'info');
+        fileToBase64(cvFile)
+            .then(b64 => fetch('/personnel/api/extract-cv', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ files: [b64] })
+            }))
+            .then(res => res.json())
+            .then(result => {
+                if (result && result.success && result.data) {
+                    prefillFromExtractedData(result.data);
+                    showMessage('CV parsed. Fields were prefilled when available.', 'success');
+                } else {
+                    const detail = result && result.error ? ` (${result.error})` : '';
+                    showMessage(`Could not extract info from the CV.${detail}`, 'error');
+                }
+            })
+            .catch(err => {
+                console.error('CV extraction error:', err);
+                showMessage('Error reading CV.', 'error');
+            });
+    }
 }
 
 function prevStep() {
@@ -836,6 +888,29 @@ function removeCV() {
     document.getElementById('cvFileInput').value = '';
     document.getElementById('uploadArea').classList.remove('hidden');
     document.getElementById('previewArea').classList.add('hidden');
+    const resetBtn = document.getElementById('resetSessionBtn');
+    if (resetBtn) resetBtn.classList.add('hidden');
+}
+
+function goBackToAddModeSelection() {
+    // Navigate back to the Single/Multiple selection page
+    window.location.href = '/personnel/add';
+}
+
+function resetCvSession() {
+    // Start a new session effect: clear any staged files and reload the step to initial state
+    cvFile = null;
+    portraitFile = null;
+    healthFile = null;
+    idCardFile = null;
+    passportFile = null;
+    document.getElementById('cvFileInput').value = '';
+    document.getElementById('cvPreview').src = '';
+    document.getElementById('uploadArea').classList.remove('hidden');
+    document.getElementById('previewArea').classList.add('hidden');
+    const resetBtn = document.getElementById('resetSessionBtn');
+    if (resetBtn) resetBtn.classList.add('hidden');
+    showMessage('Session reset. No CV on file.', 'info');
 }
 
 // Validation functions
@@ -843,16 +918,16 @@ function validateForm() {
     console.log('validateForm() called');
     let isValid = true;
     const requiredFields = [
-        { name: 'full_name', message: 'Họ và tên' },
-        { name: 'gender', message: 'Giới tính' },
-        { name: 'date_of_birth', message: 'Ngày sinh' },
-        { name: 'place_of_birth', message: 'Nơi sinh' },
-        { name: 'hometown', message: 'Quê quán' },
-        { name: 'personal_phone', message: 'Số điện thoại cá nhân' },
-        { name: 'personal_email', message: 'Email cá nhân' },
-        { name: 'id_card_number', message: 'Số căn cước công dân' },
-        { name: 'id_card_issue_date', message: 'Ngày cấp CCCD' },
-        { name: 'id_card_issue_place', message: 'Nơi cấp CCCD' }
+        { name: 'full_name', message: 'Full name' },
+        { name: 'gender', message: 'Gender' },
+        { name: 'date_of_birth', message: 'Date of birth' },
+        { name: 'place_of_birth', message: 'Place of birth' },
+        { name: 'hometown', message: 'Hometown' },
+        { name: 'personal_phone', message: 'Personal phone number' },
+        { name: 'personal_email', message: 'Personal email' },
+        { name: 'id_card_number', message: 'ID card number' },
+        { name: 'id_card_issue_date', message: 'ID card issue date' },
+        { name: 'id_card_issue_place', message: 'ID card issue place' }
     ];
 
     requiredFields.forEach(field => {
@@ -919,6 +994,27 @@ function showValidationSummary() {
     
     // Scroll to validation summary
     validationSummary.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+// Prefill only empty inputs so the user can still edit
+function prefillFromExtractedData(data) {
+    if (!data) return;
+    const form = document.getElementById('personalInfoForm');
+    Object.entries(data).forEach(([key, value]) => {
+        const elements = form.querySelectorAll(`[name="${key}"]`);
+        if (!elements.length) return;
+        elements.forEach(el => {
+            if (el.type === 'radio') {
+                if (!form.querySelector(`[name="${key}"]:checked`) && (el.value === String(value).toLowerCase())) {
+                    el.checked = true;
+                }
+            } else if (el.tagName === 'SELECT' || el.tagName === 'TEXTAREA' || el.type === 'text' || el.type === 'email' || el.type === 'tel') {
+                if (!el.value) {
+                    el.value = value;
+                }
+            }
+        });
+    });
 }
 
 // Function to convert file to base64
