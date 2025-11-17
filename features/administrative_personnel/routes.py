@@ -12,6 +12,7 @@ import io
 import zipfile
 from config.settings import Config
 from google import genai
+from google.genai import types
 from werkzeug.utils import secure_filename
 
 gemini_client = genai.Client(api_key=Config.GEMINI_API_KEY)
@@ -994,7 +995,7 @@ def get_employees():
 
 
 def _data_url_to_part(data_url):
-    """Convert data URL (base64) to an inline_data part for Gemini."""
+    """Convert data URL (base64) to a Part object for Gemini."""
     try:
         if not data_url or not isinstance(data_url, str):
             return None
@@ -1005,9 +1006,11 @@ def _data_url_to_part(data_url):
             # Assume it's just base64 without header
             mime = 'image/png'
             b64data = data_url
-        # google-genai expects base64-encoded string in inline_data.data
-        return {"mime_type": mime, "data": b64data}
-    except Exception:
+        # Decode base64 to bytes and use Part.from_bytes() for proper handling
+        file_bytes = base64.b64decode(b64data)
+        return types.Part.from_bytes(data=file_bytes, mime_type=mime)
+    except Exception as e:
+        print(f"ERROR: Failed to convert data URL to part: {str(e)}")
         return None
 
 
@@ -1060,19 +1063,16 @@ def extract_from_cv():
             "passport_number, passport_issue_date, passport_expiry_date, passport_issue_place"
         )
 
-        # Build content for google-genai: text instructions + inline_data parts
-        parts = [{"text": instructions}]
-        for p in inline_parts:
-            parts.append({
-                "inline_data": {
-                    "mime_type": p["mime_type"],
-                    "data": p["data"],
-                }
-            })
+        # Build content for google-genai: text instructions + file parts
+        parts = [types.Part.from_text(instructions)]
+        parts.extend(inline_parts)
+
+        # Wrap parts in Content object with user role
+        content = types.Content(role="user", parts=parts)
 
         response = gemini_client.models.generate_content(
             model="gemini-2.0-flash",
-            contents=[{"role": "user", "parts": parts}],
+            contents=[content],
         )
 
         text = getattr(response.candidates[0].content.parts[0], "text", "") if getattr(response, "candidates", None) else ""
