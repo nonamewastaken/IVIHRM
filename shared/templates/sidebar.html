@@ -23,160 +23,161 @@
 // Sidebar data configuration
 const sidebarData = {
     'Home': {
-        title: 'Dashboard Management',
+        title: (window.t && window.t('ui.sidebar.home.title', 'Dashboard Management')) || 'Dashboard Management',
         icon: 'fas fa-home',
         sections: [
             {
                 title: 'Overview',
                 items: [
-                    { icon: 'fas fa-chart-pie', text: 'Dashboard Overview', href: '/dashboard' },
-                    { icon: 'fas fa-calendar-check', text: 'Today\'s Summary', href: '/dashboard/today' },
-                    { icon: 'fas fa-bell', text: 'Notifications', href: '/dashboard/notifications' }
+                    { icon: 'fas fa-chart-pie', text: (window.t && window.t('ui.sidebar.home.overview', 'Dashboard Overview')) || 'Dashboard Overview', href: '/dashboard' },
+                    { icon: 'fas fa-calendar-check', text: (window.t && window.t('ui.sidebar.home.today', 'Today\'s Summary')) || 'Today\'s Summary', href: '/dashboard/today' },
+                    { icon: 'fas fa-bell', text: (window.t && window.t('ui.sidebar.home.notifications', 'Notifications')) || 'Notifications', href: '/dashboard/notifications' }
                 ]
             },
             {
                 title: 'Quick Actions',
                 items: [
-                    { icon: 'fas fa-plus', text: 'Quick Add', href: '/dashboard/quick-add' },
-                    { icon: 'fas fa-search', text: 'Search', href: '/dashboard/search' },
-                    { icon: 'fas fa-cog', text: 'Settings', href: '/dashboard/settings' }
+                    { icon: 'fas fa-plus', text: (window.t && window.t('ui.sidebar.home.quickAdd', 'Quick Add')) || 'Quick Add', href: '/dashboard/quick-add' },
+                    { icon: 'fas fa-search', text: (window.t && window.t('ui.sidebar.home.search', 'Search')) || 'Search', href: '/dashboard/search' },
+                    { icon: 'fas fa-cog', text: (window.t && window.t('ui.sidebar.home.settings', 'Settings')) || 'Settings', href: '/dashboard/settings' }
                 ]
             }
         ]
     },
     'Administrative Personnel': {
-        title: 'Personnel Management',
+        title: (window.t && window.t('ui.sidebar.personnel.title', 'Personnel Management')) || 'Personnel Management',
         icon: 'fas fa-users',
         sections: [
             {
                 title: 'Overview',
                 items: [
-                    { icon: 'fas fa-chart-line', text: 'Overview', href: '/personnel' }
+                    { icon: 'fas fa-chart-line', text: (window.t && window.t('ui.sidebar.personnel.overview', 'Overview')) || 'Overview', href: '/personnel' }
                 ]
             },
             {
                 title: 'Employee Management',
                 items: [
-                    { icon: 'fas fa-user-plus', text: 'Add Employee', href: '/personnel/add' },
-                    { icon: 'fas fa-users', text: 'All Employees', href: '/personnel/list' }
+                    { icon: 'fas fa-file-signature', text: (window.t && window.t('ui.sidebar.personnel.cvCustomization', 'CV Customization')) || 'CV Customization', href: '/personnel/cv-customization' },
+                    { icon: 'fas fa-user-plus', text: (window.t && window.t('ui.sidebar.personnel.addEmployee', 'Add Employee')) || 'Add Employee', href: '/personnel/add' },
+                    { icon: 'fas fa-users', text: (window.t && window.t('ui.sidebar.personnel.allEmployees', 'All Employees')) || 'All Employees', href: '/personnel/list' }
                 ]
             },
             {
                 title: 'Department Management',
                 items: [
-                    { icon: 'fas fa-building-columns', text: 'Companies', href: '/personnel/companies' },
-                    { icon: 'fas fa-network-wired', text: 'Divisions', href: '/personnel/divisions' },
-                    { icon: 'fas fa-building', text: 'Departments', href: '/personnel/departments' },
-                    { icon: 'fas fa-diagram-next', text: 'Sub-departments', href: '/personnel/sub-departments' },
-                    { icon: 'fas fa-sitemap', text: 'Organizational Chart', href: '/personnel/org-chart' },
-                    { icon: 'fas fa-user-tag', text: 'Roles & Positions', href: '/personnel/roles' }
+                    { icon: 'fas fa-building-columns', text: (window.t && window.t('ui.sidebar.personnel.companies', 'Companies')) || 'Companies', href: '/personnel/companies' },
+                    { icon: 'fas fa-network-wired', text: (window.t && window.t('ui.sidebar.personnel.divisions', 'Divisions')) || 'Divisions', href: '/personnel/divisions' },
+                    { icon: 'fas fa-building', text: (window.t && window.t('ui.sidebar.personnel.departments', 'Departments')) || 'Departments', href: '/personnel/departments' },
+                    { icon: 'fas fa-diagram-next', text: (window.t && window.t('ui.sidebar.personnel.subDepartments', 'Sub-departments')) || 'Sub-departments', href: '/personnel/sub-departments' },
+                    { icon: 'fas fa-sitemap', text: (window.t && window.t('ui.sidebar.personnel.orgChart', 'Organizational Chart')) || 'Organizational Chart', href: '/personnel/org-chart' },
+                    { icon: 'fas fa-user-tag', text: (window.t && window.t('ui.sidebar.personnel.roles', 'Roles & Positions')) || 'Roles & Positions', href: '/personnel/roles' }
                 ]
             },
             {
                 title: 'Reports',
                 items: [
-                    { icon: 'fas fa-file-alt', text: 'Personnel Reports', href: '/personnel/reports' },
-                    { icon: 'fas fa-chart-bar', text: 'Analytics', href: '/personnel/analytics' }
+                    { icon: 'fas fa-file-alt', text: (window.t && window.t('ui.sidebar.personnel.reports', 'Personnel Reports')) || 'Personnel Reports', href: '/personnel/reports' },
+                    { icon: 'fas fa-chart-bar', text: (window.t && window.t('ui.sidebar.personnel.analytics', 'Analytics')) || 'Analytics', href: '/personnel/analytics' }
                 ]
             }
         ]
     },
     'Attendance': {
-        title: 'Attendance Management',
+        title: (window.t && window.t('ui.sidebar.attendance.title', 'Attendance Management')) || 'Attendance Management',
         icon: 'fas fa-clock',
         sections: [
             {
                 title: 'Overview',
                 items: [
-                    { icon: 'fas fa-chart-line', text: 'Overview', href: '/attendance/overview' }
+                    { icon: 'fas fa-chart-line', text: (window.t && window.t('ui.sidebar.attendance.overview', 'Overview')) || 'Overview', href: '/attendance/overview' }
                 ]
             },
             {
                 title: 'Attendance Management',
                 items: [
-                    { icon: 'fas fa-calendar-alt', text: 'Monthly Attendance Detail', href: '/attendance/monthly_attendance_detail' },
-                    { icon: 'fas fa-chart-bar', text: 'Attendance Summary', href: '/attendance/attendance_summary' },
-                    { icon: 'fas fa-database', text: 'Work Data', href: '/attendance/work_data' },
-                    { icon: 'fas fa-history', text: 'Attendance History', href: '/attendance/history' }
+                    { icon: 'fas fa-calendar-alt', text: (window.t && window.t('ui.sidebar.attendance.monthlyDetail', 'Monthly Attendance Detail')) || 'Monthly Attendance Detail', href: '/attendance/monthly_attendance_detail' },
+                    { icon: 'fas fa-chart-bar', text: (window.t && window.t('ui.sidebar.attendance.summary', 'Attendance Summary')) || 'Attendance Summary', href: '/attendance/attendance_summary' },
+                    { icon: 'fas fa-database', text: (window.t && window.t('ui.sidebar.attendance.workData', 'Work Data')) || 'Work Data', href: '/attendance/work_data' },
+                    { icon: 'fas fa-history', text: (window.t && window.t('ui.sidebar.attendance.history', 'Attendance History')) || 'Attendance History', href: '/attendance/history' }
                 ]
             },
             {
                 title: 'Time Tracking',
                 items: [
-                    { icon: 'fas fa-play', text: 'Check In/Out', href: '/attendance/checkin' },
-                    { icon: 'fas fa-clock', text: 'Time Clock', href: '/attendance/timeclock' },
-                    { icon: 'fas fa-mobile-alt', text: 'Mobile App', href: '/attendance/mobile' }
+                    { icon: 'fas fa-play', text: (window.t && window.t('ui.sidebar.attendance.checkInOut', 'Check In/Out')) || 'Check In/Out', href: '/attendance/checkin' },
+                    { icon: 'fas fa-clock', text: (window.t && window.t('ui.sidebar.attendance.timeClock', 'Time Clock')) || 'Time Clock', href: '/attendance/timeclock' },
+                    { icon: 'fas fa-mobile-alt', text: (window.t && window.t('ui.sidebar.attendance.mobileApp', 'Mobile App')) || 'Mobile App', href: '/attendance/mobile' }
                 ]
             },
             {
                 title: 'Reports & Analytics',
                 items: [
-                    { icon: 'fas fa-file-excel', text: 'Export Data', href: '/attendance/export' },
-                    { icon: 'fas fa-chart-pie', text: 'Attendance Analytics', href: '/attendance/analytics' },
-                    { icon: 'fas fa-calendar-week', text: 'Weekly Reports', href: '/attendance/weekly' }
+                    { icon: 'fas fa-file-excel', text: (window.t && window.t('ui.sidebar.attendance.export', 'Export Data')) || 'Export Data', href: '/attendance/export' },
+                    { icon: 'fas fa-chart-pie', text: (window.t && window.t('ui.sidebar.attendance.analytics', 'Attendance Analytics')) || 'Attendance Analytics', href: '/attendance/analytics' },
+                    { icon: 'fas fa-calendar-week', text: (window.t && window.t('ui.sidebar.attendance.weekly', 'Weekly Reports')) || 'Weekly Reports', href: '/attendance/weekly' }
                 ]
             }
         ]
     },
     'Salary': {
-        title: 'Salary Management',
+        title: (window.t && window.t('ui.sidebar.salary.title', 'Salary Management')) || 'Salary Management',
         icon: 'fas fa-money-bill-wave',
         sections: [
             {
                 title: 'Payroll Management',
                 items: [
-                    { icon: 'fas fa-chart-pie', text: 'Overview', href: '/salary/overview' },
-                    { icon: 'fas fa-calculator', text: 'Calculate Salary', href: '/salary/calculate' },
-                    { icon: 'fas fa-list', text: 'Payroll List', href: '/salary/payroll' },
+                    { icon: 'fas fa-chart-pie', text: (window.t && window.t('ui.sidebar.salary.overview', 'Overview')) || 'Overview', href: '/salary/overview' },
+                    { icon: 'fas fa-calculator', text: (window.t && window.t('ui.sidebar.salary.calculate', 'Calculate Salary')) || 'Calculate Salary', href: '/salary/calculate' },
+                    { icon: 'fas fa-list', text: (window.t && window.t('ui.sidebar.salary.payrollList', 'Payroll List')) || 'Payroll List', href: '/salary/payroll' },
                 ]
             },
             {
                 title: 'Salary Components',
                 items: [
-                    { icon: 'fas fa-plus', text: 'Basic Salary', href: '/salary/basic' },
-                    { icon: 'fas fa-star', text: 'Allowances', href: '/salary/allowances' },
-                    { icon: 'fas fa-percentage', text: 'Deductions', href: '/salary/deductions' },
-                    { icon: 'fas fa-gift', text: 'Bonuses', href: '/salary/bonuses' }
+                    { icon: 'fas fa-plus', text: (window.t && window.t('ui.sidebar.salary.basic', 'Basic Salary')) || 'Basic Salary', href: '/salary/basic' },
+                    { icon: 'fas fa-star', text: (window.t && window.t('ui.sidebar.salary.allowances', 'Allowances')) || 'Allowances', href: '/salary/allowances' },
+                    { icon: 'fas fa-percentage', text: (window.t && window.t('ui.sidebar.salary.deductions', 'Deductions')) || 'Deductions', href: '/salary/deductions' },
+                    { icon: 'fas fa-gift', text: (window.t && window.t('ui.sidebar.salary.bonuses', 'Bonuses')) || 'Bonuses' }
                 ]
             },
             {
                 title: 'Reports & Documents',
                 items: [
-                    { icon: 'fas fa-file-pdf', text: 'Salary Slips', href: '/salary/slips' },
-                    { icon: 'fas fa-chart-line', text: 'Salary Reports', href: '/salary/reports' },
-                    { icon: 'fas fa-print', text: 'Print Documents', href: '/salary/print' }
+                    { icon: 'fas fa-file-pdf', text: (window.t && window.t('ui.sidebar.salary.slips', 'Salary Slips')) || 'Salary Slips', href: '/salary/slips' },
+                    { icon: 'fas fa-chart-line', text: (window.t && window.t('ui.sidebar.salary.reports', 'Salary Reports')) || 'Salary Reports', href: '/salary/reports' },
+                    { icon: 'fas fa-print', text: (window.t && window.t('ui.sidebar.salary.print', 'Print Documents')) || 'Print Documents', href: '/salary/print' }
                 ]
             }
         ]
     },
     'Decision': {
-        title: 'Decision Management',
+        title: (window.t && window.t('ui.sidebar.decision.title', 'Decision Management')) || 'Decision Management',
         icon: 'fas fa-gavel',
         sections: [
             {
                 title: 'Decision Making',
                 items: [
-                    { icon: 'fas fa-plus', text: 'New Decision', href: '/decision/create' },
-                    { icon: 'fas fa-list', text: 'All Decisions', href: '/decision/list' },
-                    { icon: 'fas fa-edit', text: 'Edit Decision', href: '/decision/edit' },
-                    { icon: 'fas fa-check', text: 'Approve Decision', href: '/decision/approve' }
+                    { icon: 'fas fa-plus', text: (window.t && window.t('ui.sidebar.decision.newDecision', 'New Decision')) || 'New Decision', href: '/decision/create' },
+                    { icon: 'fas fa-list', text: (window.t && window.t('ui.sidebar.decision.allDecisions', 'All Decisions')) || 'All Decisions', href: '/decision/list' },
+                    { icon: 'fas fa-edit', text: (window.t && window.t('ui.sidebar.decision.editDecision', 'Edit Decision')) || 'Edit Decision', href: '/decision/edit' },
+                    { icon: 'fas fa-check', text: (window.t && window.t('ui.sidebar.decision.approveDecision', 'Approve Decision')) || 'Approve Decision' }
                 ]
             },
             {
                 title: 'Decision Types',
                 items: [
-                    { icon: 'fas fa-user-plus', text: 'Hiring Decisions', href: '/decision/hiring' },
-                    { icon: 'fas fa-user-times', text: 'Termination Decisions', href: '/decision/termination' },
-                    { icon: 'fas fa-arrow-up', text: 'Promotion Decisions', href: '/decision/promotion' },
-                    { icon: 'fas fa-exchange-alt', text: 'Transfer Decisions', href: '/decision/transfer' }
+                    { icon: 'fas fa-user-plus', text: (window.t && window.t('ui.sidebar.decision.hiring', 'Hiring Decisions')) || 'Hiring Decisions', href: '/decision/hiring' },
+                    { icon: 'fas fa-user-times', text: (window.t && window.t('ui.sidebar.decision.termination', 'Termination Decisions')) || 'Termination Decisions', href: '/decision/termination' },
+                    { icon: 'fas fa-arrow-up', text: (window.t && window.t('ui.sidebar.decision.promotion', 'Promotion Decisions')) || 'Promotion Decisions', href: '/decision/promotion' },
+                    { icon: 'fas fa-exchange-alt', text: (window.t && window.t('ui.sidebar.decision.transfer', 'Transfer Decisions')) || 'Transfer Decisions', href: '/decision/transfer' }
                 ]
             },
             {
                 title: 'Review & Audit',
                 items: [
-                    { icon: 'fas fa-search', text: 'Search Decisions', href: '/decision/search' },
-                    { icon: 'fas fa-history', text: 'Decision History', href: '/decision/history' },
-                    { icon: 'fas fa-chart-bar', text: 'Decision Analytics', href: '/decision/analytics' }
+                    { icon: 'fas fa-search', text: (window.t && window.t('ui.sidebar.decision.search', 'Search Decisions')) || 'Search Decisions', href: '/decision/search' },
+                    { icon: 'fas fa-history', text: (window.t && window.t('ui.sidebar.decision.history', 'Decision History')) || 'Decision History', href: '/decision/history' },
+                    { icon: 'fas fa-chart-bar', text: (window.t && window.t('ui.sidebar.decision.analytics', 'Decision Analytics')) || 'Decision Analytics' }
                 ]
             }
         ]
@@ -255,6 +256,81 @@ function getSidebarData() {
     return sidebarData;
 }
 
+// Translate already-rendered sidebar items based on URL mapping
+function translateSidebar() {
+    try {
+        const lang = (window.getCurrentLanguage && window.getCurrentLanguage()) || 'en';
+        const t = window.t;
+        if (!t) return;
+        const currentCategory = getCurrentCategory();
+        // Update title icon text
+        const currentData = getSidebarData()[currentCategory];
+        const titleText = document.getElementById('sidebarTitleText');
+        if (titleText && currentData && currentData.title) {
+            titleText.textContent = currentData.title;
+        }
+        // Replace item texts from translations if possible
+        document.querySelectorAll('.sidebar .nav-item .nav-item-text').forEach(el => {
+            const href = el.parentElement && el.parentElement.getAttribute('href') || '';
+            const map = {
+                '/dashboard': 'ui.sidebar.home.overview',
+                '/dashboard/today': 'ui.sidebar.home.today',
+                '/dashboard/notifications': 'ui.sidebar.home.notifications',
+                '/dashboard/quick-add': 'ui.sidebar.home.quickAdd',
+                '/dashboard/search': 'ui.sidebar.home.search',
+                '/dashboard/settings': 'ui.sidebar.home.settings',
+                '/personnel': 'ui.sidebar.personnel.overview',
+                '/personnel/cv-customization': 'ui.sidebar.personnel.cvCustomization',
+                '/personnel/add': 'ui.sidebar.personnel.addEmployee',
+                '/personnel/list': 'ui.sidebar.personnel.allEmployees',
+                '/personnel/companies': 'ui.sidebar.personnel.companies',
+                '/personnel/divisions': 'ui.sidebar.personnel.divisions',
+                '/personnel/departments': 'ui.sidebar.personnel.departments',
+                '/personnel/sub-departments': 'ui.sidebar.personnel.subDepartments',
+                '/personnel/org-chart': 'ui.sidebar.personnel.orgChart',
+                '/personnel/roles': 'ui.sidebar.personnel.roles',
+                '/personnel/reports': 'ui.sidebar.personnel.reports',
+                '/personnel/analytics': 'ui.sidebar.personnel.analytics',
+                '/attendance/overview': 'ui.sidebar.attendance.overview',
+                '/attendance/monthly_attendance_detail': 'ui.sidebar.attendance.monthlyDetail',
+                '/attendance/attendance_summary': 'ui.sidebar.attendance.summary',
+                '/attendance/work_data': 'ui.sidebar.attendance.workData',
+                '/attendance/history': 'ui.sidebar.attendance.history',
+                '/attendance/checkin': 'ui.sidebar.attendance.checkInOut',
+                '/attendance/timeclock': 'ui.sidebar.attendance.timeClock',
+                '/attendance/mobile': 'ui.sidebar.attendance.mobileApp',
+                '/attendance/export': 'ui.sidebar.attendance.export',
+                '/attendance/analytics': 'ui.sidebar.attendance.analytics',
+                '/attendance/weekly': 'ui.sidebar.attendance.weekly',
+                '/salary/overview': 'ui.sidebar.salary.overview',
+                '/salary/calculate': 'ui.sidebar.salary.calculate',
+                '/salary/payroll': 'ui.sidebar.salary.payrollList',
+                '/salary/basic': 'ui.sidebar.salary.basic',
+                '/salary/allowances': 'ui.sidebar.salary.allowances',
+                '/salary/deductions': 'ui.sidebar.salary.deductions',
+                '/salary/bonuses': 'ui.sidebar.salary.bonuses',
+                '/salary/slips': 'ui.sidebar.salary.slips',
+                '/salary/reports': 'ui.sidebar.salary.reports',
+                '/salary/print': 'ui.sidebar.salary.print',
+                '/decision/create': 'ui.sidebar.decision.newDecision',
+                '/decision/list': 'ui.sidebar.decision.allDecisions',
+                '/decision/edit': 'ui.sidebar.decision.editDecision',
+                '/decision/approve': 'ui.sidebar.decision.approveDecision',
+                '/decision/hiring': 'ui.sidebar.decision.hiring',
+                '/decision/termination': 'ui.sidebar.decision.termination',
+                '/decision/promotion': 'ui.sidebar.decision.promotion',
+                '/decision/transfer': 'ui.sidebar.decision.transfer',
+                '/decision/search': 'ui.sidebar.decision.search',
+                '/decision/history': 'ui.sidebar.decision.history',
+                '/decision/analytics': 'ui.sidebar.decision.analytics'
+            };
+            if (href && map[href]) {
+                el.textContent = t(map[href], el.textContent);
+            }
+        });
+    } catch (_) {}
+}
+
 // Function to set active sidebar item
 function setActiveSidebarItem(href) {
     // Remove active class from all items
@@ -287,6 +363,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (currentCategory) {
         generateSidebar(currentCategory);
         setActiveSidebarItem(window.location.pathname);
+        translateSidebar();
     }
 });
 
@@ -324,6 +401,7 @@ function updateSidebarForCategory(category) {
     // Generate sidebar content
     generateSidebar(category);
     setActiveSidebarItem(window.location.pathname);
+    translateSidebar();
 }
 
 // Force sidebar initialization (can be called manually)
@@ -332,6 +410,7 @@ function forceSidebarInit() {
     if (currentCategory) {
         generateSidebar(currentCategory);
         setActiveSidebarItem(window.location.pathname);
+        translateSidebar();
     }
 }
 
@@ -341,4 +420,5 @@ window.setActiveSidebarItem = setActiveSidebarItem;
 window.updateSidebarForCategory = updateSidebarForCategory;
 window.toggleSidebar = toggleSidebar;
 window.forceSidebarInit = forceSidebarInit;
+window.translateSidebar = translateSidebar;
 </script>

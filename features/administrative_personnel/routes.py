@@ -1,10 +1,20 @@
-from flask import render_template, redirect, session, request, jsonify
+from flask import render_template, redirect, session, request, jsonify, send_file
 from models import User, Employee
 from core.database import db
 from core.auth import login_required
 from . import administrative_personnel_bp
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime, timedelta
+import os
+import base64
+import json
+import io
+import zipfile
+from config.settings import Config
+from google import genai
+from werkzeug.utils import secure_filename
+
+gemini_client = genai.Client(api_key=Config.GEMINI_API_KEY)
 
 EMPLOYEE_TEXT_FIELDS = [
     'full_name',
@@ -439,19 +449,46 @@ def personnel_dashboard():
     
     return render_template('personnel_dashboard.html', user=user)
 
+
+@administrative_personnel_bp.route('/personnel/cv-customization')
+@login_required
+def cv_customization():
+    """Placeholder CV customization workspace."""
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+
+    return render_template('cv_customization.html', user=user)
+
+
 @administrative_personnel_bp.route('/personnel/add')
 @login_required
 def add_employee():
-    """Add Employee Page"""
+    """Entry point for Add Employee flow: choose single vs multiple."""
     user = User.query.get(session['user_id'])
     if not user:
         session.pop('user_id', None)
         return redirect('/login')
     
+    return render_template('select_add_mode.html', user=user)
+
+
+@administrative_personnel_bp.route('/personnel/add/start')
+@login_required
+def start_add_employee():
+    """Start the Add Employee wizard after choosing mode."""
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+
+    add_mode = request.args.get('add_mode', 'single')
     return render_template(
         'add_employee.html',
         user=user,
         mode='add',
+        add_mode=add_mode,
         employee_id=None,
         employee_data={}
     )
@@ -475,6 +512,201 @@ def edit_employee(employee_id):
         employee_id=employee.id,
         employee_data=employee.to_dict()
     )
+
+
+@administrative_personnel_bp.route('/personnel/<int:employee_id>/profile')
+@login_required
+def view_employee_profile(employee_id):
+    """Read-only Employee Profile page."""
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+
+    employee = Employee.query.get_or_404(employee_id)
+
+    # Simple document status summary for UI
+    missing_docs = []
+    if not employee.id_card_file:
+        missing_docs.append('ID card')
+    if not employee.cv_file:
+        missing_docs.append('CV')
+    docs_status = 'All required documents on file' if not missing_docs else 'Missing: ' + ', '.join(missing_docs)
+
+    # Build downloadable file list
+    files = []
+
+    # Predefined document fields (zipped on download)
+    for key, (field_name, base_label) in FILE_FIELD_MAPPING.items():
+        if getattr(employee, field_name, None):
+            safe_name = (employee.full_name or f"employee_{employee.id}").replace(' ', '_').lower()
+            filename = f"{safe_name}_{base_label}.zip"
+            files.append({
+                'name': filename,
+                'url': f"/personnel/{employee.id}/files/{key}"
+            })
+
+    # Extra uploaded zip files on disk
+    uploads_dir = os.path.join(
+        os.path.dirname(__file__),
+        'static',
+        'uploads',
+        f'employee_{employee.id}'
+    )
+    try:
+        if os.path.isdir(uploads_dir):
+            for entry in os.listdir(uploads_dir):
+                if entry.lower().endswith('.zip'):
+                    files.append({
+                        'name': entry,
+                        'url': f"/personnel/{employee.id}/files/extra/{entry}"
+                    })
+    except Exception as e:
+        print(f"WARNING: Failed to list extra files for employee {employee.id}: {e}")
+
+    return render_template(
+        'employee_profile.html',
+        user=user,
+        employee=employee,
+        docs_status=docs_status,
+        employee_files=files
+    )
+
+
+FILE_FIELD_MAPPING = {
+    'cv': ('cv_file', 'cv'),
+    'portrait': ('portrait_file', 'portrait'),
+    'health': ('health_file', 'health_certificate'),
+    'id_card': ('id_card_file', 'id_card'),
+    'passport': ('passport_file', 'passport'),
+}
+
+
+@administrative_personnel_bp.route('/personnel/<int:employee_id>/files/<string:file_key>')
+@login_required
+def download_employee_file(employee_id, file_key):
+    """Download a zipped version of a stored employee document (CV, ID card, etc.)."""
+    if file_key not in FILE_FIELD_MAPPING:
+        return jsonify({'success': False, 'error': 'Unknown file type'}), 404
+
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+
+    employee = Employee.query.get_or_404(employee_id)
+    field_name, base_label = FILE_FIELD_MAPPING[file_key]
+    data_url = getattr(employee, field_name, None)
+
+    if not data_url:
+        return jsonify({'success': False, 'error': 'File not found for this employee'}), 404
+
+    # Decode data URL -> bytes and determine extension
+    mime_type = 'application/octet-stream'
+    b64data = data_url
+    try:
+        if isinstance(data_url, str) and data_url.startswith('data:'):
+            header, b64data = data_url.split(',', 1)
+            mime_type = header.split(';')[0].split(':', 1)[1] or mime_type
+        raw_bytes = base64.b64decode(b64data)
+    except Exception as e:
+        print(f"ERROR: Failed to decode stored file for employee {employee_id}, field {field_name}: {e}")
+        return jsonify({'success': False, 'error': 'Stored file is invalid'}), 500
+
+    # Guess extension from MIME
+    ext = 'bin'
+    if mime_type in ('image/jpeg', 'image/jpg'):
+        ext = 'jpg'
+    elif mime_type == 'image/png':
+        ext = 'png'
+    elif mime_type == 'image/gif':
+        ext = 'gif'
+    elif mime_type in ('application/pdf', 'application/x-pdf'):
+        ext = 'pdf'
+
+    # Build in-memory zip
+    zip_buffer = io.BytesIO()
+    with zipfile.ZipFile(zip_buffer, mode='w', compression=zipfile.ZIP_DEFLATED) as zf:
+        filename_in_zip = f"{base_label}.{ext}"
+        zf.writestr(filename_in_zip, raw_bytes)
+    zip_buffer.seek(0)
+
+    safe_name = employee.full_name or f"employee_{employee.id}"
+    download_name = f"{safe_name.replace(' ', '_').lower()}_{base_label}.zip"
+
+    return send_file(
+        zip_buffer,
+        as_attachment=True,
+        download_name=download_name,
+        mimetype='application/zip'
+    )
+
+
+@administrative_personnel_bp.route('/personnel/<int:employee_id>/files/extra/<path:filename>')
+@login_required
+def download_extra_employee_file(employee_id, filename):
+    """Download an extra uploaded zip file from disk for this employee."""
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+
+    employee = Employee.query.get_or_404(employee_id)
+
+    uploads_dir = os.path.join(
+        os.path.dirname(__file__),
+        'static',
+        'uploads',
+        f'employee_{employee.id}'
+    )
+    full_path = os.path.join(uploads_dir, filename)
+    if not os.path.isfile(full_path) or not full_path.lower().endswith('.zip'):
+        return jsonify({'success': False, 'error': 'File not found'}), 404
+
+    return send_file(full_path, as_attachment=True, download_name=filename, mimetype='application/zip')
+
+
+@administrative_personnel_bp.route('/personnel/<int:employee_id>/files/upload', methods=['POST'])
+@login_required
+def upload_employee_files(employee_id):
+    """Upload additional files for an employee, saving each as a zip on disk."""
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+
+    employee = Employee.query.get_or_404(employee_id)
+
+    files = request.files.getlist('files')
+    if not files:
+        return redirect(f'/personnel/{employee.id}/profile')
+
+    uploads_dir = os.path.join(
+        os.path.dirname(__file__),
+        'static',
+        'uploads',
+        f'employee_{employee.id}'
+    )
+    os.makedirs(uploads_dir, exist_ok=True)
+
+    for f in files:
+        if not f or not f.filename:
+            continue
+        original_name = secure_filename(f.filename)
+        if not original_name:
+            continue
+        # Create a zip file on disk containing the uploaded file
+        zip_name = f"{original_name}.zip" if not original_name.lower().endswith('.zip') else original_name
+        zip_path = os.path.join(uploads_dir, zip_name)
+        try:
+            file_bytes = f.read()
+            with zipfile.ZipFile(zip_path, mode='w', compression=zipfile.ZIP_DEFLATED) as zf:
+                zf.writestr(original_name, file_bytes)
+        except Exception as e:
+            print(f"ERROR: Failed to save uploaded file for employee {employee.id}: {e}")
+            continue
+
+    return redirect(f'/personnel/{employee.id}/profile')
 
 @administrative_personnel_bp.route('/personnel/list')
 @login_required
@@ -758,4 +990,110 @@ def get_employees():
         return jsonify({
             'success': False,
             'error': f'Failed to retrieve employees: {str(e)}'
+        }), 500
+
+
+def _data_url_to_part(data_url):
+    """Convert data URL (base64) to an inline_data part for Gemini."""
+    try:
+        if not data_url or not isinstance(data_url, str):
+            return None
+        if data_url.startswith('data:'):
+            header, b64data = data_url.split(',', 1)
+            mime = header.split(';')[0].split(':', 1)[1] or 'image/png'
+        else:
+            # Assume it's just base64 without header
+            mime = 'image/png'
+            b64data = data_url
+        # google-genai expects base64-encoded string in inline_data.data
+        return {"mime_type": mime, "data": b64data}
+    except Exception:
+        return None
+
+
+def _parse_json_forgiving(text):
+    """Extract the first JSON object in the text, forgiving surrounding content."""
+    if not text:
+        return {}
+    try:
+        return json.loads(text)
+    except Exception:
+        pass
+    # Try to find a JSON block
+    start = text.find('{')
+    end = text.rfind('}')
+    if start != -1 and end != -1 and end > start:
+        try:
+            return json.loads(text[start:end+1])
+        except Exception:
+            return {}
+    return {}
+
+
+@administrative_personnel_bp.route('/personnel/api/extract-cv', methods=['POST'])
+@login_required
+def extract_from_cv():
+    """Extract personal info fields from uploaded CV image(s) using Gemini."""
+    try:
+        payload = request.get_json() or {}
+        files = payload.get('files') or []
+        if not files:
+            return jsonify({'success': False, 'error': 'No files provided'}), 400
+
+        inline_parts = []
+        for f in files:
+            part = _data_url_to_part(f)
+            if part:
+                inline_parts.append(part)
+        if not inline_parts:
+            return jsonify({'success': False, 'error': 'Invalid file format'}), 400
+
+        instructions = (
+            "You are given one or more CV/resume files (images or PDFs). "
+            "Extract only the following fields if present. Return STRICT JSON with keys using these exact snake_case names. "
+            "Do not include keys that are missing. Do not add commentary.\n\n"
+            "Required keys if present: "
+            "full_name, gender, date_of_birth, place_of_birth, hometown, personal_phone, personal_email, "
+            "personal_tax_code, social_insurance_code, party_join_date, party_join_place, health_status, "
+            "permanent_address, current_address, permanent_province, current_province, permanent_ward, current_ward, "
+            "permanent_street, current_street, id_card_number, id_card_issue_date, id_card_expiry_date, id_card_issue_place, "
+            "passport_number, passport_issue_date, passport_expiry_date, passport_issue_place"
+        )
+
+        # Build content for google-genai: text instructions + inline_data parts
+        parts = [{"text": instructions}]
+        for p in inline_parts:
+            parts.append({
+                "inline_data": {
+                    "mime_type": p["mime_type"],
+                    "data": p["data"],
+                }
+            })
+
+        response = gemini_client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=[{"role": "user", "parts": parts}],
+        )
+
+        text = getattr(response.candidates[0].content.parts[0], "text", "") if getattr(response, "candidates", None) else ""
+        data = _parse_json_forgiving(text)
+
+        # Only return known fields to prevent UI pollution
+        allowed = {
+            'full_name','gender','date_of_birth','place_of_birth','hometown',
+            'personal_phone','personal_email','personal_tax_code','social_insurance_code',
+            'party_join_date','party_join_place','health_status',
+            'permanent_address','current_address','permanent_province','current_province',
+            'permanent_ward','current_ward','permanent_street','current_street',
+            'id_card_number','id_card_issue_date','id_card_expiry_date','id_card_issue_place',
+            'passport_number','passport_issue_date','passport_expiry_date','passport_issue_place'
+        }
+        filtered = {k: v for k, v in (data or {}).items() if k in allowed and v}
+
+        return jsonify({'success': True, 'data': filtered})
+    except Exception as e:
+        print(f"ERROR: CV extraction failed: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': f'Failed to extract data from CV: {str(e)}'
         }), 500

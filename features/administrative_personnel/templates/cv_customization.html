@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}CV Customization - HRM System{% endblock %}
+
+{% block page_title %}<i class="fas fa-file-signature"></i> CV Customization{% endblock %}
+
+{% block extra_css %}
+<style>
+    .cv-customization-placeholder {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 40px;
+        border-radius: 18px;
+        background: #ffffff;
+        box-shadow: 0 18px 48px rgba(15, 23, 42, 0.12);
+        text-align: center;
+    }
+
+    .cv-customization-placeholder h2 {
+        margin-top: 0;
+        font-size: 1.8rem;
+        color: #0f172a;
+    }
+
+    .cv-customization-placeholder p {
+        color: #475569;
+        margin-bottom: 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="cv-customization-placeholder">
+    <h2>CV Customization Workspace</h2>
+    <p>This area will host the CV customization tools and workflow. Content will be added in upcoming iterations.</p>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    setActiveSidebarItem('/personnel/cv-customization');
+});
+</script>
+{% endblock %}
+
