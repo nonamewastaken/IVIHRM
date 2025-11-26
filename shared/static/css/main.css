@@ -104,6 +104,28 @@ body {
     border-left: none;
 }
 
+.navbar .nav-item-evaluate {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+    border-radius: 5px;
+    padding: 8px 16px;
+    margin-left: 10px;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s ease;
+}
+
+.navbar .nav-item-evaluate:hover {
+    background: linear-gradient(135deg, #5568d3 0%, #6a3fa0 100%) !important;
+    color: white !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.navbar .nav-item-evaluate i {
+    margin-right: 6px;
+}
+
 /* ==================== SIDEBAR STYLES ==================== */
 
 /* Sidebar Styles */
