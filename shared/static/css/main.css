@@ -37,6 +37,29 @@ body {
     z-index: 1002;
 }
 
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+}
+
+.logo-container:hover {
+    opacity: 0.9;
+}
+
+.logo-img {
+    height: 95px;
+    width: auto;
+    object-fit: contain;
+}
+
 .header-left h1 {
     margin: 0;
     font-size: 1.8rem;
@@ -60,6 +83,70 @@ body {
     align-items: center;
     gap: 10px;
     font-size: 0.9rem;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.user-info:hover {
+    opacity: 0.9;
+}
+
+.user-profile-dropdown {
+    position: relative;
+}
+
+.profile-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 10px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 180px;
+    z-index: 1003;
+    overflow: hidden;
+}
+
+.profile-dropdown-menu.show {
+    display: block;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    color: #333;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
+    border: none;
+    width: 100%;
+    text-align: left;
+}
+
+.dropdown-item:hover {
+    background-color: #f5f5f5;
+}
+
+.dropdown-item i {
+    width: 16px;
+    color: #666;
+}
+
+.logout-item {
+    color: #dc3545;
+}
+
+.logout-item:hover {
+    background-color: #fee;
+    color: #c82333;
+}
+
+.logout-item i {
+    color: #dc3545;
 }
 
 /* Navigation Bar */
@@ -72,7 +159,7 @@ body {
     align-items: center;
     height: 60px;
     position: fixed;
-    top: 80px;
+    top: 135px;
     left: 0;
     right: 0;
     z-index: 1001;
@@ -112,9 +199,9 @@ body {
     background: white;
     box-shadow: 2px 0 10px rgba(0,0,0,0.1);
     position: fixed;
-    height: calc(100vh - 140px);
+    height: calc(100vh - 195px);
     left: 0;
-    top: 140px;
+    top: 195px;
     z-index: 1000;
     overflow-y: auto;
     transition: width 0.3s ease, transform 0.3s ease;
@@ -137,7 +224,7 @@ body {
     margin-left: 280px;
     min-height: 100vh;
     transition: margin-left 0.3s ease;
-    padding-top: 140px;
+    padding-top: 195px;
 }
 
 .main-content-with-sidebar.sidebar-collapsed {
@@ -256,7 +343,7 @@ body {
 .content-area {
     padding: 20px;
     background: #f5f5f5;
-    min-height: calc(100vh - 140px);
+    min-height: calc(100vh - 195px);
 }
 
 /* ==================== RESPONSIVE DESIGN ==================== */
