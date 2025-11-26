@@ -12,6 +12,10 @@
     <!-- Top Header -->
     <div class="top-header">
         <div class="header-left">
+            <a href="/dashboard" class="logo-container">
+                <img src="{{ url_for('static', filename='images/1.png') }}" alt="iViHRM Logo" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                <span style="display:none; color: white; font-weight: bold; font-size: 1.2rem;">iViHRM</span>
+            </a>
             <h1>{% block page_title %}{% endblock %}</h1>
         </div>
         <div class="header-right">
@@ -22,9 +26,18 @@
             <div class="language-switch">
                 <button id="languageToggle" class="lang-btn" aria-label="Switch language">EN</button>
             </div>
-            <div class="user-info">
-                <i class="fas fa-user-circle"></i>
-                <span>{% block user_name %}{{ user.first_name }} {{ user.last_name }}{% endblock %}</span>
+            <div class="user-profile-dropdown">
+                <div class="user-info" id="userProfileBtn" onclick="toggleProfileDropdown()">
+                    <i class="fas fa-user-circle"></i>
+                    <span>{% block user_name %}{{ user.first_name }} {{ user.last_name }}{% endblock %}</span>
+                    <i class="fas fa-chevron-down" style="font-size: 0.7rem; margin-left: 5px;"></i>
+                </div>
+                <div class="profile-dropdown-menu" id="profileDropdown">
+                    <a href="/logout" class="dropdown-item logout-item">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -72,6 +85,21 @@
     // Initialize and update time every second
     updateTime();
     setInterval(updateTime, 1000);
+
+    // Profile dropdown toggle
+    function toggleProfileDropdown() {
+        const dropdown = document.getElementById('profileDropdown');
+        dropdown.classList.toggle('show');
+    }
+
+    // Close dropdown when clicking outside
+    window.onclick = function(event) {
+        const dropdown = document.getElementById('profileDropdown');
+        const profileBtn = document.getElementById('userProfileBtn');
+        if (dropdown && !profileBtn.contains(event.target) && !dropdown.contains(event.target)) {
+            dropdown.classList.remove('show');
+        }
+    }
     </script>
  
     <script>

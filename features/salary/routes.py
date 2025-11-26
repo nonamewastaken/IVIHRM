@@ -97,13 +97,8 @@ def get_sample_attendance_data():
 @salary_bp.route('/salary')
 @login_required
 def salary_dashboard():
-    """Salary Management Dashboard"""
-    user = User.query.get(session['user_id'])
-    if not user:
-        session.pop('user_id', None)
-        return redirect('/login')
-    
-    return render_template('salary_dashboard.html', user=user)
+    """Salary Management Dashboard - redirects to overview"""
+    return redirect('/salary/overview')
 
 
 @salary_bp.route('/salary/overview')

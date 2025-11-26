@@ -1263,3 +1263,27 @@ def evaluate_cv():
             'success': False,
             'error': f'Failed to evaluate CV: {str(e)}'
         }), 500
+
+
+@administrative_personnel_bp.route('/personnel/reports')
+@login_required
+def personnel_reports():
+    user = User.query.get(session['user_id'])
+    
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    return render_template('under_development.html', user=user, page_title="Reports")
+
+
+@administrative_personnel_bp.route('/personnel/analytics')
+@login_required
+def personnel_analytics():
+    user = User.query.get(session['user_id'])
+    
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    return render_template('under_development.html', user=user, page_title="Analytics")
