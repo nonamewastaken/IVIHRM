@@ -26,7 +26,7 @@ body {
 .top-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    padding: 20px 30px;
+    padding: 12px 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -35,12 +35,19 @@ body {
     left: 0;
     right: 0;
     z-index: 1002;
+    box-sizing: border-box;
+    margin: 0;
+    border: none;
+    line-height: 1;
+    height: 80px;
+    overflow: visible;
 }
 
 .header-left {
     display: flex;
     align-items: center;
     gap: 15px;
+    height: 100%;
 }
 
 .logo-container {
@@ -48,6 +55,7 @@ body {
     align-items: center;
     text-decoration: none;
     transition: opacity 0.2s ease;
+    height: 100%;
 }
 
 .logo-container:hover {
@@ -55,14 +63,15 @@ body {
 }
 
 .logo-img {
-    height: 95px;
+    height: 56px;
     width: auto;
     object-fit: contain;
+    display: block;
 }
 
 .header-left h1 {
     margin: 0;
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     font-weight: 600;
 }
 
@@ -70,6 +79,8 @@ body {
     display: flex;
     align-items: center;
     gap: 20px;
+    position: relative;
+    z-index: 10005;
 }
 
 .time-display {
@@ -93,19 +104,19 @@ body {
 
 .user-profile-dropdown {
     position: relative;
+    z-index: 10005;
 }
 
 .profile-dropdown-menu {
     display: none;
     position: absolute;
-    top: 100%;
+    top: calc(100% + 10px);
     right: 0;
-    margin-top: 10px;
     background: white;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     min-width: 180px;
-    z-index: 1003;
+    z-index: 10004;
     overflow: hidden;
 }
 
@@ -159,10 +170,13 @@ body {
     align-items: center;
     height: 60px;
     position: fixed;
-    top: 135px;
+    top: 80px;
     left: 0;
     right: 0;
     z-index: 1001;
+    margin: 0;
+    border-top: none;
+    box-sizing: border-box;
 }
 
 .navbar-left {
@@ -221,9 +235,9 @@ body {
     background: white;
     box-shadow: 2px 0 10px rgba(0,0,0,0.1);
     position: fixed;
-    height: calc(100vh - 195px);
+    height: calc(100vh - 140px);
     left: 0;
-    top: 195px;
+    top: 140px;
     z-index: 1000;
     overflow-y: auto;
     transition: width 0.3s ease, transform 0.3s ease;
@@ -246,7 +260,7 @@ body {
     margin-left: 280px;
     min-height: 100vh;
     transition: margin-left 0.3s ease;
-    padding-top: 195px;
+    position: relative;
 }
 
 .main-content-with-sidebar.sidebar-collapsed {
@@ -363,9 +377,16 @@ body {
 
 /* Content Area */
 .content-area {
-    padding: 20px;
+    padding: 0;
+    margin: 0;
     background: #f5f5f5;
-    min-height: calc(100vh - 195px);
+    min-height: calc(100vh - 140px);
+    position: absolute;
+    top: 140px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow-y: auto;
 }
 
 /* ==================== RESPONSIVE DESIGN ==================== */

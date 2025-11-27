@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Company Address - HRSolutions</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+        }
+
+        /* Top Header */
+        .top-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1002;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-button-header {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .back-button-header:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateX(-3px);
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 80px;
+            padding: 40px 30px;
+            min-height: calc(100vh - 80px);
+        }
+
+        .edit-address-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .form-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .form-header h1 {
+            font-size: 1.8rem;
+            color: #333;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .form-header p {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-input:disabled {
+            background-color: #f5f5f5;
+            cursor: not-allowed;
+        }
+
+        .coordinates-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .info-box-label {
+            font-size: 0.75rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .info-box-value {
+            font-size: 0.95rem;
+            color: #333;
+            font-weight: 500;
+            font-family: 'Courier New', monospace;
+        }
+
+        .info-box-value.empty {
+            color: #999;
+            font-style: italic;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .pac-container {
+            z-index: 10000 !important;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border: none;
+            margin-top: 4px;
+        }
+
+        .pac-item {
+            padding: 10px;
+            border-top: 1px solid #e0e0e0;
+            cursor: pointer;
+        }
+
+        .pac-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        .pac-item-selected,
+        .pac-item-selected:hover {
+            background-color: #e8f0fe;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Header -->
+    <div class="top-header">
+        <div class="header-left">
+            <a href="/company/view" class="back-button-header">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back</span>
+            </a>
+            <div class="header-title">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>Edit Company Address</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="edit-address-container">
+            <div class="form-card">
+                <div class="form-header">
+                    <h1>{{ company_name }}</h1>
+                    <p>Update your company address</p>
+                </div>
+
+                <div class="success-message" id="successMessage"></div>
+                <div class="error-message" id="errorMessage"></div>
+
+                <form id="addressForm">
+                    <div class="form-group">
+                        <label for="address" class="form-label">Company Address</label>
+                        <input 
+                            type="text" 
+                            id="address" 
+                            name="address" 
+                            class="form-input" 
+                            placeholder="Start typing an address..."
+                            value="{{ current_address }}"
+                            autocomplete="off"
+                        >
+                        <div class="error-message" id="addressError"></div>
+                        <p style="font-size: 0.85rem; color: #666; margin-top: 8px;">
+                            <i class="fas fa-info-circle"></i> 
+                            Start typing and select from Google Maps suggestions
+                        </p>
+                    </div>
+
+                    <div class="coordinates-info">
+                        <div class="info-box">
+                            <div class="info-box-label">Latitude</div>
+                            <div class="info-box-value {% if not latitude %}empty{% endif %}" id="latitudeDisplay">
+                                {% if latitude %}{{ latitude }}{% else %}Not set{% endif %}
+                            </div>
+                        </div>
+                        <div class="info-box">
+                            <div class="info-box-label">Longitude</div>
+                            <div class="info-box-value {% if not longitude %}empty{% endif %}" id="longitudeDisplay">
+                                {% if longitude %}{{ longitude }}{% else %}Not set{% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <input type="hidden" id="latitude" name="latitude" value="{% if latitude %}{{ latitude }}{% endif %}">
+                    <input type="hidden" id="longitude" name="longitude" value="{% if longitude %}{{ longitude }}{% endif %}">
+
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-primary" id="saveBtn">
+                            <i class="fas fa-save"></i>
+                            Save Address
+                        </button>
+                        <a href="/company/view" class="btn btn-secondary">
+                            <i class="fas fa-times"></i>
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Google Maps JavaScript API -->
+    {% if google_maps_api_key %}
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&libraries=places"></script>
+    <script>
+        // Initialize Google Maps Autocomplete
+        let autocomplete;
+        let place;
+
+        function initAutocomplete() {
+            const addressInput = document.getElementById('address');
+            
+            autocomplete = new google.maps.places.Autocomplete(addressInput, {
+                types: ['address'],
+                componentRestrictions: { country: [] } // Allow all countries, remove if you want to restrict
+            });
+
+            autocomplete.addListener('place_changed', function() {
+                place = autocomplete.getPlace();
+                
+                if (!place.geometry) {
+                    console.log("No details available for input: '" + place.name + "'");
+                    return;
+                }
+
+                // Update address field with formatted address
+                addressInput.value = place.formatted_address;
+
+                // Get coordinates
+                const lat = place.geometry.location.lat();
+                const lng = place.geometry.location.lng();
+
+                // Update hidden fields
+                document.getElementById('latitude').value = lat;
+                document.getElementById('longitude').value = lng;
+
+                // Update display
+                document.getElementById('latitudeDisplay').textContent = lat.toFixed(6);
+                document.getElementById('latitudeDisplay').classList.remove('empty');
+                document.getElementById('longitudeDisplay').textContent = lng.toFixed(6);
+                document.getElementById('longitudeDisplay').classList.remove('empty');
+
+                // Clear any error messages
+                document.getElementById('addressError').classList.remove('show');
+            });
+        }
+
+        // Initialize when page loads
+        if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+            initAutocomplete();
+        } else {
+            // Wait for Google Maps API to load
+            window.addEventListener('load', function() {
+                if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+                    initAutocomplete();
+                } else {
+                    console.error('Google Maps API failed to load');
+                    document.getElementById('errorMessage').textContent = 'Failed to load Google Maps. Please check your API key.';
+                    document.getElementById('errorMessage').classList.add('show');
+                }
+            });
+        }
+
+        // Form submission
+        document.getElementById('addressForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const addressInput = document.getElementById('address');
+            const latitudeInput = document.getElementById('latitude');
+            const longitudeInput = document.getElementById('longitude');
+            const saveBtn = document.getElementById('saveBtn');
+
+            // Hide previous messages
+            document.getElementById('successMessage').classList.remove('show');
+            document.getElementById('errorMessage').classList.remove('show');
+            document.getElementById('addressError').classList.remove('show');
+
+            // Validate
+            const address = addressInput.value.trim();
+            if (!address) {
+                document.getElementById('addressError').textContent = 'Please enter or select an address';
+                document.getElementById('addressError').classList.add('show');
+                return;
+            }
+
+            // Disable button
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+            // Prepare data
+            const data = {
+                address: address,
+                latitude: latitudeInput.value ? parseFloat(latitudeInput.value) : null,
+                longitude: longitudeInput.value ? parseFloat(longitudeInput.value) : null
+            };
+
+            // Submit
+            fetch('/company/api/update-address', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('successMessage').textContent = 'Address updated successfully!';
+                    document.getElementById('successMessage').classList.add('show');
+                    
+                    // Update display values
+                    if (data.latitude) {
+                        document.getElementById('latitudeDisplay').textContent = parseFloat(data.latitude).toFixed(6);
+                        document.getElementById('latitudeDisplay').classList.remove('empty');
+                    }
+                    if (data.longitude) {
+                        document.getElementById('longitudeDisplay').textContent = parseFloat(data.longitude).toFixed(6);
+                        document.getElementById('longitudeDisplay').classList.remove('empty');
+                    }
+
+                    // Redirect after 1.5 seconds
+                    setTimeout(function() {
+                        window.location.href = '/company/view';
+                    }, 1500);
+                } else {
+                    document.getElementById('errorMessage').textContent = data.error || 'Failed to update address';
+                    document.getElementById('errorMessage').classList.add('show');
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Address';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('errorMessage').textContent = 'An error occurred while updating the address';
+                document.getElementById('errorMessage').classList.add('show');
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Address';
+            });
+        });
+
+        // Handle manual address input (if user types without selecting from suggestions)
+        document.getElementById('address').addEventListener('input', function() {
+            // Clear coordinates when user manually edits address
+            if (!this.value.trim()) {
+                document.getElementById('latitude').value = '';
+                document.getElementById('longitude').value = '';
+                document.getElementById('latitudeDisplay').textContent = 'Not set';
+                document.getElementById('latitudeDisplay').classList.add('empty');
+                document.getElementById('longitudeDisplay').textContent = 'Not set';
+                document.getElementById('longitudeDisplay').classList.add('empty');
+            }
+        });
+    </script>
+    {% else %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('errorMessage').textContent = 'Google Maps API key is not configured. Please contact the administrator.';
+            document.getElementById('errorMessage').classList.add('show');
+            document.getElementById('address').disabled = true;
+            document.getElementById('saveBtn').disabled = true;
+        });
+    </script>
+    {% endif %}
+</body>
+</html>
+

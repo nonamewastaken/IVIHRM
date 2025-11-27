@@ -2,6 +2,7 @@ from flask import request, jsonify, render_template, redirect, session
 from models import User, Organization, db
 from datetime import datetime
 from core.auth import api_login_required
+from config.settings import Config
 from . import onboarding_bp
 
 @onboarding_bp.route('/complete-profile')
@@ -59,8 +60,9 @@ def organization_setup():
 
     # Get stored organization data from session
     organization_data = session.get('organization_data', {})
+    google_maps_api_key = Config.GOOGLE_MAPS_API_KEY
     
-    return render_template('organization_setup.html', organization_data=organization_data, user=user)
+    return render_template('organization_setup.html', organization_data=organization_data, user=user, google_maps_api_key=google_maps_api_key)
 
 @onboarding_bp.route('/api/setup-organization', methods=['POST'])
 @api_login_required
@@ -71,10 +73,12 @@ def setup_organization():
         return jsonify({'error': 'Missing required fields'}), 400
     
     try:
-        # Store organization data in session
+        # Store organization data in session (including optional coordinates)
         session['organization_data'] = {
             'name': data['organizationName'],
-            'location': data['location']
+            'location': data['location'],
+            'latitude': data.get('latitude'),  # Optional
+            'longitude': data.get('longitude')  # Optional
         }
         
         return jsonify({
@@ -118,33 +122,53 @@ def update_organization_size():
 
         # Only create organization and update user if this is final submission
         if data.get('isSubmitting', True):  # Default to True for backward compatibility
-            # Create new organization with all the stored data
+            # Check if required session data exists
+            if 'organization_data' not in session:
+                return jsonify({'error': 'Organization data missing. Please go back and complete organization setup.'}), 400
+            
+            if 'profile_data' not in session:
+                return jsonify({'error': 'Profile data missing. Please go back and complete profile setup.'}), 400
+            
+            # Create new organization with all the stored data (including coordinates if available)
+            org_data = session['organization_data']
             org = Organization(
-                name=session['organization_data']['name'],
-                location=session['organization_data']['location'],
-                size=data['size']
+                name=org_data['name'],
+                location=org_data['location'],
+                size=data['size'],
+                latitude=org_data.get('latitude'),  # Optional coordinates
+                longitude=org_data.get('longitude')  # Optional coordinates
             )
             db.session.add(org)
+            db.session.flush()  # Get the org.id before commit
             
             # Update user with all the stored data
             user = User.query.get(session['user_id'])
-            user.citizenship = session['profile_data']['citizenship']
-            user.date_of_birth = session['profile_data']['date_of_birth']
-            user.phone = session['profile_data']['phone_number']
+            if not user:
+                db.session.rollback()
+                return jsonify({'error': 'User not found. Please log in again.'}), 401
+            
+            profile_data = session['profile_data']
+            user.citizenship = profile_data.get('citizenship')
+            user.date_of_birth = profile_data.get('date_of_birth')
+            user.phone = profile_data.get('phone_number')
             user.organization_id = org.id
             user.profile_completed = True
             
             # Commit all changes to database
             db.session.commit()
 
-            # Clear temporary session data after successful commit
+            # Clear temporary session data after successful commit (but keep user_id in session)
             session.pop('profile_data', None)
             session.pop('organization_data', None)
             session.pop('size_data', None)
+            
+            # Ensure session is saved
+            session.modified = True
 
+            # Keep user logged in and redirect to dashboard
             return jsonify({
                 'message': 'Setup completed successfully',
-                'redirect': '/login'
+                'redirect': '/dashboard'
             }), 200
         else:
             # If not final submission, just store the data and return success

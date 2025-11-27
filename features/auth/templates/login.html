@@ -591,7 +591,9 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.message === 'Login successful') {
-                        window.location.href = '/';
+                        // Use redirect URL from server response, or default to dashboard
+                        const redirectUrl = data.redirect || '/dashboard';
+                        window.location.href = redirectUrl;
                     } else {
                         // Show translated error message based on the error type
                         let errorText;
