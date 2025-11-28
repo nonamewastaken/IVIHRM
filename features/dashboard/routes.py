@@ -14,6 +14,9 @@ def root():
             # Redirect employee accounts to maintenance page
             if hasattr(user, 'role') and user.role == 'employee':
                 return redirect('/employee/maintenance')
+            # If profile is not completed, redirect to complete profile
+            if not user.profile_completed:
+                return redirect('/complete-profile')
             return redirect('/dashboard')
     return redirect('/login')
 
@@ -25,6 +28,9 @@ def login_page():
             # Redirect employee accounts to maintenance page
             if hasattr(user, 'role') and user.role == 'employee':
                 return redirect('/employee/maintenance')
+            # If profile is not completed, redirect to complete profile
+            if not user.profile_completed:
+                return redirect('/complete-profile')
             return redirect('/dashboard')
     return render_template('login.html')
 
@@ -54,7 +60,12 @@ def home_page():
 @dashboard_bp.route('/dashboard')
 @login_required
 def dashboard():
+    # Re-query user object from database to get latest state (ensures fresh data after onboarding)
     user = User.query.get(session['user_id'])
+    
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
     
     # Redirect employee accounts to maintenance page
     if hasattr(user, 'role') and user.role == 'employee':

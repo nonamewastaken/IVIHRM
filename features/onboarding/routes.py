@@ -1,4 +1,4 @@
-from flask import request, jsonify, render_template, redirect, session
+from flask import request, jsonify, render_template, redirect, session, current_app
 from models import User, Organization, db
 from datetime import datetime
 from core.auth import api_login_required
@@ -131,12 +131,31 @@ def update_organization_size():
             
             # Create new organization with all the stored data (including coordinates if available)
             org_data = session['organization_data']
+            
+            # Validate organization data
+            if not org_data.get('name') or not org_data.get('name').strip():
+                return jsonify({'error': 'Organization name is required'}), 400
+            
+            # Convert latitude/longitude to float if they exist
+            latitude = None
+            longitude = None
+            if org_data.get('latitude') is not None:
+                try:
+                    latitude = float(org_data.get('latitude'))
+                except (ValueError, TypeError):
+                    latitude = None
+            if org_data.get('longitude') is not None:
+                try:
+                    longitude = float(org_data.get('longitude'))
+                except (ValueError, TypeError):
+                    longitude = None
+            
             org = Organization(
-                name=org_data['name'],
-                location=org_data['location'],
+                name=org_data['name'].strip(),
+                location=org_data.get('location', '').strip() if org_data.get('location') else None,
                 size=data['size'],
-                latitude=org_data.get('latitude'),  # Optional coordinates
-                longitude=org_data.get('longitude')  # Optional coordinates
+                latitude=latitude,
+                longitude=longitude
             )
             db.session.add(org)
             db.session.flush()  # Get the org.id before commit
@@ -146,6 +165,10 @@ def update_organization_size():
             if not user:
                 db.session.rollback()
                 return jsonify({'error': 'User not found. Please log in again.'}), 401
+            
+            # Ensure user role is set (should be 'admin' for signup accounts)
+            if not user.role:
+                user.role = 'admin'
             
             profile_data = session['profile_data']
             user.citizenship = profile_data.get('citizenship')
@@ -168,7 +191,8 @@ def update_organization_size():
             # Keep user logged in and redirect to dashboard
             return jsonify({
                 'message': 'Setup completed successfully',
-                'redirect': '/dashboard'
+                'redirect': '/dashboard',
+                'success': True
             }), 200
         else:
             # If not final submission, just store the data and return success
@@ -179,4 +203,15 @@ def update_organization_size():
 
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': 'Failed to complete setup'}), 500
+        import traceback
+        error_details = str(e)
+        traceback.print_exc()  # Print full traceback to console for debugging
+        print(f"ERROR in update_organization_size: {error_details}")
+        # Include error details in response for debugging
+        error_response = {'error': 'Failed to complete setup'}
+        try:
+            if current_app.config.get('DEBUG', False):
+                error_response['details'] = error_details
+        except:
+            pass
+        return jsonify(error_response), 500

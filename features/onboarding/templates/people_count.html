@@ -402,8 +402,18 @@
                     isSubmitting: true
                 })
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => Promise.reject(err));
+                }
+                return response.json();
+            })
             .then(data => {
+                // Check if there's an error in the response
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
                 // Show completion message
                 progressFill.classList.remove('completing');
                 progressFill.classList.add('completed');
@@ -419,6 +429,9 @@
                 setTimeout(() => {
                     if (data.redirect) {
                         window.location.href = data.redirect;
+                    } else {
+                        // Fallback redirect if no redirect specified
+                        window.location.href = '/dashboard';
                     }
                 }, 1500);
             })
@@ -428,7 +441,8 @@
                 progressFill.classList.remove('completing', 'completed');
                 progressFill.style.width = '67%';
                 progressPercentage.textContent = '67% Complete';
-                alert('An error occurred. Please try again.');
+                const errorMsg = error.message || error.error || 'An error occurred. Please try again.';
+                alert(errorMsg);
                 btn.disabled = false;
                 btn.textContent = 'Complete Setup';
                 btn.style.background = '#000000';

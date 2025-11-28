@@ -5,6 +5,7 @@ from . import auth_bp
 
 @auth_bp.route('/api/register', methods=['POST'])
 def register():
+    """Legacy register endpoint - use /api/signup instead"""
     data = request.get_json()
 
     if not data or not data.get('email') or not data.get('password'):
@@ -13,11 +14,22 @@ def register():
     if User.query.filter_by(email=data['email']).first():
         return jsonify({'error': 'Email already registered'}), 400
 
+    # Parse name if provided (for backward compatibility)
+    name = data.get('name', '').strip()
+    first_name = None
+    last_name = None
+    if name:
+        name_parts = name.split(' ', 1)
+        first_name = name_parts[0].capitalize() if name_parts else None
+        last_name = name_parts[1].capitalize() if len(name_parts) > 1 else None
+
     hashed_password = generate_password_hash(data['password'])
     new_user = User(
         email=data['email'],
         password=hashed_password,
-        name=data.get('name', '')
+        first_name=first_name,
+        last_name=last_name,
+        role='admin'  # Register creates admin accounts
     )
 
     try:
@@ -26,7 +38,10 @@ def register():
         return jsonify({'message': 'User registered successfully'}), 201
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': 'Registration failed'}), 500
+        import traceback
+        traceback.print_exc()
+        print(f"ERROR in register: {str(e)}")
+        return jsonify({'error': f'Registration failed: {str(e)}'}), 500
 
 @auth_bp.route('/api/login', methods=['POST'])
 def login():
@@ -50,14 +65,23 @@ def login():
         if not check_password_hash(user.password, data['password']):
             return jsonify({'error': 'Incorrect password'}), 401
 
+        # Ensure user has a role (default to 'admin' if missing)
+        if not hasattr(user, 'role') or not user.role:
+            user.role = 'admin'
+            try:
+                db.session.commit()
+            except Exception as e:
+                print(f"Warning: Could not update user role: {e}")
+                db.session.rollback()
+
         session.clear()
         session['user_id'] = user.id
-        session['user_role'] = user.role if hasattr(user, 'role') else 'admin'
+        session['user_role'] = user.role
         session.modified = True
 
         # Determine redirect based on user role
         redirect_url = '/dashboard'
-        if hasattr(user, 'role') and user.role == 'employee':
+        if user.role == 'employee':
             redirect_url = '/employee/maintenance'
 
         response = make_response(jsonify({
@@ -109,13 +133,23 @@ def signup():
         db.session.add(new_user)
         db.session.commit()
         session['user_id'] = new_user.id
+        session['user_role'] = 'admin'  # Explicitly set role in session
+        session.modified = True
         return jsonify({
             'message': 'Signup successful',
-            'redirect': '/complete-profile'
+            'redirect': '/complete-profile',
+            'user': {
+                'email': new_user.email,
+                'name': new_user.name,
+                'role': new_user.role
+            }
         })
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': 'An error occurred during signup'}), 500
+        import traceback
+        traceback.print_exc()
+        print(f"ERROR in signup: {str(e)}")
+        return jsonify({'error': f'An error occurred during signup: {str(e)}'}), 500
 
 @auth_bp.route('/api/logout', methods=['POST'])
 def logout():
