@@ -149,8 +149,66 @@
         .progress-fill {
             height: 100%;
             background: #000000;
+            width: 67%;
+            transition: width 0.5s ease;
+        }
+
+        .progress-fill.completing {
+            background: linear-gradient(90deg, #000000 0%, #10b981 100%);
+            animation: progressPulse 1s ease-in-out;
+        }
+
+        .progress-fill.completed {
+            background: #10b981;
             width: 100%;
-            transition: width 0.3s ease;
+        }
+
+        @keyframes progressPulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.8;
+            }
+        }
+
+        .progress-percentage {
+            text-align: center;
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+
+        .completion-message {
+            text-align: center;
+            color: #10b981;
+            font-weight: 600;
+            font-size: 1rem;
+            margin-top: 1rem;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .completion-message.show {
+            opacity: 1;
+        }
+
+        .completion-message::before {
+            content: "✓";
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background: #10b981;
+            color: white;
+            border-radius: 50%;
+            line-height: 20px;
+            font-size: 0.875rem;
+            font-weight: bold;
         }
 
         .step-indicator {
@@ -245,7 +303,11 @@
         <p class="welcome-subtitle">Select the size of your organization</p>
 
         <div class="progress-bar">
-            <div class="progress-fill"></div>
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-percentage" id="progressPercentage">67% Complete</div>
+        <div class="completion-message" id="completionMessage">
+            Setup completed successfully!
         </div>
 
         <div class="step-indicator">
@@ -319,6 +381,17 @@
             btn.disabled = true;
             btn.textContent = 'Setting up...';
 
+            // Update progress bar
+            const progressFill = document.getElementById('progressFill');
+            const progressPercentage = document.getElementById('progressPercentage');
+            
+            // Animate progress to 100%
+            setTimeout(() => {
+                progressFill.classList.add('completing');
+                progressFill.style.width = '100%';
+                progressPercentage.textContent = '100% Complete';
+            }, 100);
+
             fetch('/api/update-organization-size', {
                 method: 'POST',
                 headers: {
@@ -331,15 +404,34 @@
             })
             .then(response => response.json())
             .then(data => {
-                if (data.redirect) {
-                    window.location.href = data.redirect;
-                }
+                // Show completion message
+                progressFill.classList.remove('completing');
+                progressFill.classList.add('completed');
+                progressPercentage.textContent = 'Setup Complete!';
+                
+                const completionMessage = document.getElementById('completionMessage');
+                completionMessage.classList.add('show');
+                
+                btn.textContent = '✓ Completed!';
+                btn.style.background = '#10b981';
+                
+                // Redirect after showing completion
+                setTimeout(() => {
+                    if (data.redirect) {
+                        window.location.href = data.redirect;
+                    }
+                }, 1500);
             })
             .catch(error => {
                 console.error('Error:', error);
+                // Reset progress bar on error
+                progressFill.classList.remove('completing', 'completed');
+                progressFill.style.width = '67%';
+                progressPercentage.textContent = '67% Complete';
                 alert('An error occurred. Please try again.');
                 btn.disabled = false;
                 btn.textContent = 'Complete Setup';
+                btn.style.background = '#000000';
             });
         });
     </script>

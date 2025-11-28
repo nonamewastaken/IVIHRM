@@ -5,6 +5,7 @@ from core.auth import login_required
 from . import administrative_personnel_bp
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime, timedelta
+from werkzeug.security import generate_password_hash
 import os
 import base64
 import json
@@ -12,6 +13,7 @@ import io
 import zipfile
 from config.settings import Config
 from google import genai
+from google.genai import types
 from werkzeug.utils import secure_filename
 
 gemini_client = genai.Client(api_key=Config.GEMINI_API_KEY)
@@ -524,6 +526,24 @@ def view_employee_profile(employee_id):
         return redirect('/login')
 
     employee = Employee.query.get_or_404(employee_id)
+    
+    # Get user account for employee
+    employee_user = None
+    employee_account_email = None
+    employee_account_password = None
+    is_new_account = False
+    
+    # Check if employee has a linked user account
+    employee_user = User.query.filter_by(employee_id=employee.id).first()
+    
+    if employee_user:
+        # Employee has an account
+        employee_account_email = employee_user.email
+        employee_account_password = None  # Password cannot be retrieved, will show as hidden
+    elif employee.personal_email:
+        # Employee doesn't have an account yet, show email but no password
+        employee_account_email = employee.personal_email
+        employee_account_password = None
 
     # Simple document status summary for UI
     missing_docs = []
@@ -564,13 +584,111 @@ def view_employee_profile(employee_id):
     except Exception as e:
         print(f"WARNING: Failed to list extra files for employee {employee.id}: {e}")
 
+    # Check if password was just reset (stored in session)
+    reset_password = session.pop(f'employee_{employee.id}_reset_password', None)
+    if reset_password:
+        employee_account_password = reset_password
+        is_new_account = True
+    
     return render_template(
         'employee_profile.html',
         user=user,
         employee=employee,
         docs_status=docs_status,
-        employee_files=files
+        employee_files=files,
+        employee_account_email=employee_account_email,
+        employee_account_password=employee_account_password,
+        is_new_account=is_new_account,
+        has_account=employee_user is not None
     )
+
+
+@administrative_personnel_bp.route('/personnel/<int:employee_id>/reset-password', methods=['POST'])
+@login_required
+def reset_employee_password(employee_id):
+    """Reset employee password and return new password for admin to view"""
+    try:
+        user = User.query.get(session['user_id'])
+        if not user:
+            return jsonify({'success': False, 'error': 'Not authenticated'}), 401
+        
+        employee = Employee.query.get_or_404(employee_id)
+        
+        # Get or create employee user account
+        employee_user = User.query.filter_by(employee_id=employee.id).first()
+        
+        if not employee_user:
+            # Create account if doesn't exist
+            if not employee.personal_email:
+                return jsonify({'success': False, 'error': 'Employee has no email address'}), 400
+            
+            import secrets
+            import string
+            from werkzeug.security import generate_password_hash
+            
+            # Generate random password
+            alphabet = string.ascii_letters + string.digits + "!@#$%^&*"
+            random_password = ''.join(secrets.choice(alphabet) for i in range(16))
+            
+            # Check if email is already taken
+            existing_user = User.query.filter_by(email=employee.personal_email).first()
+            if existing_user:
+                return jsonify({'success': False, 'error': 'Email already taken by another user'}), 400
+            
+            # Get current user's organization_id
+            organization_id = user.organization_id if user else None
+            
+            # Split full name
+            name_parts = employee.full_name.split() if employee.full_name else []
+            first_name = name_parts[0] if name_parts else None
+            last_name = ' '.join(name_parts[1:]) if len(name_parts) > 1 else None
+            
+            # Create employee user account
+            employee_user = User(
+                email=employee.personal_email,
+                password=generate_password_hash(random_password),
+                role='employee',
+                employee_id=employee.id,
+                organization_id=organization_id,
+                profile_completed=True,
+                first_name=first_name,
+                last_name=last_name
+            )
+            
+            db.session.add(employee_user)
+            new_password = random_password
+        else:
+            # Reset existing password
+            import secrets
+            import string
+            from werkzeug.security import generate_password_hash
+            
+            # Generate new random password
+            alphabet = string.ascii_letters + string.digits + "!@#$%^&*"
+            new_password = ''.join(secrets.choice(alphabet) for i in range(16))
+            
+            employee_user.password = generate_password_hash(new_password)
+        
+        db.session.commit()
+        
+        # Store password in session temporarily so it can be displayed
+        session[f'employee_{employee.id}_reset_password'] = new_password
+        
+        return jsonify({
+            'success': True,
+            'message': 'Password reset successfully',
+            'password': new_password
+        }), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"ERROR: Failed to reset employee password: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': f'Failed to reset password: {str(e)}'
+        }), 500
 
 
 FILE_FIELD_MAPPING = {
@@ -664,6 +782,20 @@ def download_extra_employee_file(employee_id, filename):
         return jsonify({'success': False, 'error': 'File not found'}), 404
 
     return send_file(full_path, as_attachment=True, download_name=filename, mimetype='application/zip')
+
+
+@administrative_personnel_bp.route('/personnel/evaluate-cv')
+@login_required
+def evaluate_cv_page():
+    """CV Evaluation page with department selection"""
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    departments = ['Development', 'HRM', 'Sales', 'Marketing', 'Finance', 'Operations']
+    
+    return render_template('evaluate_cv.html', user=user, departments=departments)
 
 
 @administrative_personnel_bp.route('/personnel/<int:employee_id>/files/upload', methods=['POST'])
@@ -893,33 +1025,80 @@ def organizational_chart():
 @administrative_personnel_bp.route('/personnel/api/employee', methods=['POST'])
 @login_required
 def save_employee():
-    """Save employee data to database"""
+    """Save employee data to database and create User account if email/password provided"""
     try:
         data = request.get_json()
         
         if not data:
             return jsonify({'success': False, 'error': 'No data provided'}), 400
         
-        sanitized_payload = sanitize_employee_payload(data)
+        # Extract account information before sanitizing
+        account_email = data.get('account_email', '').strip() if data.get('account_email') else None
+        account_password = data.get('account_password', '').strip() if data.get('account_password') else None
+        
+        # Validate account information if email is provided
+        if account_email:
+            if not account_password:
+                return jsonify({'success': False, 'error': 'Password is required when email is provided'}), 400
+            
+            # Check if email already exists
+            existing_user = User.query.filter_by(email=account_email).first()
+            if existing_user:
+                return jsonify({'success': False, 'error': f'Email {account_email} is already registered'}), 400
+        
+        # Remove account fields from data before sanitizing employee payload
+        employee_data = {k: v for k, v in data.items() if k not in ['account_email', 'account_password']}
+        
+        sanitized_payload = sanitize_employee_payload(employee_data)
         
         # Create new employee record
         employee = Employee(**sanitized_payload)
         
-        # Add to database
+        # Add to database first to get employee ID
         db.session.add(employee)
+        db.session.flush()  # Get the employee ID without committing
+        
+        # Create User account if email and password provided
+        if account_email and account_password:
+            hashed_password = generate_password_hash(account_password)
+            
+            # Get current user's organization_id (admin creating the employee)
+            current_user = User.query.get(session['user_id'])
+            organization_id = current_user.organization_id if current_user else None
+            
+            # Create employee user account
+            employee_user = User(
+                email=account_email,
+                password=hashed_password,
+                role='employee',
+                employee_id=employee.id,
+                organization_id=organization_id,
+                profile_completed=True  # Employee accounts don't need onboarding
+            )
+            
+            db.session.add(employee_user)
+            print(f"DEBUG: Employee user account created - Email: {account_email}, Employee ID: {employee.id}")
+        
+        # Commit all changes
         db.session.commit()
         
         print(f"DEBUG: Employee saved successfully - ID: {employee.id}, Name: {employee.full_name}")
         
+        success_message = f'Employee {employee.full_name} has been saved successfully!'
+        if account_email:
+            success_message += f' Employee account created with email: {account_email}'
+        
         return jsonify({
             'success': True,
-            'message': f'Employee {employee.full_name} has been saved successfully!',
+            'message': success_message,
             'employee_id': employee.id
         })
         
     except Exception as e:
         db.session.rollback()
         print(f"ERROR: Failed to save employee: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({
             'success': False,
             'error': f'Failed to save employee data: {str(e)}'
@@ -994,7 +1173,7 @@ def get_employees():
 
 
 def _data_url_to_part(data_url):
-    """Convert data URL (base64) to an inline_data part for Gemini."""
+    """Convert data URL (base64) to a Part object for Gemini."""
     try:
         if not data_url or not isinstance(data_url, str):
             return None
@@ -1005,9 +1184,11 @@ def _data_url_to_part(data_url):
             # Assume it's just base64 without header
             mime = 'image/png'
             b64data = data_url
-        # google-genai expects base64-encoded string in inline_data.data
-        return {"mime_type": mime, "data": b64data}
-    except Exception:
+        # Decode base64 to bytes and use Part.from_bytes() for proper handling
+        file_bytes = base64.b64decode(b64data)
+        return types.Part.from_bytes(data=file_bytes, mime_type=mime)
+    except Exception as e:
+        print(f"ERROR: Failed to convert data URL to part: {str(e)}")
         return None
 
 
@@ -1060,19 +1241,16 @@ def extract_from_cv():
             "passport_number, passport_issue_date, passport_expiry_date, passport_issue_place"
         )
 
-        # Build content for google-genai: text instructions + inline_data parts
-        parts = [{"text": instructions}]
-        for p in inline_parts:
-            parts.append({
-                "inline_data": {
-                    "mime_type": p["mime_type"],
-                    "data": p["data"],
-                }
-            })
+        # Build content for google-genai: text instructions + file parts
+        parts = [types.Part.from_text(instructions)]
+        parts.extend(inline_parts)
+
+        # Wrap parts in Content object with user role
+        content = types.Content(role="user", parts=parts)
 
         response = gemini_client.models.generate_content(
             model="gemini-2.0-flash",
-            contents=[{"role": "user", "parts": parts}],
+            contents=[content],
         )
 
         text = getattr(response.candidates[0].content.parts[0], "text", "") if getattr(response, "candidates", None) else ""
@@ -1097,3 +1275,179 @@ def extract_from_cv():
             'success': False,
             'error': f'Failed to extract data from CV: {str(e)}'
         }), 500
+
+
+@administrative_personnel_bp.route('/personnel/api/evaluate-cv', methods=['POST'])
+@login_required
+def evaluate_cv():
+    """Evaluate CV to determine if it suits the Development department using Gemini."""
+    try:
+        payload = request.get_json() or {}
+        files = payload.get('files') or []
+        department = payload.get('department', 'Development')  # Default to Development
+        
+        if not files:
+            return jsonify({'success': False, 'error': 'No files provided'}), 400
+
+        inline_parts = []
+        for f in files:
+            part = _data_url_to_part(f)
+            if part:
+                inline_parts.append(part)
+        if not inline_parts:
+            return jsonify({'success': False, 'error': 'Invalid file format'}), 400
+
+        # Create evaluation prompt based on department
+        department_requirements = {
+            'Development': {
+                'skills': ['programming', 'software development', 'coding', 'algorithms', 'data structures', 
+                          'web development', 'mobile development', 'database', 'API', 'version control', 
+                          'testing', 'debugging', 'problem solving'],
+                'technologies': ['Python', 'JavaScript', 'Java', 'C++', 'React', 'Node.js', 'SQL', 
+                                'Git', 'Docker', 'AWS', 'Agile', 'Scrum'],
+                'experience': 'software development, programming projects, technical roles'
+            },
+            'HRM': {
+                'skills': ['human resources management', 'recruitment', 'talent acquisition', 'employee relations', 
+                          'performance management', 'compensation and benefits', 'training and development', 
+                          'HR policies', 'labor law', 'organizational development', 'conflict resolution'],
+                'technologies': ['HRIS', 'ATS', 'Microsoft Office', 'HR Analytics', 'Payroll Systems'],
+                'experience': 'human resources, recruitment, employee management, HR administration'
+            },
+            'Sales': {
+                'skills': ['communication', 'negotiation', 'customer relations', 'presentation', 
+                          'relationship building', 'closing deals'],
+                'technologies': ['CRM', 'Salesforce', 'Microsoft Office'],
+                'experience': 'sales, business development, account management'
+            },
+            'Marketing': {
+                'skills': ['digital marketing', 'SEO', 'content creation', 'social media', 
+                          'analytics', 'campaign management', 'branding'],
+                'technologies': ['Google Analytics', 'Facebook Ads', 'Adobe Creative Suite', 'HubSpot'],
+                'experience': 'marketing, advertising, content creation'
+            },
+            'Finance': {
+                'skills': ['financial analysis', 'accounting', 'budgeting', 'financial reporting', 
+                          'risk management', 'auditing', 'tax planning'],
+                'technologies': ['Excel', 'QuickBooks', 'SAP', 'Oracle Financials', 'Financial Software'],
+                'experience': 'finance, accounting, financial analysis, auditing'
+            },
+            'Operations': {
+                'skills': ['process improvement', 'project management', 'supply chain', 'logistics', 
+                          'quality control', 'operations management', 'strategic planning'],
+                'technologies': ['ERP Systems', 'Project Management Tools', 'Microsoft Office'],
+                'experience': 'operations, process management, supply chain, logistics'
+            }
+        }
+
+        req = department_requirements.get(department, department_requirements['Development'])
+
+        instructions = (
+            f"You are an HR evaluation expert. Analyze the provided CV/resume and evaluate if the candidate "
+            f"is suitable for the {department} department.\n\n"
+            f"**Department Requirements for {department}:**\n"
+            f"- Key Skills: {', '.join(req['skills'])}\n"
+            f"- Technologies/Tools: {', '.join(req['technologies'])}\n"
+            f"- Relevant Experience: {req['experience']}\n\n"
+            f"**Evaluation Criteria:**\n"
+            f"1. Technical Skills Match (0-10): Rate how well the candidate's technical skills match the department requirements\n"
+            f"2. Experience Relevance (0-10): Rate how relevant their work experience is to the department\n"
+            f"3. Education Background (0-10): Rate how relevant their education is\n"
+            f"4. Overall Suitability (0-10): Overall rating for the department\n\n"
+            f"**Return a JSON object with the following structure:**\n"
+            f"{{\n"
+            f"  \"suitable\": true/false,\n"
+            f"  \"overall_score\": 0-10,\n"
+            f"  \"scores\": {{\n"
+            f"    \"technical_skills\": 0-10,\n"
+            f"    \"experience_relevance\": 0-10,\n"
+            f"    \"education_background\": 0-10\n"
+            f"  }},\n"
+            f"  \"strengths\": [\"strength1\", \"strength2\", ...],\n"
+            f"  \"weaknesses\": [\"weakness1\", \"weakness2\", ...],\n"
+            f"  \"recommendation\": \"Brief recommendation text\",\n"
+            f"  \"key_skills_found\": [\"skill1\", \"skill2\", ...],\n"
+            f"  \"missing_skills\": [\"skill1\", \"skill2\", ...]\n"
+            f"}}\n\n"
+            f"Be thorough and objective in your evaluation. Consider the candidate's potential even if they don't have all required skills."
+        )
+
+        # Build content for google-genai: text instructions + file parts
+        parts = [types.Part.from_text(instructions)]
+        parts.extend(inline_parts)
+
+        # Wrap parts in Content object with user role
+        content = types.Content(role="user", parts=parts)
+
+        response = gemini_client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=[content],
+        )
+
+        text = getattr(response.candidates[0].content.parts[0], "text", "") if getattr(response, "candidates", None) else ""
+        evaluation_data = _parse_json_forgiving(text)
+
+        # Validate and structure the response
+        if not evaluation_data:
+            return jsonify({
+                'success': False,
+                'error': 'Failed to parse evaluation response from AI'
+            }), 500
+
+        # Ensure required fields exist
+        result = {
+            'suitable': evaluation_data.get('suitable', False),
+            'overall_score': float(evaluation_data.get('overall_score', 0)),
+            'scores': {
+                'technical_skills': float(evaluation_data.get('scores', {}).get('technical_skills', 0)),
+                'experience_relevance': float(evaluation_data.get('scores', {}).get('experience_relevance', 0)),
+                'education_background': float(evaluation_data.get('scores', {}).get('education_background', 0))
+            },
+            'strengths': evaluation_data.get('strengths', []),
+            'weaknesses': evaluation_data.get('weaknesses', []),
+            'recommendation': evaluation_data.get('recommendation', 'No recommendation provided'),
+            'key_skills_found': evaluation_data.get('key_skills_found', []),
+            'missing_skills': evaluation_data.get('missing_skills', []),
+            'department': department
+        }
+
+        print(f"DEBUG: CV evaluation completed for {department} department")
+        print(f"  Suitable: {result['suitable']}, Overall Score: {result['overall_score']}")
+
+        return jsonify({
+            'success': True,
+            'evaluation': result
+        })
+
+    except Exception as e:
+        print(f"ERROR: CV evaluation failed: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': f'Failed to evaluate CV: {str(e)}'
+        }), 500
+
+
+@administrative_personnel_bp.route('/personnel/reports')
+@login_required
+def personnel_reports():
+    user = User.query.get(session['user_id'])
+    
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    return render_template('under_development.html', user=user, page_title="Reports")
+
+
+@administrative_personnel_bp.route('/personnel/analytics')
+@login_required
+def personnel_analytics():
+    user = User.query.get(session['user_id'])
+    
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    return render_template('under_development.html', user=user, page_title="Analytics")

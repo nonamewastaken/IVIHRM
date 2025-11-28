@@ -201,6 +201,42 @@
         background: #1e7e34;
     }
 
+    .btn-evaluate {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-evaluate:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        background: linear-gradient(135deg, #5568d3 0%, #6a3fa0 100%);
+    }
+
+    .btn-evaluate:active {
+        transform: translateY(0);
+    }
+
+    .btn-evaluate:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .btn-evaluate i {
+        font-size: 16px;
+    }
+
     .hidden {
         display: none;
     }
@@ -274,9 +310,26 @@
                 <div id="previewArea" class="hidden">
                     <img id="cvPreview" class="upload-preview" src="" alt="CV Preview">
                     <p id="cvPreviewLabel">CV Uploaded</p>
-                    <button class="btn btn-secondary" onclick="removeCV()">
-                        <i class="fas fa-trash"></i> Remove
-                    </button>
+                    <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px; flex-wrap: wrap;">
+                        <button class="btn btn-secondary" onclick="removeCV()">
+                            <i class="fas fa-trash"></i> Remove
+                        </button>
+                        <button class="btn-evaluate" id="evaluateCvBtn" onclick="evaluateCV()">
+                            <i class="fas fa-brain"></i> Evaluate CV for Development
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- CV Evaluation Results -->
+            <div id="evaluationResults" class="hidden" style="margin-top: 20px;">
+                <div class="personnel-card" style="background: #f8f9fa; border-left: 4px solid #667eea;">
+                    <h3 style="color: #2c3e50; margin-bottom: 20px;">
+                        <i class="fas fa-chart-line"></i> CV Evaluation Results
+                    </h3>
+                    <div id="evaluationContent">
+                        <!-- Evaluation results will be displayed here -->
+                    </div>
                 </div>
             </div>
             
@@ -612,6 +665,48 @@
                                     <i class="fas fa-upload"></i> Upload
                                 </button>
                                 <input type="file" id="passportFileInput" accept="image/*" style="display: none;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account Information Section -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <i class="fas fa-key"></i>
+                        <span>ACCOUNT INFORMATION</span>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Employee Email</label>
+                            <input type="email" class="form-control" name="account_email" id="account_email" placeholder="Enter email for employee account (optional)">
+                            <small style="color: #666; font-size: 0.85rem; display: block; margin-top: 5px;">
+                                Leave blank if you don't want to create a login account for this employee
+                            </small>
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <div style="position: relative;">
+                                <input type="password" class="form-control" name="account_password" id="account_password" placeholder="Enter password (required if email provided)">
+                                <button type="button" class="btn btn-secondary" onclick="generatePassword()" style="margin-top: 5px; width: 100%; font-size: 0.85rem;">
+                                    <i class="fas fa-key"></i> Generate Strong Password
+                                </button>
+                            </div>
+                            <small style="color: #666; font-size: 0.85rem; display: block; margin-top: 5px;">
+                                Password is required if email is provided
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <div id="passwordStrength" style="margin-top: 8px; padding: 8px; border-radius: 4px; display: none;">
+                                <div style="font-size: 0.85rem; font-weight: 600; margin-bottom: 4px;">Password Strength:</div>
+                                <div id="passwordStrengthBar" style="height: 4px; background: #e0e0e0; border-radius: 2px; overflow: hidden;">
+                                    <div id="passwordStrengthFill" style="height: 100%; width: 0%; transition: all 0.3s ease;"></div>
+                                </div>
+                                <div id="passwordStrengthText" style="font-size: 0.75rem; margin-top: 4px; color: #666;"></div>
                             </div>
                         </div>
                     </div>
@@ -1018,6 +1113,174 @@ function prefillFromExtractedData(data) {
 }
 
 // Function to convert file to base64
+// CV Evaluation function
+async function evaluateCV() {
+    if (!cvFile) {
+        showMessage('Please upload a CV first', 'error');
+        return;
+    }
+    
+    const evaluateBtn = document.getElementById('evaluateCvBtn');
+    const originalText = evaluateBtn.innerHTML;
+    evaluateBtn.disabled = true;
+    evaluateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing CV...';
+    
+    try {
+        showMessage('Evaluating CV for Development department...', 'info');
+        const b64 = await fileToBase64(cvFile);
+        
+        const response = await fetch('/personnel/api/evaluate-cv', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                files: [b64],
+                department: 'Development'
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result && result.success && result.evaluation) {
+            displayEvaluationResults(result.evaluation);
+            showMessage('CV evaluation completed!', 'success');
+        } else {
+            const errorMsg = result && result.error ? result.error : 'Failed to evaluate CV';
+            showMessage(`Evaluation failed: ${errorMsg}`, 'error');
+        }
+    } catch (error) {
+        console.error('CV evaluation error:', error);
+        showMessage('Error evaluating CV. Please try again.', 'error');
+    } finally {
+        evaluateBtn.disabled = false;
+        evaluateBtn.innerHTML = originalText;
+    }
+}
+
+function displayEvaluationResults(evaluation) {
+    const resultsDiv = document.getElementById('evaluationResults');
+    const contentDiv = document.getElementById('evaluationContent');
+    
+    if (!resultsDiv || !contentDiv) return;
+    
+    const suitable = evaluation.suitable;
+    const overallScore = evaluation.overall_score;
+    const scores = evaluation.scores || {};
+    const strengths = evaluation.strengths || [];
+    const weaknesses = evaluation.weaknesses || [];
+    const recommendation = evaluation.recommendation || 'No recommendation provided';
+    const keySkills = evaluation.key_skills_found || [];
+    const missingSkills = evaluation.missing_skills || [];
+    
+    // Determine color based on suitability
+    const statusColor = suitable ? '#28a745' : '#dc3545';
+    const statusIcon = suitable ? 'fa-check-circle' : 'fa-times-circle';
+    const statusText = suitable ? 'Suitable' : 'Not Suitable';
+    
+    contentDiv.innerHTML = `
+        <div style="margin-bottom: 20px;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                <i class="fas ${statusIcon}" style="color: ${statusColor}; font-size: 24px;"></i>
+                <h4 style="margin: 0; color: ${statusColor};">
+                    ${statusText} for ${evaluation.department} Department
+                </h4>
+            </div>
+            <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                <div style="text-align: center;">
+                    <div style="font-size: 36px; font-weight: bold; color: ${statusColor};">
+                        ${overallScore.toFixed(1)}/10
+                    </div>
+                    <div style="color: #666; margin-top: 5px;">Overall Score</div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px;">
+            <div style="background: white; padding: 15px; border-radius: 8px; text-align: center;">
+                <div style="font-size: 24px; font-weight: bold; color: #667eea;">
+                    ${scores.technical_skills?.toFixed(1) || '0'}/10
+                </div>
+                <div style="color: #666; font-size: 12px; margin-top: 5px;">Technical Skills</div>
+            </div>
+            <div style="background: white; padding: 15px; border-radius: 8px; text-align: center;">
+                <div style="font-size: 24px; font-weight: bold; color: #667eea;">
+                    ${scores.experience_relevance?.toFixed(1) || '0'}/10
+                </div>
+                <div style="color: #666; font-size: 12px; margin-top: 5px;">Experience</div>
+            </div>
+            <div style="background: white; padding: 15px; border-radius: 8px; text-align: center;">
+                <div style="font-size: 24px; font-weight: bold; color: #667eea;">
+                    ${scores.education_background?.toFixed(1) || '0'}/10
+                </div>
+                <div style="color: #666; font-size: 12px; margin-top: 5px;">Education</div>
+            </div>
+        </div>
+        
+        ${strengths.length > 0 ? `
+        <div style="margin-bottom: 15px;">
+            <h5 style="color: #28a745; margin-bottom: 10px;">
+                <i class="fas fa-check-circle"></i> Strengths
+            </h5>
+            <ul style="margin: 0; padding-left: 20px; color: #333;">
+                ${strengths.map(s => `<li>${s}</li>`).join('')}
+            </ul>
+        </div>
+        ` : ''}
+        
+        ${weaknesses.length > 0 ? `
+        <div style="margin-bottom: 15px;">
+            <h5 style="color: #dc3545; margin-bottom: 10px;">
+                <i class="fas fa-exclamation-circle"></i> Areas for Improvement
+            </h5>
+            <ul style="margin: 0; padding-left: 20px; color: #333;">
+                ${weaknesses.map(w => `<li>${w}</li>`).join('')}
+            </ul>
+        </div>
+        ` : ''}
+        
+        ${keySkills.length > 0 ? `
+        <div style="margin-bottom: 15px;">
+            <h5 style="color: #667eea; margin-bottom: 10px;">
+                <i class="fas fa-star"></i> Key Skills Found
+            </h5>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                ${keySkills.map(skill => `
+                    <span style="background: #e3f2fd; color: #1976d2; padding: 5px 12px; border-radius: 20px; font-size: 12px;">
+                        ${skill}
+                    </span>
+                `).join('')}
+            </div>
+        </div>
+        ` : ''}
+        
+        ${missingSkills.length > 0 ? `
+        <div style="margin-bottom: 15px;">
+            <h5 style="color: #ff9800; margin-bottom: 10px;">
+                <i class="fas fa-exclamation-triangle"></i> Missing Skills
+            </h5>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                ${missingSkills.map(skill => `
+                    <span style="background: #fff3e0; color: #f57c00; padding: 5px 12px; border-radius: 20px; font-size: 12px;">
+                        ${skill}
+                    </span>
+                `).join('')}
+            </div>
+        </div>
+        ` : ''}
+        
+        <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #667eea;">
+            <h5 style="color: #2c3e50; margin-bottom: 10px;">
+                <i class="fas fa-comment-dots"></i> Recommendation
+            </h5>
+            <p style="margin: 0; color: #333; line-height: 1.6;">
+                ${recommendation}
+            </p>
+        </div>
+    `;
+    
+    resultsDiv.classList.remove('hidden');
+    resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
 function fileToBase64(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -1115,6 +1378,16 @@ function resetFormAndReturnToCVUpload() {
     document.getElementById('uploadArea').classList.remove('hidden');
     document.getElementById('previewArea').classList.add('hidden');
     
+    // Clear account information fields
+    const accountEmailInput = document.getElementById('account_email');
+    const accountPasswordInput = document.getElementById('account_password');
+    if (accountEmailInput) accountEmailInput.value = '';
+    if (accountPasswordInput) accountPasswordInput.value = '';
+    
+    // Hide password strength indicator
+    const passwordStrengthDiv = document.getElementById('passwordStrength');
+    if (passwordStrengthDiv) passwordStrengthDiv.style.display = 'none';
+    
     // Clear any validation errors
     clearValidation();
     
@@ -1173,6 +1446,20 @@ async function submitEmployeeData() {
 
         await Promise.all(fileConversions);
 
+        // Handle account information (email and password)
+        const accountEmail = document.getElementById('account_email')?.value?.trim();
+        const accountPassword = document.getElementById('account_password')?.value?.trim();
+        
+        if (accountEmail) {
+            if (!accountPassword) {
+                showMessage('Password is required when email is provided', 'error');
+                showLoading(false);
+                return;
+            }
+            employeeData.account_email = accountEmail;
+            employeeData.account_password = accountPassword;
+        }
+
         // Send data to backend
         console.log('Sending data to API:', employeeData);
         const url = IS_EDIT_MODE ? `/personnel/api/employee/${EMPLOYEE_ID}` : '/personnel/api/employee';
@@ -1212,5 +1499,121 @@ async function submitEmployeeData() {
         showLoading(false);
     }
 }
+
+// Password generation function
+function generatePassword() {
+    const length = 16;
+    const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|;:,.<>?';
+    let password = '';
+    
+    // Ensure at least one of each type
+    password += 'abcdefghijklmnopqrstuvwxyz'[Math.floor(Math.random() * 26)];
+    password += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[Math.floor(Math.random() * 26)];
+    password += '0123456789'[Math.floor(Math.random() * 10)];
+    password += '!@#$%^&*()_+-=[]{}|;:,.<>?'[Math.floor(Math.random() * 26)];
+    
+    // Fill the rest
+    for (let i = password.length; i < length; i++) {
+        password += charset[Math.floor(Math.random() * charset.length)];
+    }
+    
+    // Shuffle the password
+    password = password.split('').sort(() => Math.random() - 0.5).join('');
+    
+    // Set password and trigger strength check
+    const passwordInput = document.getElementById('account_password');
+    if (passwordInput) {
+        passwordInput.value = password;
+        passwordInput.type = 'text'; // Show generated password
+        checkPasswordStrength(password);
+        
+        // Hide after 3 seconds
+        setTimeout(() => {
+            passwordInput.type = 'password';
+        }, 3000);
+    }
+}
+
+// Password strength checking
+function checkPasswordStrength(password) {
+    const strengthDiv = document.getElementById('passwordStrength');
+    const strengthFill = document.getElementById('passwordStrengthFill');
+    const strengthText = document.getElementById('passwordStrengthText');
+    
+    if (!strengthDiv || !strengthFill || !strengthText) return;
+    
+    if (!password || password.length === 0) {
+        strengthDiv.style.display = 'none';
+        return;
+    }
+    
+    strengthDiv.style.display = 'block';
+    
+    let strength = 0;
+    let feedback = [];
+    
+    // Length check
+    if (password.length >= 8) strength += 1;
+    else feedback.push('At least 8 characters');
+    
+    if (password.length >= 12) strength += 1;
+    
+    // Character type checks
+    if (/[a-z]/.test(password)) strength += 1;
+    else feedback.push('lowercase letters');
+    
+    if (/[A-Z]/.test(password)) strength += 1;
+    else feedback.push('uppercase letters');
+    
+    if (/[0-9]/.test(password)) strength += 1;
+    else feedback.push('numbers');
+    
+    if (/[^a-zA-Z0-9]/.test(password)) strength += 1;
+    else feedback.push('special characters');
+    
+    // Calculate percentage
+    const percentage = (strength / 6) * 100;
+    
+    // Update visual indicator
+    strengthFill.style.width = percentage + '%';
+    
+    // Set color and text
+    if (strength <= 2) {
+        strengthFill.style.background = '#dc3545'; // Red
+        strengthText.textContent = 'Weak' + (feedback.length > 0 ? ' - Add: ' + feedback.join(', ') : '');
+        strengthText.style.color = '#dc3545';
+    } else if (strength <= 4) {
+        strengthFill.style.background = '#ffc107'; // Yellow
+        strengthText.textContent = 'Medium' + (feedback.length > 0 ? ' - Consider adding: ' + feedback.join(', ') : '');
+        strengthText.style.color = '#856404';
+    } else {
+        strengthFill.style.background = '#28a745'; // Green
+        strengthText.textContent = 'Strong password!';
+        strengthText.style.color = '#155724';
+    }
+}
+
+// Add event listener for password strength checking
+document.addEventListener('DOMContentLoaded', function() {
+    const passwordInput = document.getElementById('account_password');
+    if (passwordInput) {
+        passwordInput.addEventListener('input', function(e) {
+            checkPasswordStrength(e.target.value);
+        });
+    }
+    
+    // Validate account information before submission
+    const accountEmailInput = document.getElementById('account_email');
+    if (accountEmailInput) {
+        accountEmailInput.addEventListener('blur', function() {
+            const email = this.value.trim();
+            const password = document.getElementById('account_password')?.value?.trim();
+            
+            if (email && !password) {
+                document.getElementById('account_password').focus();
+            }
+        });
+    }
+});
 </script>
 {% endblock %}

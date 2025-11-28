@@ -63,6 +63,7 @@
         position: relative;
         gap: 28px;
         padding: 0 18px 18px;
+        flex-shrink: 0;
     }
 
     .tree-column.has-children > .tree-node::after {
@@ -80,14 +81,10 @@
         display: flex;
         gap: 36px;
         align-items: flex-start;
-        justify-content: center;
-        flex-wrap: wrap;
+        justify-content: flex-start;
+        flex-wrap: nowrap;
         position: relative;
         padding-top: 24px;
-    }
-
-    .root-column > .tree-children {
-        flex-wrap: nowrap;
     }
 
     .tree-column.has-children > .tree-children::before {
@@ -382,9 +379,6 @@ document.addEventListener('DOMContentLoaded', function() {
             column.classList.add('has-children');
             const childrenWrapper = document.createElement('div');
             childrenWrapper.className = 'tree-children';
-            if (node.type === 'root') {
-                childrenWrapper.style.flexWrap = 'nowrap';
-            }
             node.children.forEach(child => {
                 childrenWrapper.appendChild(buildTreeColumn(child));
             });

@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Company - HRSolutions</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+        }
+
+        /* Top Header */
+        .top-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1002;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-button-header {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .back-button-header:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateX(-3px);
+        }
+
+        .back-button-header i {
+            font-size: 1rem;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .header-title i {
+            font-size: 1.3rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 80px;
+            padding: 40px 30px;
+            min-height: calc(100vh - 80px);
+        }
+
+        .company-view-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .company-card {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .company-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .company-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 36px;
+        }
+
+        .company-title {
+            flex: 1;
+        }
+
+        .company-title h1 {
+            font-size: 2rem;
+            color: #333;
+            margin: 0 0 8px 0;
+            font-weight: 600;
+        }
+
+        .company-title p {
+            color: #666;
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        .company-info-section {
+            margin-top: 30px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 20px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-icon {
+            width: 40px;
+            height: 40px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #667eea;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .info-content {
+            flex: 1;
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .info-value {
+            font-size: 1.1rem;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .info-value.empty {
+            color: #999;
+            font-style: italic;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .modal-header h2 {
+            font-size: 1.5rem;
+            color: #333;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #666;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .modal-form-group {
+            margin-bottom: 20px;
+        }
+
+        .modal-form-label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .modal-form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .modal-form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .modal-coordinates-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .modal-info-box {
+            background: #f8f9fa;
+            padding: 10px 12px;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .modal-info-label {
+            font-size: 0.7rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .modal-info-value {
+            font-size: 0.85rem;
+            color: #333;
+            font-weight: 500;
+            font-family: 'Courier New', monospace;
+        }
+
+        .modal-info-value.empty {
+            color: #999;
+            font-style: italic;
+        }
+
+        .modal-button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .modal-btn-primary:hover:not(:disabled) {
+            background: #5568d3;
+        }
+
+        .modal-btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .modal-btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .modal-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .modal-message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .modal-message.show {
+            display: block;
+        }
+
+        .modal-message.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .modal-message.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .pac-container {
+            z-index: 10001 !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Header -->
+    <div class="top-header">
+        <div class="header-left">
+            <a href="/dashboard" class="back-button-header">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back</span>
+            </a>
+            <div class="header-title">
+                <i class="fas fa-building"></i>
+                <span>View Company</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="company-view-container">
+            <div class="company-card">
+                <div class="company-header">
+                    <div class="company-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <div class="company-title">
+                        <h1>{{ company_name }}</h1>
+                        <p>Company Information</p>
+                    </div>
+                </div>
+
+                <div class="company-info-section">
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">Company Name</div>
+                            <div class="info-value">{{ company_name }}</div>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="info-content" style="flex: 1;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <div style="flex: 1;">
+                                    <div class="info-label">Company Address</div>
+                                    <div class="info-value {% if not company_address %}empty{% endif %}">
+                                        {% if company_address %}
+                                            {{ company_address }}
+                                        {% else %}
+                                            Not specified
+                                        {% endif %}
+                                    </div>
+                                    {% if latitude and longitude %}
+                                    <div style="font-size: 0.75rem; color: #666; margin-top: 6px;">
+                                        <i class="fas fa-map"></i> Coordinates: {{ "%.6f"|format(latitude) }}, {{ "%.6f"|format(longitude) }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <button onclick="openEditModal()" style="margin-left: 15px; padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 6px; font-size: 0.875rem; font-weight: 500; white-space: nowrap; cursor: pointer; transition: all 0.2s ease;">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Address Modal -->
+    <div class="modal-overlay" id="editAddressModal" onclick="closeModalOnOverlay(event)">
+        <div class="modal-container" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2><i class="fas fa-map-marker-alt"></i> Edit Company Address</h2>
+                <button class="modal-close" onclick="closeEditModal()" aria-label="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="modal-message" id="modalMessage"></div>
+
+            <form id="editAddressForm">
+                <div class="modal-form-group">
+                    <label for="modalAddress" class="modal-form-label">Company Address</label>
+                    <input 
+                        type="text" 
+                        id="modalAddress" 
+                        name="address" 
+                        class="modal-form-input" 
+                        placeholder="Start typing an address..."
+                        value="{{ company_address }}"
+                        autocomplete="off"
+                    >
+                    <p style="font-size: 0.8rem; color: #666; margin-top: 6px;">
+                        <i class="fas fa-info-circle"></i> Start typing and select from Google Maps suggestions
+                    </p>
+                </div>
+
+                <div class="modal-coordinates-info">
+                    <div class="modal-info-box">
+                        <div class="modal-info-label">Latitude</div>
+                        <div class="modal-info-value {% if not latitude %}empty{% endif %}" id="modalLatitudeDisplay">
+                            {% if latitude %}{{ "%.6f"|format(latitude) }}{% else %}Not set{% endif %}
+                        </div>
+                    </div>
+                    <div class="modal-info-box">
+                        <div class="modal-info-label">Longitude</div>
+                        <div class="modal-info-value {% if not longitude %}empty{% endif %}" id="modalLongitudeDisplay">
+                            {% if longitude %}{{ "%.6f"|format(longitude) }}{% else %}Not set{% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <input type="hidden" id="modalLatitude" name="latitude" value="{% if latitude %}{{ latitude }}{% endif %}">
+                <input type="hidden" id="modalLongitude" name="longitude" value="{% if longitude %}{{ longitude }}{% endif %}">
+
+                <div class="modal-button-group">
+                    <button type="submit" class="modal-btn modal-btn-primary" id="modalSaveBtn">
+                        <i class="fas fa-save"></i> Save Address
+                    </button>
+                    <button type="button" class="modal-btn modal-btn-secondary" onclick="closeEditModal()">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Google Maps JavaScript API -->
+    {% if google_maps_api_key %}
+    <script>
+        // Global error handler for Google Maps
+        window.gm_authFailure = function() {
+            console.error('Google Maps authentication failed. API key is invalid or restricted.');
+            const messageDiv = document.getElementById('modalMessage');
+            if (messageDiv) {
+                messageDiv.innerHTML = 'Google Maps authentication failed.<br><small>Please check:<br>1. Places API is ENABLED in Google Cloud Console<br>2. API key is valid and not restricted<br>3. Domain restrictions allow this website<br>4. Billing is enabled</small>';
+                messageDiv.className = 'modal-message error show';
+            }
+        };
+
+        // Load Google Maps API with callback
+        function initGoogleMaps() {
+            const apiKey = '{{ google_maps_api_key }}';
+            if (!apiKey) {
+                console.error('Google Maps API key is missing');
+                return;
+            }
+            
+            console.log('Loading Google Maps API with key:', apiKey.substring(0, 10) + '...');
+            
+            const script = document.createElement('script');
+            script.src = 'https://maps.googleapis.com/maps/api/js?key=' + apiKey + '&libraries=places&callback=onGoogleMapsLoaded';
+            script.async = true;
+            script.defer = true;
+            script.onerror = function() {
+                console.error('Failed to load Google Maps API script');
+                const messageDiv = document.getElementById('modalMessage');
+                if (messageDiv) {
+                    messageDiv.innerHTML = 'Failed to load Google Maps API.<br><small>Please ensure:<br>1. Places API is enabled in Google Cloud Console<br>2. API key has no domain restrictions (or includes this domain)<br>3. Billing is enabled for your Google Cloud project</small>';
+                    messageDiv.className = 'modal-message error show';
+                }
+            };
+            document.head.appendChild(script);
+        }
+
+        // Callback when Google Maps loads successfully
+        window.onGoogleMapsLoaded = function() {
+            console.log('Google Maps API loaded successfully');
+            // Autocomplete will be initialized when modal opens
+        };
+
+        // Initialize Google Maps API
+        initGoogleMaps();
+    </script>
+    {% endif %}
+
+    <script>
+        let autocomplete;
+        let currentPlace;
+        let mapsApiLoaded = false;
+
+        // Check if Google Maps API is loaded
+        function checkMapsApiLoaded() {
+            if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+                mapsApiLoaded = true;
+                return true;
+            }
+            return false;
+        }
+
+        // Modal functions
+        function openEditModal() {
+            document.getElementById('editAddressModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+            
+            // Wait a bit for API to load if not already loaded
+            if (checkMapsApiLoaded()) {
+                initAutocomplete();
+            } else {
+                // Retry after short delay
+                let retries = 0;
+                const checkInterval = setInterval(function() {
+                    retries++;
+                    if (checkMapsApiLoaded()) {
+                        clearInterval(checkInterval);
+                        initAutocomplete();
+                    } else if (retries > 20) { // Wait up to 2 seconds
+                        clearInterval(checkInterval);
+                        const messageDiv = document.getElementById('modalMessage');
+                        messageDiv.textContent = 'Google Maps API is still loading. Please wait a moment and try again.';
+                        messageDiv.className = 'modal-message error show';
+                    }
+                }, 100);
+            }
+        }
+
+        function closeEditModal() {
+            document.getElementById('editAddressModal').classList.remove('show');
+            document.body.style.overflow = '';
+            // Reset form
+            document.getElementById('modalMessage').classList.remove('show');
+        }
+
+        function closeModalOnOverlay(event) {
+            if (event.target === event.currentTarget) {
+                closeEditModal();
+            }
+        }
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeEditModal();
+            }
+        });
+
+        // Initialize Google Maps Autocomplete
+        function initAutocomplete() {
+            const addressInput = document.getElementById('modalAddress');
+            
+            if (!addressInput || autocomplete) {
+                return; // Already initialized or input not found
+            }
+            
+            autocomplete = new google.maps.places.Autocomplete(addressInput, {
+                types: ['address'],
+                componentRestrictions: { country: [] }
+            });
+
+            autocomplete.addListener('place_changed', function() {
+                currentPlace = autocomplete.getPlace();
+                
+                if (!currentPlace.geometry) {
+                    console.log("No details available for input: '" + currentPlace.name + "'");
+                    return;
+                }
+
+                // Update address field with formatted address
+                addressInput.value = currentPlace.formatted_address;
+
+                // Get coordinates
+                const lat = currentPlace.geometry.location.lat();
+                const lng = currentPlace.geometry.location.lng();
+
+                // Update hidden fields
+                document.getElementById('modalLatitude').value = lat;
+                document.getElementById('modalLongitude').value = lng;
+
+                // Update display
+                document.getElementById('modalLatitudeDisplay').textContent = lat.toFixed(6);
+                document.getElementById('modalLatitudeDisplay').classList.remove('empty');
+                document.getElementById('modalLongitudeDisplay').textContent = lng.toFixed(6);
+                document.getElementById('modalLongitudeDisplay').classList.remove('empty');
+
+                // Clear any error messages
+                document.getElementById('modalMessage').classList.remove('show');
+            });
+        }
+
+        // Initialize autocomplete when Google Maps loads
+        {% if google_maps_api_key %}
+        // Autocomplete will be initialized when modal opens
+        {% else %}
+        console.error('Google Maps API key not configured');
+        document.addEventListener('DOMContentLoaded', function() {
+            const messageDiv = document.getElementById('modalMessage');
+            if (messageDiv) {
+                messageDiv.textContent = 'Google Maps API key is not configured. Please contact the administrator.';
+                messageDiv.className = 'modal-message error show';
+            }
+        });
+        {% endif %}
+
+        // Form submission
+        document.getElementById('editAddressForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const addressInput = document.getElementById('modalAddress');
+            const latitudeInput = document.getElementById('modalLatitude');
+            const longitudeInput = document.getElementById('modalLongitude');
+            const saveBtn = document.getElementById('modalSaveBtn');
+            const messageDiv = document.getElementById('modalMessage');
+
+            // Hide previous messages
+            messageDiv.classList.remove('show');
+
+            // Validate
+            const address = addressInput.value.trim();
+            if (!address) {
+                messageDiv.textContent = 'Please enter or select an address';
+                messageDiv.className = 'modal-message error show';
+                return;
+            }
+
+            // Disable button
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+            // Prepare data
+            const data = {
+                address: address,
+                latitude: latitudeInput.value ? parseFloat(latitudeInput.value) : null,
+                longitude: longitudeInput.value ? parseFloat(longitudeInput.value) : null
+            };
+
+            // Submit
+            fetch('/company/api/update-address', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    messageDiv.textContent = 'Address updated successfully!';
+                    messageDiv.className = 'modal-message success show';
+                    
+                    // Reload page after short delay to show updated address
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    messageDiv.textContent = data.error || 'Failed to update address';
+                    messageDiv.className = 'modal-message error show';
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Address';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                messageDiv.textContent = 'An error occurred while updating the address';
+                messageDiv.className = 'modal-message error show';
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Address';
+            });
+        });
+
+        // Handle manual address input
+        document.getElementById('modalAddress').addEventListener('input', function() {
+            if (!this.value.trim()) {
+                document.getElementById('modalLatitude').value = '';
+                document.getElementById('modalLongitude').value = '';
+                document.getElementById('modalLatitudeDisplay').textContent = 'Not set';
+                document.getElementById('modalLatitudeDisplay').classList.add('empty');
+                document.getElementById('modalLongitudeDisplay').textContent = 'Not set';
+                document.getElementById('modalLongitudeDisplay').classList.add('empty');
+            }
+        });
+    </script>
+</body>
+</html>

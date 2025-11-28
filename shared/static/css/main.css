@@ -26,7 +26,7 @@ body {
 .top-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    padding: 20px 30px;
+    padding: 12px 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -35,11 +35,43 @@ body {
     left: 0;
     right: 0;
     z-index: 1002;
+    box-sizing: border-box;
+    margin: 0;
+    border: none;
+    line-height: 1;
+    height: 80px;
+    overflow: visible;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    height: 100%;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+    height: 100%;
+}
+
+.logo-container:hover {
+    opacity: 0.9;
+}
+
+.logo-img {
+    height: 56px;
+    width: auto;
+    object-fit: contain;
+    display: block;
 }
 
 .header-left h1 {
     margin: 0;
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     font-weight: 600;
 }
 
@@ -47,6 +79,8 @@ body {
     display: flex;
     align-items: center;
     gap: 20px;
+    position: relative;
+    z-index: 10005;
 }
 
 .time-display {
@@ -60,6 +94,70 @@ body {
     align-items: center;
     gap: 10px;
     font-size: 0.9rem;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.user-info:hover {
+    opacity: 0.9;
+}
+
+.user-profile-dropdown {
+    position: relative;
+    z-index: 10005;
+}
+
+.profile-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 180px;
+    z-index: 10004;
+    overflow: hidden;
+}
+
+.profile-dropdown-menu.show {
+    display: block;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    color: #333;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
+    border: none;
+    width: 100%;
+    text-align: left;
+}
+
+.dropdown-item:hover {
+    background-color: #f5f5f5;
+}
+
+.dropdown-item i {
+    width: 16px;
+    color: #666;
+}
+
+.logout-item {
+    color: #dc3545;
+}
+
+.logout-item:hover {
+    background-color: #fee;
+    color: #c82333;
+}
+
+.logout-item i {
+    color: #dc3545;
 }
 
 /* Navigation Bar */
@@ -76,6 +174,9 @@ body {
     left: 0;
     right: 0;
     z-index: 1001;
+    margin: 0;
+    border-top: none;
+    box-sizing: border-box;
 }
 
 .navbar-left {
@@ -102,6 +203,28 @@ body {
     background-color: #e8f0fe;
     color: #1a73e8;
     border-left: none;
+}
+
+.navbar .nav-item-evaluate {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+    border-radius: 5px;
+    padding: 8px 16px;
+    margin-left: 10px;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s ease;
+}
+
+.navbar .nav-item-evaluate:hover {
+    background: linear-gradient(135deg, #5568d3 0%, #6a3fa0 100%) !important;
+    color: white !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.navbar .nav-item-evaluate i {
+    margin-right: 6px;
 }
 
 /* ==================== SIDEBAR STYLES ==================== */
@@ -137,7 +260,7 @@ body {
     margin-left: 280px;
     min-height: 100vh;
     transition: margin-left 0.3s ease;
-    padding-top: 140px;
+    position: relative;
 }
 
 .main-content-with-sidebar.sidebar-collapsed {
@@ -254,9 +377,16 @@ body {
 
 /* Content Area */
 .content-area {
-    padding: 20px;
+    padding: 0;
+    margin: 0;
     background: #f5f5f5;
     min-height: calc(100vh - 140px);
+    position: absolute;
+    top: 140px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow-y: auto;
 }
 
 /* ==================== RESPONSIVE DESIGN ==================== */

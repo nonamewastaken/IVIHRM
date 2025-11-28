@@ -52,14 +52,22 @@ def login():
 
         session.clear()
         session['user_id'] = user.id
+        session['user_role'] = user.role if hasattr(user, 'role') else 'admin'
         session.modified = True
+
+        # Determine redirect based on user role
+        redirect_url = '/dashboard'
+        if hasattr(user, 'role') and user.role == 'employee':
+            redirect_url = '/employee/maintenance'
 
         response = make_response(jsonify({
             'message': 'Login successful',
             'user': {
                 'email': user.email,
-                'name': user.name
-            }
+                'name': user.name,
+                'role': user.role if hasattr(user, 'role') else 'admin'
+            },
+            'redirect': redirect_url
         }))
         
         return response, 200
@@ -93,7 +101,8 @@ def signup():
         email=email, 
         password=hashed_password,
         first_name=first_name,
-        last_name=last_name
+        last_name=last_name,
+        role='admin'  # Signup creates admin accounts
     )
     
     try:

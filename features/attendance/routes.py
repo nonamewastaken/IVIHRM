@@ -873,3 +873,69 @@ def save_attendance_data(processed_data, year, month):
         print(f"DEBUG: Error saving attendance data: {e}")
         db.session.rollback()
         raise e
+
+@attendance_bp.route('/checkin')
+@login_required
+def attendance_checkin():
+    user = User.query.get(session['user_id'])
+    
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    return render_template('under_development.html', user=user, page_title="Check In")
+
+@attendance_bp.route('/timeclock')
+@login_required
+def attendance_timeclock():
+    user = User.query.get(session['user_id'])
+    
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    return render_template('under_development.html', user=user, page_title="Time Clock")
+
+@attendance_bp.route('/mobile')
+@login_required
+def attendance_mobile():
+    user = User.query.get(session['user_id'])
+    
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    return render_template('under_development.html', user=user, page_title="Mobile Attendance")
+
+@attendance_bp.route('/weekly')
+@login_required
+def attendance_weekly():
+    user = User.query.get(session['user_id'])
+    
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    return render_template('under_development.html', user=user, page_title="Weekly Attendance")
+
+@attendance_bp.route('/export')
+@login_required
+def attendance_export():
+    user = User.query.get(session['user_id'])
+    
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    return render_template('under_development.html', user=user, page_title="Export Attendance")
+
+@attendance_bp.route('/analytics')
+@login_required
+def attendance_analytics():
+    user = User.query.get(session['user_id'])
+    
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    return render_template('under_development.html', user=user, page_title="Attendance Analytics")

@@ -239,18 +239,30 @@ Configuration management for different environments:
    pip install -r requirements.txt
    ```
 
-4. **Initialize Database (Optional)**
+4. **Set Up Environment Variables**
+   Copy the example environment file and configure it:
+   ```bash
+   cp .env.example .env
+   ```
+   
+   Then edit `.env` and add your configuration:
+   - **GEMINI_API_KEY**: Required for CV/PDF scanning functionality. Get your API key from [Google AI Studio](https://makersuite.google.com/app/apikey)
+   - **SECRET_KEY**: Required for Flask session management. Generate a secure random key for production
+   
+   **Important**: Without `GEMINI_API_KEY`, the CV scanning feature will not work when uploading PDF files.
+
+5. **Initialize Database (Optional)**
    If the database tables don't exist, run:
    ```bash
    python create_tables.py
    ```
 
-5. **Run the Application**
+6. **Run the Application**
    ```bash
    python app.py
    ```
 
-6. **Access the Application**
+7. **Access the Application**
    - Open your browser to `http://localhost:5001`
    - The application will automatically initialize the database on first run
 
@@ -269,6 +281,10 @@ The application requires the following Python packages:
 - Werkzeug 2.3.7 - WSGI utilities
 - SQLAlchemy 1.4.53 - Database toolkit
 - openpyxl 3.1.2 - Excel file processing
+- google-generativeai 0.7.2 - Google Gemini AI for CV/PDF scanning
+- google-genai 0.3.0 - Google Gemini AI client library
+- mysql-connector-python 9.0.0 - MySQL database connector (optional)
+- gunicorn 20.1.0 - WSGI HTTP Server for production (optional)
 
 ## Configuration
 
@@ -276,6 +292,22 @@ The application uses a configuration system located in `config/settings.py`:
 
 - **Development**: Default configuration with SQLite database
 - **Production**: Production-ready settings (configure as needed)
+
+### Environment Variables
+
+The application requires the following environment variables (set in `.env` file):
+
+- **GEMINI_API_KEY** (Required): Google Gemini API key for CV/PDF scanning functionality
+  - Get your API key from: https://makersuite.google.com/app/apikey
+  - Without this key, the CV scanning feature will return errors when uploading PDF files
+  
+- **SECRET_KEY** (Required): Flask secret key for session management
+  - Generate a secure random key for production use
+  
+- **DATABASE_URL** (Optional): Database connection string
+  - Defaults to SQLite if not provided
+
+See `.env.example` for a template of required environment variables.
 
 ## Adding New Features
 

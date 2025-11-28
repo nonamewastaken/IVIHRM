@@ -18,9 +18,12 @@ class User(db.Model):
     organization_id = db.Column(db.Integer, db.ForeignKey('organization.id'))
     reset_token = db.Column(db.String(100), unique=True)
     reset_token_expiry = db.Column(db.DateTime)
+    role = db.Column(db.String(20), default='admin')  # 'admin' or 'employee'
+    employee_id = db.Column(db.Integer, db.ForeignKey('employee.id'), nullable=True)  # Link to Employee if employee account
     
-    # Relationship
+    # Relationships
     organization = db.relationship('Organization', back_populates='users')
+    employee = db.relationship('Employee', backref='user_account', uselist=False)
 
     @property
     def name(self):
@@ -162,6 +165,8 @@ class Organization(db.Model):
     industry = db.Column(db.String(80))
     size = db.Column(db.String(50))
     location = db.Column(db.String(120))
+    latitude = db.Column(db.Float, nullable=True)  # Geographic coordinates
+    longitude = db.Column(db.Float, nullable=True)  # Geographic coordinates
     logo_url = db.Column(db.String(255))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     

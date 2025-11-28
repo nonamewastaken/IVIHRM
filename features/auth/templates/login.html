@@ -32,6 +32,18 @@
             margin: 0 auto;  /* Center the container */
         }
 
+        .logo-container-login {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-img-login {
+            height: 170px;
+            width: auto;
+            object-fit: contain;
+        }
+
         h1 {
             font-size: 36px;  /* Increased from 32px */
             margin-bottom: 12px;
@@ -425,6 +437,10 @@
 </head>
 <body>
     <div class="login-container">
+        <div class="logo-container-login">
+            <img src="{{ url_for('static', filename='images/ivihrm-logo.png') }}" alt="iViHRM Logo" class="logo-img-login" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <div style="display:none; color: #1976D2; font-weight: bold; font-size: 2rem; text-align: center;">iViHRM</div>
+        </div>
         <h1>Login</h1>
         <p class="subtitle">Fill out the form below.</p>
 
@@ -575,7 +591,9 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.message === 'Login successful') {
-                        window.location.href = '/';
+                        // Use redirect URL from server response, or default to dashboard
+                        const redirectUrl = data.redirect || '/dashboard';
+                        window.location.href = redirectUrl;
                     } else {
                         // Show translated error message based on the error type
                         let errorText;
