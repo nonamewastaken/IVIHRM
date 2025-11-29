@@ -2,7 +2,7 @@
 
 {% block title %}Add Employee - Choose Mode{% endblock %}
 
-{% block page_title %}<i class="fas fa-user-plus"></i> Add Employee{% endblock %}
+{% block page_title %}<i class="fas fa-user-plus"></i> <span id="pageTitleAddEmployee">Add Employee</span>{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -60,17 +60,17 @@
 <div class="select-mode-wrapper">
     <div class="mode-grid">
         <div class="mode-card">
-            <h3 class="mode-title"><i class="fas fa-user"></i> One Employee</h3>
-            <p class="mode-desc">Create a record for a single employee using the step-by-step wizard.</p>
+            <h3 class="mode-title"><i class="fas fa-user"></i> <span id="modeTitleOne">One Employee</span></h3>
+            <p class="mode-desc"><span id="modeDescOne">Create a record for a single employee using the step-by-step wizard.</span></p>
             <a class="mode-action" href="/personnel/add/start?add_mode=single">
-                <i class="fas fa-arrow-right"></i> Continue
+                <i class="fas fa-arrow-right"></i> <span id="modeContinueOne">Continue</span>
             </a>
         </div>
         <div class="mode-card">
-            <h3 class="mode-title"><i class="fas fa-users"></i> Multiple Employees</h3>
-            <p class="mode-desc">Start a batch onboarding flow. For now, this opens the same wizard and will expand later.</p>
+            <h3 class="mode-title"><i class="fas fa-users"></i> <span id="modeTitleMultiple">Multiple Employees</span></h3>
+            <p class="mode-desc"><span id="modeDescMultiple">Start a batch onboarding flow. For now, this opens the same wizard and will expand later.</span></p>
             <a class="mode-action" href="/personnel/add/start?add_mode=multiple">
-                <i class="fas fa-arrow-right"></i> Continue
+                <i class="fas fa-arrow-right"></i> <span id="modeContinueMultiple">Continue</span>
             </a>
         </div>
     </div>
@@ -81,6 +81,71 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     setActiveSidebarItem('/personnel/add');
+    
+    // Translate page title
+    function translatePageTitle() {
+        const titleElement = document.getElementById('pageTitleAddEmployee');
+        if (titleElement && window.t) {
+            titleElement.textContent = window.t('ui.sidebar.personnel.addEmployee', 'Add Employee');
+        }
+    }
+    
+    // Translate card content
+    function translateCards() {
+        if (!window.t) return;
+        
+        // One Employee card
+        const titleOne = document.getElementById('modeTitleOne');
+        if (titleOne) {
+            titleOne.textContent = window.t('ui.sidebar.personnel.addMode.oneEmployee', 'One Employee');
+        }
+        
+        const descOne = document.getElementById('modeDescOne');
+        if (descOne) {
+            descOne.textContent = window.t('ui.sidebar.personnel.addMode.oneEmployeeDesc', 'Create a record for a single employee using the step-by-step wizard.');
+        }
+        
+        const continueOne = document.getElementById('modeContinueOne');
+        if (continueOne) {
+            continueOne.textContent = window.t('ui.sidebar.personnel.addMode.continue', 'Continue');
+        }
+        
+        // Multiple Employees card
+        const titleMultiple = document.getElementById('modeTitleMultiple');
+        if (titleMultiple) {
+            titleMultiple.textContent = window.t('ui.sidebar.personnel.addMode.multipleEmployees', 'Multiple Employees');
+        }
+        
+        const descMultiple = document.getElementById('modeDescMultiple');
+        if (descMultiple) {
+            descMultiple.textContent = window.t('ui.sidebar.personnel.addMode.multipleEmployeesDesc', 'Start a batch onboarding flow. For now, this opens the same wizard and will expand later.');
+        }
+        
+        const continueMultiple = document.getElementById('modeContinueMultiple');
+        if (continueMultiple) {
+            continueMultiple.textContent = window.t('ui.sidebar.personnel.addMode.continue', 'Continue');
+        }
+    }
+    
+    // Translate on load
+    translatePageTitle();
+    translateCards();
+    
+    // Translate when language changes
+    window.addEventListener('languagechange', function() {
+        translatePageTitle();
+        translateCards();
+    });
+    
+    // Also translate after translations are applied
+    if (typeof window.applyTranslations === 'function') {
+        const originalApply = window.applyTranslations;
+        window.applyTranslations = function(lang) {
+            originalApply(lang);
+            translatePageTitle();
+            translateCards();
+        };
+    }
 });
 </script>
 {% endblock %}

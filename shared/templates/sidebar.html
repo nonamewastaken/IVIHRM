@@ -49,13 +49,13 @@ const sidebarData = {
         icon: 'fas fa-users',
         sections: [
             {
-                title: 'Overview',
+                title: (window.t && window.t('ui.sidebar.personnel.sections.overview', 'Overview')) || 'Overview',
                 items: [
                     { icon: 'fas fa-chart-line', text: (window.t && window.t('ui.sidebar.personnel.overview', 'Overview')) || 'Overview', href: '/personnel' }
                 ]
             },
             {
-                title: 'Employee Management',
+                title: (window.t && window.t('ui.sidebar.personnel.sections.employeeManagement', 'Employee Management')) || 'Employee Management',
                 items: [
                     { icon: 'fas fa-file-signature', text: (window.t && window.t('ui.sidebar.personnel.cvCustomization', 'CV Customization')) || 'CV Customization', href: '/personnel/cv-customization' },
                     { icon: 'fas fa-user-plus', text: (window.t && window.t('ui.sidebar.personnel.addEmployee', 'Add Employee')) || 'Add Employee', href: '/personnel/add' },
@@ -63,7 +63,7 @@ const sidebarData = {
                 ]
             },
             {
-                title: 'Department Management',
+                title: (window.t && window.t('ui.sidebar.personnel.sections.departmentManagement', 'Department Management')) || 'Department Management',
                 items: [
                     { icon: 'fas fa-building-columns', text: (window.t && window.t('ui.sidebar.personnel.companies', 'Companies')) || 'Companies', href: '/personnel/companies' },
                     { icon: 'fas fa-network-wired', text: (window.t && window.t('ui.sidebar.personnel.divisions', 'Divisions')) || 'Divisions', href: '/personnel/divisions' },
@@ -74,7 +74,7 @@ const sidebarData = {
                 ]
             },
             {
-                title: 'Reports',
+                title: (window.t && window.t('ui.sidebar.personnel.sections.reports', 'Reports')) || 'Reports',
                 items: [
                     { icon: 'fas fa-file-alt', text: (window.t && window.t('ui.sidebar.personnel.reports', 'Personnel Reports')) || 'Personnel Reports', href: '/personnel/reports' },
                     { icon: 'fas fa-chart-bar', text: (window.t && window.t('ui.sidebar.personnel.analytics', 'Analytics')) || 'Analytics', href: '/personnel/analytics' }
@@ -198,12 +198,26 @@ function generateSidebar(category) {
     const userRole = window.userRole || 'admin';
     const isEmployee = userRole === 'employee';
     
-    // Update sidebar title
+    // Update sidebar title with translation
     const titleElement = document.getElementById('sidebarTitleText');
     const iconElement = document.querySelector('#sidebarTitle i');
     
     if (titleElement) {
-        titleElement.textContent = categoryData.title;
+        // Map category to translation key
+        const titleMap = {
+            'Home': 'ui.sidebar.home.title',
+            'Administrative Personnel': 'ui.sidebar.personnel.title',
+            'Attendance': 'ui.sidebar.attendance.title',
+            'Salary': 'ui.sidebar.salary.title',
+            'Decision': 'ui.sidebar.decision.title'
+        };
+        const translationKey = titleMap[category];
+        const t = window.t;
+        if (translationKey && t) {
+            titleElement.textContent = t(translationKey, categoryData.title || '');
+        } else {
+            titleElement.textContent = categoryData.title;
+        }
     }
     
     if (iconElement) {
@@ -228,6 +242,7 @@ function generateSidebar(category) {
             // Create section title
             const sectionTitle = document.createElement('h3');
             sectionTitle.className = 'nav-section-title';
+            // Section title is already translated in sidebarData
             sectionTitle.textContent = section.title;
             sectionDiv.appendChild(sectionTitle);
             
@@ -272,12 +287,38 @@ function translateSidebar() {
         const t = window.t;
         if (!t) return;
         const currentCategory = getCurrentCategory();
-        // Update title icon text
+        // Update title icon text with translation
         const currentData = getSidebarData()[currentCategory];
         const titleText = document.getElementById('sidebarTitleText');
-        if (titleText && currentData && currentData.title) {
-            titleText.textContent = currentData.title;
+        if (titleText && currentData) {
+            // Map category to translation key
+            const titleMap = {
+                'Home': 'ui.sidebar.home.title',
+                'Administrative Personnel': 'ui.sidebar.personnel.title',
+                'Attendance': 'ui.sidebar.attendance.title',
+                'Salary': 'ui.sidebar.salary.title',
+                'Decision': 'ui.sidebar.decision.title'
+            };
+            const translationKey = titleMap[currentCategory];
+            if (translationKey && t) {
+                titleText.textContent = t(translationKey, currentData.title || '');
+            } else if (currentData.title) {
+                titleText.textContent = currentData.title;
+            }
         }
+        // Translate section titles
+        document.querySelectorAll('.sidebar .nav-section-title').forEach(el => {
+            const text = el.textContent.trim();
+            const sectionMap = {
+                'Overview': 'ui.sidebar.personnel.sections.overview',
+                'Employee Management': 'ui.sidebar.personnel.sections.employeeManagement',
+                'Department Management': 'ui.sidebar.personnel.sections.departmentManagement',
+                'Reports': 'ui.sidebar.personnel.sections.reports'
+            };
+            if (sectionMap[text] && t) {
+                el.textContent = t(sectionMap[text], text);
+            }
+        });
         // Replace item texts from translations if possible
         document.querySelectorAll('.sidebar .nav-item .nav-item-text').forEach(el => {
             const href = el.parentElement && el.parentElement.getAttribute('href') || '';

@@ -62,7 +62,7 @@
             <a id="navSalary" href="/salary" class="nav-item" onclick="updateSidebarForCategory('Salary')">Salary</a>
             <a id="navDecision" href="/decision" class="nav-item" onclick="updateSidebarForCategory('Decision')">Decision</a>
             <a id="navEvaluateCV" href="/personnel/evaluate-cv" class="nav-item nav-item-evaluate" onclick="updateSidebarForCategory('Administrative Personnel')">
-                <i class="fas fa-brain"></i> Evaluate CV
+                <i class="fas fa-brain"></i> <span id="navEvaluateCVText">Evaluate CV</span>
             </a>
             {% endif %}
         </div>
@@ -170,6 +170,9 @@
         window.addEventListener('languagechange', refreshBtn);
     })();
     </script>
+    
+    <!-- Chatbot Widget -->
+    {% include 'chatbot.html' %}
     
     {% block extra_js %}{% endblock %}
 </body>

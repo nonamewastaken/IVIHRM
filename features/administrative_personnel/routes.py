@@ -16,7 +16,16 @@ from google import genai
 from google.genai import types
 from werkzeug.utils import secure_filename
 
-gemini_client = genai.Client(api_key=Config.GEMINI_API_KEY)
+# Initialize Gemini client only if API key is available
+gemini_client = None
+if Config.GEMINI_API_KEY:
+    try:
+        gemini_client = genai.Client(api_key=Config.GEMINI_API_KEY)
+    except Exception as e:
+        print(f"WARNING: Failed to initialize Gemini client: {e}")
+        gemini_client = None
+else:
+    print("WARNING: GEMINI_API_KEY not configured. CV extraction features will be disabled.")
 
 EMPLOYEE_TEXT_FIELDS = [
     'full_name',
@@ -1275,6 +1284,13 @@ def _parse_json_forgiving(text):
 def extract_from_cv():
     """Extract personal info fields from uploaded CV image(s) using Gemini."""
     try:
+        # Check if Gemini client is available
+        if not gemini_client:
+            return jsonify({
+                'success': False,
+                'error': 'CV extraction is not available. Please configure GEMINI_API_KEY environment variable. Get your API key from: https://makersuite.google.com/app/apikey'
+            }), 503
+        
         payload = request.get_json() or {}
         files = payload.get('files') or []
         if not files:
@@ -1312,9 +1328,39 @@ def extract_from_cv():
             contents=[content],
         )
 
-        text = getattr(response.candidates[0].content.parts[0], "text", "") if getattr(response, "candidates", None) else ""
+        # Safely extract text from response
+        text = ""
+        try:
+            if hasattr(response, 'candidates') and response.candidates:
+                candidate = response.candidates[0]
+                if hasattr(candidate, 'content') and candidate.content:
+                    if hasattr(candidate.content, 'parts') and candidate.content.parts:
+                        part = candidate.content.parts[0]
+                        if hasattr(part, 'text'):
+                            text = part.text or ""
+        except Exception as e:
+            print(f"WARNING: Error extracting text from Gemini response: {e}")
+            text = ""
+        
+        if not text:
+            return jsonify({
+                'success': False,
+                'error': 'No text content received from AI. The CV might be unreadable or the response format is unexpected.'
+            }), 500
+        
+        print(f"DEBUG: Received text from Gemini (length: {len(text)}): {text[:200]}...")
+        
         data = _parse_json_forgiving(text)
-
+        
+        if not data:
+            print(f"DEBUG: Failed to parse JSON from text: {text[:500]}")
+            return jsonify({
+                'success': False,
+                'error': 'Could not parse data from CV. The AI response was not in the expected format.'
+            }), 500
+        
+        print(f"DEBUG: Parsed data: {data}")
+        
         # Only return known fields to prevent UI pollution
         allowed = {
             'full_name','gender','date_of_birth','place_of_birth','hometown',
@@ -1326,13 +1372,29 @@ def extract_from_cv():
             'passport_number','passport_issue_date','passport_expiry_date','passport_issue_place'
         }
         filtered = {k: v for k, v in (data or {}).items() if k in allowed and v}
+        
+        print(f"DEBUG: Filtered data: {filtered}")
 
         return jsonify({'success': True, 'data': filtered})
     except Exception as e:
-        print(f"ERROR: CV extraction failed: {str(e)}")
+        error_msg = str(e)
+        print(f"ERROR: CV extraction failed: {error_msg}")
+        
+        # Handle specific API key errors
+        if '403' in error_msg or 'PERMISSION_DENIED' in error_msg or 'leaked' in error_msg.lower():
+            return jsonify({
+                'success': False,
+                'error': 'API key is invalid or has been revoked. Please get a new API key from https://makersuite.google.com/app/apikey and set it as GEMINI_API_KEY environment variable.'
+            }), 403
+        elif '401' in error_msg or 'UNAUTHENTICATED' in error_msg:
+            return jsonify({
+                'success': False,
+                'error': 'API key is invalid. Please check your GEMINI_API_KEY environment variable.'
+            }), 401
+        
         return jsonify({
             'success': False,
-            'error': f'Failed to extract data from CV: {str(e)}'
+            'error': f'Failed to extract data from CV: {error_msg}'
         }), 500
 
 
@@ -1341,6 +1403,13 @@ def extract_from_cv():
 def evaluate_cv():
     """Evaluate CV to determine if it suits the Development department using Gemini."""
     try:
+        # Check if Gemini client is available
+        if not gemini_client:
+            return jsonify({
+                'success': False,
+                'error': 'CV evaluation is not available. Please configure GEMINI_API_KEY environment variable. Get your API key from: https://makersuite.google.com/app/apikey'
+            }), 503
+        
         payload = request.get_json() or {}
         files = payload.get('files') or []
         department = payload.get('department', 'Development')  # Default to Development
@@ -1479,12 +1548,26 @@ def evaluate_cv():
         })
 
     except Exception as e:
-        print(f"ERROR: CV evaluation failed: {str(e)}")
+        error_msg = str(e)
+        print(f"ERROR: CV evaluation failed: {error_msg}")
         import traceback
         traceback.print_exc()
+        
+        # Handle specific API key errors
+        if '403' in error_msg or 'PERMISSION_DENIED' in error_msg or 'leaked' in error_msg.lower():
+            return jsonify({
+                'success': False,
+                'error': 'API key is invalid or has been revoked. Please get a new API key from https://makersuite.google.com/app/apikey and set it as GEMINI_API_KEY environment variable.'
+            }), 403
+        elif '401' in error_msg or 'UNAUTHENTICATED' in error_msg:
+            return jsonify({
+                'success': False,
+                'error': 'API key is invalid. Please check your GEMINI_API_KEY environment variable.'
+            }), 401
+        
         return jsonify({
             'success': False,
-            'error': f'Failed to evaluate CV: {str(e)}'
+            'error': f'Failed to evaluate CV: {error_msg}'
         }), 500
 
 

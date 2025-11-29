@@ -35,6 +35,7 @@ def create_app(config_name='default'):
     from features.administrative_personnel import administrative_personnel_bp
     from features.salary import salary_bp
     from features.decision import decision_bp
+    from features.chat import chatbot_bp
     
     # Register blueprints
     app.register_blueprint(auth_bp)
@@ -45,6 +46,7 @@ def create_app(config_name='default'):
     app.register_blueprint(administrative_personnel_bp)
     app.register_blueprint(salary_bp)
     app.register_blueprint(decision_bp)
+    app.register_blueprint(chatbot_bp)
     
     return app
 

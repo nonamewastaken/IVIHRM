@@ -4,7 +4,7 @@
 
 {% block page_title %}
     <i class="fas {{ 'fa-user-edit' if mode == 'edit' else 'fa-user-plus' }}"></i>
-    {{ 'Edit Employee' if mode == 'edit' else 'Add Employee' }}
+    <span id="pageTitleEmployee">{{ 'Edit Employee' if mode == 'edit' else 'Add Employee' }}</span>
 {% endblock %}
 
 {% block extra_css %}
@@ -282,28 +282,28 @@
         <div class="step-indicator">
             <div class="step" id="step1">
                 <i class="fas fa-upload"></i>
-                <span>Upload CV</span>
+                <span id="stepUploadCV">Upload CV</span>
             </div>
             <div class="step" id="step2">
                 <i class="fas fa-user"></i>
-                <span>Personal Info</span>
+                <span id="stepPersonalInfo">Personal Info</span>
             </div>
         </div>
 
         <!-- Step 1: CV Upload -->
         <div class="personnel-card" id="cvUploadStep">
             <h2 style="text-align: center; color: #2c3e50; margin-bottom: 30px;">
-                <i class="fas fa-upload"></i> Upload CV (Image or PDF)
+                <i class="fas fa-upload"></i> <span id="uploadCVTitle">Upload CV (Image or PDF)</span>
             </h2>
             
             <div class="upload-section">
                 <div id="uploadArea">
                     <i class="fas fa-cloud-upload-alt" style="font-size: 48px; color: #ddd; margin-bottom: 15px;"></i>
-                    <h4>Upload CV (Image or PDF)</h4>
-                    <p>You can upload a CV file (image or PDF) or skip this step — Max 10 files, 100MB each</p>
+                    <h4 id="uploadCVTitle2">Upload CV (Image or PDF)</h4>
+                    <p id="uploadCVDesc">You can upload a CV file (image or PDF) or skip this step — Max 10 files, 100MB each</p>
                     <input type="file" id="cvFileInput" accept="image/*,.pdf,application/pdf" style="display: none;">
                     <button class="btn btn-upload" onclick="document.getElementById('cvFileInput').click()">
-                        <i class="fas fa-upload"></i> Upload
+                        <i class="fas fa-upload"></i> <span id="uploadBtnText">Upload</span>
                     </button>
                 </div>
                 
@@ -312,10 +312,10 @@
                     <p id="cvPreviewLabel">CV Uploaded</p>
                     <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px; flex-wrap: wrap;">
                         <button class="btn btn-secondary" onclick="removeCV()">
-                            <i class="fas fa-trash"></i> Remove
+                            <i class="fas fa-trash"></i> <span id="removeBtnText">Remove</span>
                         </button>
                         <button class="btn-evaluate" id="evaluateCvBtn" onclick="evaluateCV()">
-                            <i class="fas fa-brain"></i> Evaluate CV for Development
+                            <i class="fas fa-brain"></i> <span id="evaluateCVBtnText">Evaluate CV for Development</span>
                         </button>
                     </div>
                 </div>
@@ -325,7 +325,7 @@
             <div id="evaluationResults" class="hidden" style="margin-top: 20px;">
                 <div class="personnel-card" style="background: #f8f9fa; border-left: 4px solid #667eea;">
                     <h3 style="color: #2c3e50; margin-bottom: 20px;">
-                        <i class="fas fa-chart-line"></i> CV Evaluation Results
+                        <i class="fas fa-chart-line"></i> <span id="cvEvaluationResultsTitle">CV Evaluation Results</span>
                     </h3>
                     <div id="evaluationContent">
                         <!-- Evaluation results will be displayed here -->
@@ -335,13 +335,13 @@
             
             <div class="form-actions">
                 <button class="btn btn-secondary" style="margin-right: 10px;" onclick="goBackToAddModeSelection()">
-                    <i class="fas fa-arrow-left"></i> Back
+                    <i class="fas fa-arrow-left"></i> <span id="backBtnText">Back</span>
                 </button>
                 <button id="resetSessionBtn" class="btn btn-secondary hidden" style="margin-right: 10px;" onclick="resetCvSession()">
-                    <i class="fas fa-undo"></i> Reset
+                    <i class="fas fa-undo"></i> <span id="resetBtnText">Reset</span>
                 </button>
                 <button class="btn btn-primary" onclick="nextStep()">
-                    <i class="fas fa-arrow-right"></i> Continue
+                    <i class="fas fa-arrow-right"></i> <span id="continueBtnText">Continue</span>
                 </button>
             </div>
         </div>
@@ -349,13 +349,13 @@
         <!-- Step 2: Personal Information Form -->
         <div class="personnel-card hidden" id="personalInfoStep">
             <h2 style="text-align: center; color: #2c3e50; margin-bottom: 30px;">
-                <i class="fas fa-user"></i> Personal Information
+                <i class="fas fa-user"></i> <span id="personalInfoTitle">Personal Information</span>
             </h2>
             
             <form id="personalInfoForm">
                 <!-- Validation Summary -->
                 <div id="validationSummary" class="validation-summary">
-                    <strong><i class="fas fa-exclamation-triangle"></i> Please fill in all required fields:</strong>
+                    <strong><i class="fas fa-exclamation-triangle"></i> <span id="validationFillAll">Please fill in all required fields:</span></strong>
                     <ul id="validationErrors"></ul>
                 </div>
                 
@@ -363,15 +363,15 @@
                 <div class="form-section">
                     <div class="section-header">
                         <i class="fas fa-user"></i>
-                        <span>PERSONAL INFORMATION</span>
+                        <span id="sectionPersonalInfo">PERSONAL INFORMATION</span>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="required">Portrait Photo</label>
+                            <label class="required" data-translate="form.portraitPhoto">Portrait Photo</label>
                             <div style="display: flex; align-items: center; gap: 10px;">
                                 <button type="button" class="btn btn-upload" onclick="document.getElementById('portraitFileInput').click()">
-                                    <i class="fas fa-upload"></i> Upload
+                                    <i class="fas fa-upload"></i> <span data-translate="upload">Upload</span>
                                 </button>
                                 <input type="file" id="portraitFileInput" accept="image/*" style="display: none;">
                                 <div id="portraitPreview" style="width: 60px; height: 60px; border-radius: 50%; background: #f0f0f0; border: 2px solid #ddd; display: flex; align-items: center; justify-content: center;">
@@ -383,59 +383,59 @@
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="required">Full Name</label>
-                            <input type="text" class="form-control" name="full_name" placeholder="Full name">
-                            <div class="error-message">Please enter full name</div>
+                            <label class="required" data-translate="form.fullName">Full Name</label>
+                            <input type="text" class="form-control" name="full_name" data-translate-placeholder="form.fullNamePlaceholder" placeholder="Full name">
+                            <div class="error-message" data-translate="form.errorFullName">Please enter full name</div>
                         </div>
                         <div class="form-group">
-                            <label class="required">Gender</label>
+                            <label class="required" data-translate="form.gender">Gender</label>
                             <div class="radio-group">
                                 <div class="radio-item">
                                     <input type="radio" name="gender" value="male" id="gender_male">
-                                    <label for="gender_male">Male</label>
+                                    <label for="gender_male" data-translate="form.male">Male</label>
                                 </div>
                                 <div class="radio-item">
                                     <input type="radio" name="gender" value="female" id="gender_female">
-                                    <label for="gender_female">Female</label>
+                                    <label for="gender_female" data-translate="form.female">Female</label>
                                 </div>
                             </div>
-                            <div class="error-message">Please select gender</div>
+                            <div class="error-message" data-translate="form.errorGender">Please select gender</div>
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="required">Date of Birth</label>
+                            <label class="required" data-translate="form.dateOfBirth">Date of Birth</label>
                             <input type="text" class="form-control" name="date_of_birth" placeholder="dd/mm/yyyy">
-                            <div class="error-message">Please enter date of birth</div>
+                            <div class="error-message" data-translate="form.errorDateOfBirth">Please enter date of birth</div>
                         </div>
                         <div class="form-group">
-                            <label class="required">Place of Birth</label>
-                            <input type="text" class="form-control" name="place_of_birth" placeholder="Enter place of birth">
-                            <div class="error-message">Please enter place of birth</div>
+                            <label class="required" data-translate="form.placeOfBirth">Place of Birth</label>
+                            <input type="text" class="form-control" name="place_of_birth" data-translate-placeholder="form.placeOfBirthPlaceholder" placeholder="Enter place of birth">
+                            <div class="error-message" data-translate="form.errorPlaceOfBirth">Please enter place of birth</div>
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="required">Hometown</label>
-                            <input type="text" class="form-control" name="hometown" placeholder="Enter hometown">
-                            <div class="error-message">Please enter hometown</div>
+                            <label class="required" data-translate="form.hometown">Hometown</label>
+                            <input type="text" class="form-control" name="hometown" data-translate-placeholder="form.hometownPlaceholder" placeholder="Enter hometown">
+                            <div class="error-message" data-translate="form.errorHometown">Please enter hometown</div>
                         </div>
                         <div class="form-group">
-                            <label>Marital Status</label>
+                            <label data-translate="form.maritalStatus">Marital Status</label>
                             <div class="radio-group">
                                 <div class="radio-item">
                                     <input type="radio" name="marital_status" value="single" id="marital_single">
-                                    <label for="marital_single">Single</label>
+                                    <label for="marital_single" data-translate="form.single">Single</label>
                                 </div>
                                 <div class="radio-item">
                                     <input type="radio" name="marital_status" value="married" id="marital_married">
-                                    <label for="marital_married">Married</label>
+                                    <label for="marital_married" data-translate="form.married">Married</label>
                                 </div>
                                 <div class="radio-item">
                                     <input type="radio" name="marital_status" value="other" id="marital_other">
-                                    <label for="marital_other">Other</label>
+                                    <label for="marital_other" data-translate="form.other">Other</label>
                                 </div>
                             </div>
                         </div>
@@ -443,54 +443,54 @@
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Ethnicity</label>
-                            <input type="text" class="form-control" name="ethnicity" placeholder="Enter ethnicity">
+                            <label data-translate="form.ethnicity">Ethnicity</label>
+                            <input type="text" class="form-control" name="ethnicity" data-translate-placeholder="form.ethnicityPlaceholder" placeholder="Enter ethnicity">
                         </div>
                         <div class="form-group">
-                            <label>Religion</label>
-                            <input type="text" class="form-control" name="religion" placeholder="Enter religion">
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Personal Tax Code</label>
-                            <input type="text" class="form-control" name="personal_tax_code" placeholder="Enter personal tax code">
-                        </div>
-                        <div class="form-group">
-                            <label>Social Insurance Code</label>
-                            <input type="text" class="form-control" name="social_insurance_code" placeholder="Enter social insurance code">
+                            <label data-translate="form.religion">Religion</label>
+                            <input type="text" class="form-control" name="religion" data-translate-placeholder="form.religionPlaceholder" placeholder="Enter religion">
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="required">Personal Phone Number</label>
-                            <input type="tel" class="form-control" name="personal_phone" placeholder="Enter personal phone number">
-                            <div class="error-message">Please enter personal phone number</div>
+                            <label data-translate="form.personalTaxCode">Personal Tax Code</label>
+                            <input type="text" class="form-control" name="personal_tax_code" data-translate-placeholder="form.personalTaxCodePlaceholder" placeholder="Enter personal tax code">
                         </div>
                         <div class="form-group">
-                            <label class="required">Personal Email</label>
-                            <input type="email" class="form-control" name="personal_email" placeholder="Enter personal email">
-                            <div class="error-message">Please enter personal email</div>
+                            <label data-translate="form.socialInsuranceCode">Social Insurance Code</label>
+                            <input type="text" class="form-control" name="social_insurance_code" data-translate-placeholder="form.socialInsuranceCodePlaceholder" placeholder="Enter social insurance code">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="required" data-translate="form.personalPhoneNumber">Personal Phone Number</label>
+                            <input type="tel" class="form-control" name="personal_phone" data-translate-placeholder="form.personalPhoneNumberPlaceholder" placeholder="Enter personal phone number">
+                            <div class="error-message" data-translate="form.errorPersonalPhone">Please enter personal phone number</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="required" data-translate="form.personalEmail">Personal Email</label>
+                            <input type="email" class="form-control" name="personal_email" data-translate-placeholder="form.personalEmailPlaceholder" placeholder="Enter personal email">
+                            <div class="error-message" data-translate="form.errorPersonalEmail">Please enter personal email</div>
                         </div>
                     </div>
                     
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Party Join Date</label>
+                            <label data-translate="form.partyJoinDate">Party Join Date</label>
                             <input type="text" class="form-control" name="party_join_date" placeholder="dd/mm/yyyy">
                         </div>
                         <div class="form-group">
-                            <label>Party Join Place</label>
-                            <input type="text" class="form-control" name="party_join_place" placeholder="Enter party join place">
+                            <label data-translate="form.partyJoinPlace">Party Join Place</label>
+                            <input type="text" class="form-control" name="party_join_place" data-translate-placeholder="form.partyJoinPlacePlaceholder" placeholder="Enter party join place">
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Health Status</label>
+                            <label data-translate="form.healthStatus">Health Status</label>
                             <select class="form-control" name="health_status">
                                 <option value="">Select health status</option>
                                 <option value="excellent">Excellent</option>
@@ -500,10 +500,10 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Health Certificate</label>
+                            <label data-translate="form.healthCertificate">Health Certificate</label>
                             <div style="display: flex; align-items: center; gap: 10px;">
                                 <button type="button" class="btn btn-upload" onclick="document.getElementById('healthFileInput').click()">
-                                    <i class="fas fa-upload"></i> Upload
+                                    <i class="fas fa-upload"></i> <span data-translate="upload">Upload</span>
                                 </button>
                                 <input type="file" id="healthFileInput" accept="image/*" style="display: none;">
                             </div>
@@ -512,8 +512,8 @@
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Emergency Contact (name + phone)</label>
-                            <input type="text" class="form-control" name="emergency_contact" placeholder="Name and phone number for emergency contact">
+                            <label data-translate="form.emergencyContact">Emergency Contact (name + phone)</label>
+                            <input type="text" class="form-control" name="emergency_contact" data-translate-placeholder="form.emergencyContactPlaceholder" placeholder="Name and phone number for emergency contact">
                         </div>
                     </div>
                 </div>
@@ -522,23 +522,23 @@
                 <div class="form-section">
                     <div class="section-header">
                         <i class="fas fa-home"></i>
-                        <span>PERMANENT RESIDENCE & CURRENT ADDRESS</span>
+                        <span id="sectionPermanentResidence" data-translate="form.permanentResidence">PERMANENT RESIDENCE & CURRENT ADDRESS</span>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label><strong>Permanent residence e.g., "144 Nghia Do Ward, Hanoi City"</strong></label>
-                            <textarea class="form-control" name="permanent_address" rows="3" placeholder="Enter permanent address"></textarea>
+                            <label><strong data-translate="form.permanentResidenceLabel">Permanent residence e.g., "144 Nghia Do Ward, Hanoi City"</strong></label>
+                            <textarea class="form-control" name="permanent_address" rows="3" data-translate-placeholder="form.permanentResidencePlaceholder" placeholder="Enter permanent address"></textarea>
                         </div>
                         <div class="form-group">
-                            <label><strong>Current address e.g., "144 Nghia Do Ward, Hanoi City"</strong></label>
-                            <textarea class="form-control" name="current_address" rows="3" placeholder="Enter current address"></textarea>
+                            <label><strong data-translate="form.currentAddressLabel">Current address e.g., "144 Nghia Do Ward, Hanoi City"</strong></label>
+                            <textarea class="form-control" name="current_address" rows="3" data-translate-placeholder="form.currentAddressPlaceholder" placeholder="Enter current address"></textarea>
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Province/City</label>
+                            <label data-translate="form.provinceCity">Province/City</label>
                             <select class="form-control" name="permanent_province">
                                 <option value="">Select Province/City</option>
                                 <option value="hanoi">Hanoi</option>
@@ -549,7 +549,7 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Province/City</label>
+                            <label data-translate="form.provinceCity">Province/City</label>
                             <select class="form-control" name="current_province">
                                 <option value="">Select Province/City</option>
                                 <option value="hanoi">Hanoi</option>
@@ -563,7 +563,7 @@
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Ward/District/Town</label>
+                            <label data-translate="form.wardDistrictTown">Ward/District/Town</label>
                             <select class="form-control" name="permanent_ward">
                                 <option value="">Select Ward/District/Town</option>
                                 <option value="nghia_do">Nghia Do</option>
@@ -572,7 +572,7 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Ward/District/Town</label>
+                            <label data-translate="form.wardDistrictTown">Ward/District/Town</label>
                             <select class="form-control" name="current_ward">
                                 <option value="">Select Ward/District/Town</option>
                                 <option value="nghia_do">Nghia Do</option>
@@ -584,12 +584,12 @@
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label>House number, street/hamlet</label>
-                            <input type="text" class="form-control" name="permanent_street" placeholder="Enter house number, street/hamlet">
+                            <label data-translate="form.houseNumberStreet">House number, street/hamlet</label>
+                            <input type="text" class="form-control" name="permanent_street" data-translate-placeholder="form.houseNumberStreetPlaceholder" placeholder="Enter house number, street/hamlet">
                         </div>
                         <div class="form-group">
-                            <label>House number, street/hamlet</label>
-                            <input type="text" class="form-control" name="current_street" placeholder="Enter house number, street/hamlet">
+                            <label data-translate="form.houseNumberStreet">House number, street/hamlet</label>
+                            <input type="text" class="form-control" name="current_street" data-translate-placeholder="form.houseNumberStreetPlaceholder" placeholder="Enter house number, street/hamlet">
                         </div>
                     </div>
                 </div>
@@ -598,71 +598,71 @@
                 <div class="form-section">
                     <div class="section-header">
                         <i class="fas fa-id-card"></i>
-                        <span>ID CARD & PASSPORT</span>
+                        <span id="sectionIdCardPassport" data-translate="form.idCardPassport">ID CARD & PASSPORT</span>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="required"><strong>ID Card Number</strong></label>
-                            <input type="text" class="form-control" name="id_card_number" placeholder="Enter ID card number">
-                            <div class="error-message">Please enter ID card number</div>
+                            <label class="required"><strong data-translate="form.idCardNumber">ID Card Number</strong></label>
+                            <input type="text" class="form-control" name="id_card_number" data-translate-placeholder="form.idCardNumberPlaceholder" placeholder="Enter ID card number">
+                            <div class="error-message" data-translate="form.errorIdCardNumber">Please enter ID card number</div>
                         </div>
                         <div class="form-group">
-                            <label><strong>Passport Number</strong></label>
-                            <input type="text" class="form-control" name="passport_number" placeholder="Enter passport number">
+                            <label><strong data-translate="form.passportNumber">Passport Number</strong></label>
+                            <input type="text" class="form-control" name="passport_number" data-translate-placeholder="form.passportNumberPlaceholder" placeholder="Enter passport number">
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="required">Issue Date</label>
+                            <label class="required" data-translate="form.issueDate">Issue Date</label>
                             <input type="text" class="form-control" name="id_card_issue_date" placeholder="dd/mm/yyyy">
-                            <div class="error-message">Please enter ID card issue date</div>
+                            <div class="error-message" data-translate="form.errorIdCardIssueDate">Please enter ID card issue date</div>
                         </div>
                         <div class="form-group">
-                            <label>Issue Date</label>
+                            <label data-translate="form.issueDate">Issue Date</label>
                             <input type="text" class="form-control" name="passport_issue_date" placeholder="dd/mm/yyyy">
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Expiry Date</label>
+                            <label data-translate="form.expiryDate">Expiry Date</label>
                             <input type="text" class="form-control" name="id_card_expiry_date" placeholder="dd/mm/yyyy">
                         </div>
                         <div class="form-group">
-                            <label>Expiry Date</label>
+                            <label data-translate="form.expiryDate">Expiry Date</label>
                             <input type="text" class="form-control" name="passport_expiry_date" placeholder="dd/mm/yyyy">
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="required">Issue Place</label>
-                            <input type="text" class="form-control" name="id_card_issue_place" placeholder="Enter ID card issue place">
-                            <div class="error-message">Please enter ID card issue place</div>
+                            <label class="required" data-translate="form.idCardIssuePlace">Issue Place</label>
+                            <input type="text" class="form-control" name="id_card_issue_place" data-translate-placeholder="form.idCardIssuePlacePlaceholder" placeholder="Enter ID card issue place">
+                            <div class="error-message" data-translate="form.errorIdCardIssuePlace">Please enter ID card issue place</div>
                         </div>
                         <div class="form-group">
-                            <label>Issue Place</label>
-                            <input type="text" class="form-control" name="passport_issue_place" placeholder="Enter passport issue place">
+                            <label data-translate="form.passportIssuePlace">Issue Place</label>
+                            <input type="text" class="form-control" name="passport_issue_place" data-translate-placeholder="form.passportIssuePlacePlaceholder" placeholder="Enter passport issue place">
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Attach (both sides)</label>
+                            <label data-translate="form.attachBothSides">Attach (both sides)</label>
                             <div style="display: flex; align-items: center; gap: 10px;">
                                 <button type="button" class="btn btn-upload" onclick="document.getElementById('idCardFileInput').click()">
-                                    <i class="fas fa-upload"></i> Upload
+                                    <i class="fas fa-upload"></i> <span data-translate="upload">Upload</span>
                                 </button>
                                 <input type="file" id="idCardFileInput" accept="image/*" style="display: none;">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label>Attach (both sides)</label>
+                            <label data-translate="form.attachBothSides">Attach (both sides)</label>
                             <div style="display: flex; align-items: center; gap: 10px;">
                                 <button type="button" class="btn btn-upload" onclick="document.getElementById('passportFileInput').click()">
-                                    <i class="fas fa-upload"></i> Upload
+                                    <i class="fas fa-upload"></i> <span data-translate="upload">Upload</span>
                                 </button>
                                 <input type="file" id="passportFileInput" accept="image/*" style="display: none;">
                             </div>
@@ -674,26 +674,26 @@
                 <div class="form-section">
                     <div class="section-header">
                         <i class="fas fa-key"></i>
-                        <span>ACCOUNT INFORMATION</span>
+                        <span id="sectionAccountInfo" data-translate="form.accountInformation">ACCOUNT INFORMATION</span>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Employee Email</label>
-                            <input type="email" class="form-control" name="account_email" id="account_email" placeholder="Enter email for employee account (optional)">
-                            <small style="color: #666; font-size: 0.85rem; display: block; margin-top: 5px;">
+                            <label data-translate="form.employeeEmail">Employee Email</label>
+                            <input type="email" class="form-control" name="account_email" id="account_email" data-translate-placeholder="form.employeeEmailPlaceholder" placeholder="Enter email for employee account (optional)">
+                            <small style="color: #666; font-size: 0.85rem; display: block; margin-top: 5px;" data-translate="form.employeeEmailHelp">
                                 Leave blank if you don't want to create a login account for this employee
                             </small>
                         </div>
                         <div class="form-group">
-                            <label>Password</label>
+                            <label data-translate="form.password">Password</label>
                             <div style="position: relative;">
-                                <input type="password" class="form-control" name="account_password" id="account_password" placeholder="Enter password (required if email provided)">
+                                <input type="password" class="form-control" name="account_password" id="account_password" data-translate-placeholder="form.passwordPlaceholder" placeholder="Enter password (required if email provided)">
                                 <button type="button" class="btn btn-secondary" onclick="generatePassword()" style="margin-top: 5px; width: 100%; font-size: 0.85rem;">
-                                    <i class="fas fa-key"></i> Generate Strong Password
+                                    <i class="fas fa-key"></i> <span data-translate="form.generateStrongPassword">Generate Strong Password</span>
                                 </button>
                             </div>
-                            <small style="color: #666; font-size: 0.85rem; display: block; margin-top: 5px;">
+                            <small style="color: #666; font-size: 0.85rem; display: block; margin-top: 5px;" data-translate="form.passwordHelp">
                                 Password is required if email is provided
                             </small>
                         </div>
@@ -702,7 +702,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <div id="passwordStrength" style="margin-top: 8px; padding: 8px; border-radius: 4px; display: none;">
-                                <div style="font-size: 0.85rem; font-weight: 600; margin-bottom: 4px;">Password Strength:</div>
+                                <div style="font-size: 0.85rem; font-weight: 600; margin-bottom: 4px;" data-translate="form.passwordStrength">Password Strength:</div>
                                 <div id="passwordStrengthBar" style="height: 4px; background: #e0e0e0; border-radius: 2px; overflow: hidden;">
                                     <div id="passwordStrengthFill" style="height: 100%; width: 0%; transition: all 0.3s ease;"></div>
                                 </div>
@@ -714,10 +714,10 @@
                 
                 <div class="form-actions">
                     <button type="button" class="btn btn-secondary" onclick="prevStep()">
-                        <i class="fas fa-arrow-left"></i> Back
+                        <i class="fas fa-arrow-left"></i> <span data-translate="back">Back</span>
                     </button>
                     <button type="submit" class="btn btn-success" onclick="handleFormSubmission(); return false;">
-                        <i class="fas fa-check"></i> Finish
+                        <i class="fas fa-check"></i> <span data-translate="form.finish">Finish</span>
                     </button>
                 </div>
             </form>
@@ -747,6 +747,179 @@ document.addEventListener('DOMContentLoaded', function() {
     const activeNavHref = IS_EDIT_MODE ? '/personnel/list' : '/personnel/add';
     setActiveSidebarItem(activeNavHref);
     // Sidebar is handled by main sidebar component
+    
+    // Translate page title
+    function translatePageTitle() {
+        const titleElement = document.getElementById('pageTitleEmployee');
+        if (titleElement && window.t) {
+            if (IS_EDIT_MODE) {
+                titleElement.textContent = window.t('ui.sidebar.personnel.editEmployee', 'Edit Employee');
+            } else {
+                titleElement.textContent = window.t('ui.sidebar.personnel.addEmployee', 'Add Employee');
+            }
+        }
+    }
+    
+    // Translate form elements
+    function translateForm() {
+        if (!window.t) return;
+        
+        // Step indicators
+        const stepUploadCV = document.getElementById('stepUploadCV');
+        if (stepUploadCV) {
+            stepUploadCV.textContent = window.t('ui.sidebar.personnel.addEmployeeForm.stepUploadCV', 'Upload CV');
+        }
+        
+        const stepPersonalInfo = document.getElementById('stepPersonalInfo');
+        if (stepPersonalInfo) {
+            stepPersonalInfo.textContent = window.t('ui.sidebar.personnel.addEmployeeForm.stepPersonalInfo', 'Personal Info');
+        }
+        
+        // CV Upload section
+        const uploadCVTitle = document.getElementById('uploadCVTitle');
+        if (uploadCVTitle) {
+            uploadCVTitle.textContent = window.t('ui.sidebar.personnel.addEmployeeForm.uploadCVTitle', 'Upload CV (Image or PDF)');
+        }
+        
+        const uploadCVTitle2 = document.getElementById('uploadCVTitle2');
+        if (uploadCVTitle2) {
+            uploadCVTitle2.textContent = window.t('ui.sidebar.personnel.addEmployeeForm.uploadCVTitle', 'Upload CV (Image or PDF)');
+        }
+        
+        const uploadCVDesc = document.getElementById('uploadCVDesc');
+        if (uploadCVDesc) {
+            uploadCVDesc.textContent = window.t('ui.sidebar.personnel.addEmployeeForm.uploadCVDesc', 'You can upload a CV file (image or PDF) or skip this step — Max 10 files, 100MB each');
+        }
+        
+        const uploadBtnText = document.getElementById('uploadBtnText');
+        if (uploadBtnText) {
+            uploadBtnText.textContent = window.t('ui.sidebar.personnel.addEmployeeForm.upload', 'Upload');
+        }
+        
+        const cvPreviewLabel = document.getElementById('cvPreviewLabel');
+        if (cvPreviewLabel && !cvPreviewLabel.textContent.includes('PDF')) {
+            cvPreviewLabel.textContent = window.t('ui.sidebar.personnel.addEmployeeForm.cvUploaded', 'CV Uploaded');
+        }
+        
+        const removeBtnText = document.getElementById('removeBtnText');
+        if (removeBtnText) {
+            removeBtnText.textContent = window.t('ui.sidebar.personnel.addEmployeeForm.remove', 'Remove');
+        }
+        
+        const evaluateCVBtnText = document.getElementById('evaluateCVBtnText');
+        if (evaluateCVBtnText) {
+            evaluateCVBtnText.textContent = window.t('ui.sidebar.personnel.addEmployeeForm.evaluateCV', 'Evaluate CV for Development');
+        }
+        
+        const cvEvaluationResultsTitle = document.getElementById('cvEvaluationResultsTitle');
+        if (cvEvaluationResultsTitle) {
+            cvEvaluationResultsTitle.textContent = window.t('ui.sidebar.personnel.addEmployeeForm.cvEvaluationResults', 'CV Evaluation Results');
+        }
+        
+        // Action buttons
+        const backBtnText = document.getElementById('backBtnText');
+        if (backBtnText) {
+            backBtnText.textContent = window.t('ui.sidebar.personnel.addEmployeeForm.back', 'Back');
+        }
+        
+        const resetBtnText = document.getElementById('resetBtnText');
+        if (resetBtnText) {
+            resetBtnText.textContent = window.t('ui.sidebar.personnel.addEmployeeForm.reset', 'Reset');
+        }
+        
+        const continueBtnText = document.getElementById('continueBtnText');
+        if (continueBtnText) {
+            continueBtnText.textContent = window.t('ui.sidebar.personnel.addEmployeeForm.continue', 'Continue');
+        }
+        
+        // Personal Information section
+        const personalInfoTitle = document.getElementById('personalInfoTitle');
+        if (personalInfoTitle) {
+            personalInfoTitle.textContent = window.t('ui.sidebar.personnel.addEmployeeForm.personalInformation', 'Personal Information');
+        }
+        
+        // Translate all elements with data-translate attribute
+        document.querySelectorAll('[data-translate]').forEach(el => {
+            const key = el.getAttribute('data-translate');
+            const fullKey = `ui.sidebar.personnel.addEmployeeForm.${key}`;
+            if (window.t) {
+                el.textContent = window.t(fullKey, el.textContent);
+            }
+        });
+        
+        // Translate all placeholders with data-translate-placeholder attribute
+        document.querySelectorAll('[data-translate-placeholder]').forEach(el => {
+            const key = el.getAttribute('data-translate-placeholder');
+            const fullKey = `ui.sidebar.personnel.addEmployeeForm.${key}`;
+            if (window.t) {
+                el.placeholder = window.t(fullKey, el.placeholder);
+            }
+        });
+        
+        // Translate validation message
+        const validationFillAll = document.getElementById('validationFillAll');
+        if (validationFillAll && window.t) {
+            validationFillAll.textContent = window.t('ui.sidebar.personnel.addEmployeeForm.form.validationFillAll', 'Please fill in all required fields:');
+        }
+        
+        // Translate section headers
+        const sectionPersonalInfo = document.getElementById('sectionPersonalInfo');
+        if (sectionPersonalInfo && window.t) {
+            sectionPersonalInfo.textContent = window.t('ui.sidebar.personnel.addEmployeeForm.form.personalInformation', 'PERSONAL INFORMATION');
+        }
+        
+        const sectionPermanentResidence = document.getElementById('sectionPermanentResidence');
+        if (sectionPermanentResidence && window.t) {
+            sectionPermanentResidence.textContent = window.t('ui.sidebar.personnel.addEmployeeForm.form.permanentResidence', 'PERMANENT RESIDENCE & CURRENT ADDRESS');
+        }
+        
+        const sectionIdCardPassport = document.getElementById('sectionIdCardPassport');
+        if (sectionIdCardPassport && window.t) {
+            sectionIdCardPassport.textContent = window.t('ui.sidebar.personnel.addEmployeeForm.form.idCardPassport', 'ID CARD & PASSPORT');
+        }
+        
+        const sectionAccountInfo = document.getElementById('sectionAccountInfo');
+        if (sectionAccountInfo && window.t) {
+            sectionAccountInfo.textContent = window.t('ui.sidebar.personnel.addEmployeeForm.form.accountInformation', 'ACCOUNT INFORMATION');
+        }
+        
+        // Translate select options
+        const healthStatusSelect = document.querySelector('select[name="health_status"]');
+        if (healthStatusSelect && window.t) {
+            const options = healthStatusSelect.querySelectorAll('option');
+            if (options[0]) options[0].textContent = window.t('ui.sidebar.personnel.addEmployeeForm.form.selectHealthStatus', 'Select health status');
+            if (options[1]) options[1].textContent = window.t('ui.sidebar.personnel.addEmployeeForm.form.healthStatusExcellent', 'Excellent');
+            if (options[2]) options[2].textContent = window.t('ui.sidebar.personnel.addEmployeeForm.form.healthStatusGood', 'Good');
+            if (options[3]) options[3].textContent = window.t('ui.sidebar.personnel.addEmployeeForm.form.healthStatusFair', 'Fair');
+            if (options[4]) options[4].textContent = window.t('ui.sidebar.personnel.addEmployeeForm.form.healthStatusPoor', 'Poor');
+        }
+        
+        // Translate province/city select options
+        document.querySelectorAll('select[name="permanent_province"], select[name="current_province"]').forEach(select => {
+            if (select && window.t) {
+                const options = select.querySelectorAll('option');
+                if (options[0]) options[0].textContent = window.t('ui.sidebar.personnel.addEmployeeForm.form.selectProvinceCity', 'Select Province/City');
+            }
+        });
+        
+        // Translate ward/district/town select options
+        document.querySelectorAll('select[name="permanent_ward"], select[name="current_ward"]').forEach(select => {
+            if (select && window.t) {
+                const options = select.querySelectorAll('option');
+                if (options[0]) options[0].textContent = window.t('ui.sidebar.personnel.addEmployeeForm.form.selectWardDistrictTown', 'Select Ward/District/Town');
+            }
+        });
+    }
+    
+    // Translate on load
+    translatePageTitle();
+    translateForm();
+    
+    // Translate when language changes
+    window.addEventListener('languagechange', function() {
+        translatePageTitle();
+        translateForm();
+    });
 
     if (IS_EDIT_MODE) {
         initializeEditMode();
@@ -768,11 +941,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     // For PDF, don't try to render in <img>; just show an icon/label
                     previewImg.src = '';
                     previewImg.style.display = 'none';
-                    previewLabel.textContent = `CV PDF Uploaded: ${file.name}`;
+                    const cvUploadedText = window.t ? window.t('ui.sidebar.personnel.addEmployeeForm.cvUploaded', 'CV Uploaded') : 'CV Uploaded';
+                    previewLabel.textContent = `${cvUploadedText} PDF: ${file.name}`;
                 } else {
                     previewImg.style.display = 'block';
                     previewImg.src = e.target.result;
-                    previewLabel.textContent = 'CV Image Uploaded';
+                    const cvUploadedText = window.t ? window.t('ui.sidebar.personnel.addEmployeeForm.cvUploaded', 'CV Uploaded') : 'CV Uploaded';
+                    previewLabel.textContent = cvUploadedText;
                 }
 
                 uploadArea.classList.add('hidden');
@@ -944,26 +1119,44 @@ function nextStep() {
 
     // If a CV was uploaded, call backend to extract fields with Gemini and prefill
     if (cvFile) {
-        showMessage('Reading CV to prefill your info...', 'info');
+        const readingMsg = window.t ? window.t('ui.sidebar.personnel.addEmployeeForm.readingCV', 'Reading CV to prefill your info...') : 'Reading CV to prefill your info...';
+        showMessage(readingMsg, 'info');
         fileToBase64(cvFile)
             .then(b64 => fetch('/personnel/api/extract-cv', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ files: [b64] })
             }))
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) {
+                    return res.json().then(err => {
+                        throw new Error(err.error || `HTTP ${res.status}: ${res.statusText}`);
+                    });
+                }
+                return res.json();
+            })
             .then(result => {
-                if (result && result.success && result.data) {
-                    prefillFromExtractedData(result.data);
-                    showMessage('CV parsed. Fields were prefilled when available.', 'success');
+                console.log('CV extraction result:', result);
+                if (result && result.success) {
+                    if (result.data && Object.keys(result.data).length > 0) {
+                        prefillFromExtractedData(result.data);
+                        const successMsg = window.t ? window.t('ui.sidebar.personnel.addEmployeeForm.cvParsedSuccess', 'CV parsed. Fields were prefilled when available.') : 'CV parsed. Fields were prefilled when available.';
+                        showMessage(successMsg, 'success');
+                    } else {
+                        const noDataMsg = window.t ? window.t('ui.sidebar.personnel.addEmployeeForm.cvNoDataFound', 'CV was read but no extractable information was found. Please fill the form manually.') : 'CV was read but no extractable information was found. Please fill the form manually.';
+                        showMessage(noDataMsg, 'info');
+                    }
                 } else {
                     const detail = result && result.error ? ` (${result.error})` : '';
-                    showMessage(`Could not extract info from the CV.${detail}`, 'error');
+                    const errorMsg = window.t ? window.t('ui.sidebar.personnel.addEmployeeForm.cvExtractError', 'Could not extract info from the CV.') : 'Could not extract info from the CV.';
+                    showMessage(`${errorMsg}${detail}`, 'error');
                 }
             })
             .catch(err => {
                 console.error('CV extraction error:', err);
-                showMessage('Error reading CV.', 'error');
+                const errorMsg = err.message || 'Unknown error occurred';
+                const readErrorMsg = window.t ? window.t('ui.sidebar.personnel.addEmployeeForm.cvReadError', 'Error reading CV:') : 'Error reading CV:';
+                showMessage(`${readErrorMsg} ${errorMsg}`, 'error');
             });
     }
 }

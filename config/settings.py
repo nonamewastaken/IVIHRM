@@ -1,5 +1,12 @@
 import os
 
+# Try to load .env file if python-dotenv is available
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass  # python-dotenv not installed, will use environment variables directly
+
 class Config:
     """Base configuration class"""
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'your-secret-key'
@@ -7,9 +14,14 @@ class Config:
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SECURE = False  # Set to True in production with HTTPS
     SESSION_COOKIE_SAMESITE = 'Lax'
-    # Gemini API key: prefers environment variable, falls back to hardcoded value
+    # Gemini API key: prefers environment variable or .env file, falls back to provided value
     # Get your API key from: https://makersuite.google.com/app/apikey
-    GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY') or "AIzaSyDT8TD5DMWW_NK-pvDgIovFbJ6CUsHdgLo"
+    # Set it as: export GEMINI_API_KEY="your-api-key-here" or add to .env file
+    _gk = os.environ.get('GEMINI_API_KEY')
+    if not _gk:
+        # Fallback to provided API key
+        _gk = "AIzaSyBSnCbQ5KPQ53FshjecEUl0nhuXbqNg9X4"
+    GEMINI_API_KEY = _gk
     # Google Maps API key: prefers environment variable, falls back to provided value
     _gmk = os.environ.get('GOOGLE_MAPS_API_KEY')
     if not _gmk:

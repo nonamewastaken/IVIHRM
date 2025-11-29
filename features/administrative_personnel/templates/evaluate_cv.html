@@ -3,7 +3,7 @@
 {% block title %}Evaluate CV - HRM System{% endblock %}
 
 {% block page_title %}
-    <i class="fas fa-brain"></i> Evaluate CV
+    <i class="fas fa-brain"></i> <span id="pageTitleEvaluateCV">Evaluate CV</span>
 {% endblock %}
 
 {% block extra_css %}
@@ -278,7 +278,7 @@
         <!-- Evaluate Button -->
         <div style="text-align: center;">
             <button class="btn-evaluate" id="evaluateBtn" onclick="evaluateCV()" disabled>
-                <i class="fas fa-brain"></i> Evaluate CV
+                <i class="fas fa-brain"></i> <span id="evaluateBtnText">Evaluate CV</span>
             </button>
         </div>
     </div>
@@ -578,6 +578,40 @@ function displayEvaluationResults(evaluation) {
     resultsDiv.style.display = 'block';
     resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
+
+// Translate page elements
+document.addEventListener('DOMContentLoaded', function() {
+    function translatePage() {
+        if (!window.t) return;
+        
+        // Translate page title
+        const pageTitle = document.getElementById('pageTitleEvaluateCV');
+        if (pageTitle) {
+            pageTitle.textContent = window.t('ui.navbar.evaluateCV', 'Evaluate CV');
+        }
+        
+        // Translate button
+        const evaluateBtnText = document.getElementById('evaluateBtnText');
+        if (evaluateBtnText) {
+            evaluateBtnText.textContent = window.t('ui.navbar.evaluateCV', 'Evaluate CV');
+        }
+    }
+    
+    // Translate on load
+    translatePage();
+    
+    // Translate when language changes
+    window.addEventListener('languagechange', translatePage);
+    
+    // Also translate after translations are applied
+    if (typeof window.applyTranslations === 'function') {
+        const originalApply = window.applyTranslations;
+        window.applyTranslations = function(lang) {
+            originalApply(lang);
+            translatePage();
+        };
+    }
+});
 </script>
 {% endblock %}
 

@@ -1,0 +1,694 @@
+<!-- Chatbot Widget -->
+<div id="chatbotWidget" class="chatbot-widget">
+    <!-- Chatbot Toggle Button -->
+    <button id="chatbotToggle" class="chatbot-toggle" onclick="toggleChatbot()" aria-label="Open chat">
+        <i class="fas fa-comments"></i>
+    </button>
+    
+    <!-- Chatbot Window -->
+    <div id="chatbotWindow" class="chatbot-window hidden">
+        <div class="chatbot-header">
+            <div class="chatbot-header-content">
+                <i class="fas fa-robot"></i>
+                <span id="chatbotTitle">HR Assistant</span>
+            </div>
+            <button class="chatbot-close" onclick="toggleChatbot()" aria-label="Close chat">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div id="chatbotMessages" class="chatbot-messages">
+            <div class="chatbot-message bot-message">
+                <div class="message-avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="message-content">
+                    <p id="chatbotWelcome"></p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chatbot-input-container">
+            <input 
+                type="text" 
+                id="chatbotInput" 
+                class="chatbot-input" 
+                placeholder="Type here and press Enter to chat"
+                onkeypress="handleChatbotKeyPress(event)"
+            />
+            <button id="chatbotSend" class="chatbot-send" onclick="sendChatbotMessage()" aria-label="Send message">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+.chatbot-widget {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+.chatbot-toggle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chatbot-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.chatbot-window {
+    position: absolute;
+    bottom: 80px;
+    right: 0;
+    width: 380px;
+    height: 500px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.chatbot-window.hidden {
+    display: none;
+}
+
+.chatbot-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chatbot-header-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.chatbot-close {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.chatbot-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.chatbot-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    background: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.chatbot-message {
+    display: flex;
+    gap: 10px;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.chatbot-message.user-message {
+    flex-direction: row-reverse;
+}
+
+.message-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.bot-message .message-avatar {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.user-message .message-avatar {
+    background: #e9ecef;
+    color: #495057;
+}
+
+.message-content {
+    max-width: 75%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    word-wrap: break-word;
+}
+
+.bot-message .message-content {
+    background: white;
+    color: #333;
+    border-bottom-left-radius: 4px;
+}
+
+.user-message .message-content {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-bottom-right-radius: 4px;
+}
+
+.message-content p {
+    margin: 0;
+    line-height: 1.5;
+    font-size: 14px;
+}
+
+.chatbot-input-container {
+    display: flex;
+    padding: 16px;
+    background: white;
+    border-top: 1px solid #e9ecef;
+    gap: 8px;
+}
+
+.chatbot-input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid #e9ecef;
+    border-radius: 24px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.chatbot-input:focus {
+    border-color: #667eea;
+}
+
+.chatbot-send {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
+}
+
+.chatbot-send:hover {
+    transform: scale(1.1);
+}
+
+.chatbot-send:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.chatbot-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chatbot-messages::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.chatbot-messages::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+
+.chatbot-messages::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Loading indicator */
+.chatbot-loading {
+    display: flex;
+    gap: 4px;
+    padding: 12px 16px;
+}
+
+.chatbot-loading span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #667eea;
+    animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.chatbot-loading span:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.chatbot-loading span:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+@keyframes bounce {
+    0%, 80%, 100% {
+        transform: scale(0);
+    }
+    40% {
+        transform: scale(1);
+    }
+}
+
+@media (max-width: 480px) {
+    .chatbot-window {
+        width: calc(100vw - 40px);
+        height: calc(100vh - 100px);
+        bottom: 80px;
+        right: 20px;
+    }
+}
+</style>
+
+<script>
+let chatbotOpen = false;
+let chatHistory = [];
+let isNewChat = true; // Track if this is a new chat session
+
+function toggleChatbot() {
+    chatbotOpen = !chatbotOpen;
+    const window = document.getElementById('chatbotWindow');
+    if (chatbotOpen) {
+        window.classList.remove('hidden');
+        document.getElementById('chatbotInput').focus();
+        
+        // When opening, check if it's a new chat and initialize language
+        if (isNewChat) {
+            initializeChatbotForNewChat();
+            isNewChat = false;
+        }
+    } else {
+        window.classList.add('hidden');
+    }
+}
+
+// Function to initialize chatbot for a new chat session
+function initializeChatbotForNewChat() {
+    // Get current language
+    const getCurrentLang = () => {
+        try {
+            return (window.getCurrentLanguage && window.getCurrentLanguage()) || 
+                   localStorage.getItem('language') || 
+                   document.documentElement.getAttribute('lang') || 
+                   'en';
+        } catch (_) {
+            return 'en';
+        }
+    };
+    
+    const currentLang = getCurrentLang();
+    const isVietnamese = currentLang === 'vi';
+    
+    // Update chatbot title
+    const chatbotTitle = document.getElementById('chatbotTitle');
+    if (chatbotTitle) {
+        if (window.t && typeof window.t === 'function') {
+            chatbotTitle.textContent = window.t('ui.chatbot.title', 
+                isVietnamese ? 'Trợ lý nhân sự ảo' : 'HR Assistant');
+        } else {
+            chatbotTitle.textContent = isVietnamese ? 'Trợ lý nhân sự ảo' : 'HR Assistant';
+        }
+    }
+    
+    // Clear chat history for new chat
+    chatHistory = [];
+    
+    // Clear all messages except the welcome message
+    const messagesContainer = document.getElementById('chatbotMessages');
+    if (messagesContainer) {
+        // Remove all messages except the first one (welcome message)
+        const messages = messagesContainer.querySelectorAll('.chatbot-message');
+        for (let i = 1; i < messages.length; i++) {
+            messages[i].remove();
+        }
+        
+        // Update welcome message
+        const welcomeElement = document.getElementById('chatbotWelcome');
+        if (welcomeElement) {
+            if (window.t && typeof window.t === 'function') {
+                welcomeElement.textContent = window.t('ui.chatbot.welcome', 
+                    isVietnamese 
+                        ? 'Xin chào! Vui lòng cho tôi biết nếu bạn có bất kỳ câu hỏi nào.' 
+                        : 'Hi there! Please let me know if you have any questions.');
+            } else {
+                welcomeElement.textContent = isVietnamese 
+                    ? 'Xin chào! Vui lòng cho tôi biết nếu bạn có bất kỳ câu hỏi nào.' 
+                    : 'Hi there! Please let me know if you have any questions.';
+            }
+        }
+    }
+    
+    // Update input placeholder
+    const chatbotInput = document.getElementById('chatbotInput');
+    if (chatbotInput) {
+        if (window.t && typeof window.t === 'function') {
+            chatbotInput.placeholder = window.t('ui.chatbot.placeholder', 
+                isVietnamese 
+                    ? 'Nhập vào đây và nhấn Enter để trò chuyện' 
+                    : 'Type here and press Enter to chat');
+        } else {
+            chatbotInput.placeholder = isVietnamese 
+                ? 'Nhập vào đây và nhấn Enter để trò chuyện' 
+                : 'Type here and press Enter to chat';
+        }
+    }
+}
+
+function handleChatbotKeyPress(event) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        sendChatbotMessage();
+    }
+}
+
+function addMessageToChat(content, isUser = false) {
+    const messagesContainer = document.getElementById('chatbotMessages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `chatbot-message ${isUser ? 'user-message' : 'bot-message'}`;
+    
+    const avatar = document.createElement('div');
+    avatar.className = 'message-avatar';
+    avatar.innerHTML = isUser ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
+    
+    const messageContent = document.createElement('div');
+    messageContent.className = 'message-content';
+    const paragraph = document.createElement('p');
+    paragraph.textContent = content;
+    messageContent.appendChild(paragraph);
+    
+    messageDiv.appendChild(avatar);
+    messageDiv.appendChild(messageContent);
+    messagesContainer.appendChild(messageDiv);
+    
+    // Scroll to bottom
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+function showLoadingIndicator() {
+    const messagesContainer = document.getElementById('chatbotMessages');
+    const loadingDiv = document.createElement('div');
+    loadingDiv.className = 'chatbot-message bot-message';
+    loadingDiv.id = 'chatbotLoading';
+    
+    const avatar = document.createElement('div');
+    avatar.className = 'message-avatar';
+    avatar.innerHTML = '<i class="fas fa-robot"></i>';
+    
+    const loadingContent = document.createElement('div');
+    loadingContent.className = 'message-content chatbot-loading';
+    loadingContent.innerHTML = '<span></span><span></span><span></span>';
+    
+    loadingDiv.appendChild(avatar);
+    loadingDiv.appendChild(loadingContent);
+    messagesContainer.appendChild(loadingDiv);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+function removeLoadingIndicator() {
+    const loading = document.getElementById('chatbotLoading');
+    if (loading) {
+        loading.remove();
+    }
+}
+
+async function sendChatbotMessage() {
+    const input = document.getElementById('chatbotInput');
+    const sendButton = document.getElementById('chatbotSend');
+    const message = input.value.trim();
+    
+    if (!message) return;
+    
+    // Disable input and button
+    input.disabled = true;
+    sendButton.disabled = true;
+    
+    // Add user message to chat
+    addMessageToChat(message, true);
+    input.value = '';
+    
+    // Add to history
+    chatHistory.push({ role: 'user', content: message });
+    
+    // Show loading indicator
+    showLoadingIndicator();
+    
+    try {
+        // Get current language
+        const currentLang = (window.getCurrentLanguage && window.getCurrentLanguage()) || 
+                           localStorage.getItem('language') || 
+                           document.documentElement.getAttribute('lang') || 
+                           'en';
+        
+        const response = await fetch('/api/chatbot', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                message: message,
+                history: chatHistory.slice(-10), // Send last 10 messages for context
+                language: currentLang // Send current language preference
+            })
+        });
+        
+        const data = await response.json();
+        removeLoadingIndicator();
+        
+        if (data.success && data.response) {
+            addMessageToChat(data.response, false);
+            chatHistory.push({ role: 'assistant', content: data.response });
+        } else {
+            // Get translated error message
+            const errorMsg = data.error || (window.t && window.t('ui.chatbot.error', 
+                currentLang === 'vi' ? 'Xin lỗi, tôi gặp lỗi. Vui lòng thử lại.' : 'Sorry, I encountered an error. Please try again.')) 
+                || (currentLang === 'vi' ? 'Xin lỗi, tôi gặp lỗi. Vui lòng thử lại.' : 'Sorry, I encountered an error. Please try again.');
+            addMessageToChat(errorMsg, false);
+        }
+    } catch (error) {
+        removeLoadingIndicator();
+        console.error('Chatbot error:', error);
+        // Get current language for error message
+        const currentLang = (window.getCurrentLanguage && window.getCurrentLanguage()) || 
+                           localStorage.getItem('language') || 
+                           document.documentElement.getAttribute('lang') || 
+                           'en';
+        const errorMsg = (window.t && window.t('ui.chatbot.error', 
+            currentLang === 'vi' ? 'Xin lỗi, tôi gặp lỗi. Vui lòng thử lại.' : 'Sorry, I encountered an error. Please try again.')) 
+            || (currentLang === 'vi' ? 'Xin lỗi, tôi gặp lỗi. Vui lòng thử lại.' : 'Sorry, I encountered an error. Please try again.');
+        addMessageToChat(errorMsg, false);
+    } finally {
+        // Re-enable input and button
+        input.disabled = false;
+        sendButton.disabled = false;
+        input.focus();
+    }
+}
+
+// Translate chatbot elements
+function translateChatbot() {
+    if (!window.t) return;
+    
+    const chatbotTitle = document.getElementById('chatbotTitle');
+    if (chatbotTitle) {
+        chatbotTitle.textContent = window.t('ui.chatbot.title', 'HR Assistant');
+    }
+    
+    const chatbotWelcome = document.getElementById('chatbotWelcome');
+    if (chatbotWelcome) {
+        chatbotWelcome.textContent = window.t('ui.chatbot.welcome', 'Hi there! Please let me know if you have any questions.');
+    }
+    
+    const chatbotInput = document.getElementById('chatbotInput');
+    if (chatbotInput) {
+        chatbotInput.placeholder = window.t('ui.chatbot.placeholder', 'Type here and press Enter to chat');
+    }
+}
+
+// Function to initialize chatbot with proper language
+function initializeChatbotLanguage() {
+    // Get current language and set welcome message accordingly
+    const getCurrentLang = () => {
+        try {
+            return (window.getCurrentLanguage && window.getCurrentLanguage()) || 
+                   localStorage.getItem('language') || 
+                   document.documentElement.getAttribute('lang') || 
+                   'en';
+        } catch (_) {
+            return 'en';
+        }
+    };
+    
+    const currentLang = getCurrentLang();
+    const welcomeElement = document.getElementById('chatbotWelcome');
+    
+    if (welcomeElement) {
+        // Use translation function if available, otherwise use direct text
+        if (window.t && typeof window.t === 'function') {
+            welcomeElement.textContent = window.t('ui.chatbot.welcome', 
+                currentLang === 'vi' 
+                    ? 'Xin chào! Vui lòng cho tôi biết nếu bạn có bất kỳ câu hỏi nào.' 
+                    : 'Hi there! Please let me know if you have any questions.');
+        } else {
+            // Fallback to direct text based on language
+            if (currentLang === 'vi') {
+                welcomeElement.textContent = 'Xin chào! Vui lòng cho tôi biết nếu bạn có bất kỳ câu hỏi nào.';
+            } else {
+                welcomeElement.textContent = 'Hi there! Please let me know if you have any questions.';
+            }
+        }
+    }
+    
+    // Translate all chatbot elements
+    translateChatbot();
+}
+
+// Initialize chatbot translations on load
+(function() {
+    let initialized = false;
+    
+    function tryInitialize() {
+        if (initialized) return;
+        
+        const welcomeElement = document.getElementById('chatbotWelcome');
+        if (!welcomeElement) return; // Element not ready yet
+        
+        // Get current language
+        const getCurrentLang = () => {
+            try {
+                return (window.getCurrentLanguage && window.getCurrentLanguage()) || 
+                       localStorage.getItem('language') || 
+                       document.documentElement.getAttribute('lang') || 
+                       'en';
+            } catch (_) {
+                return 'en';
+            }
+        };
+        
+        const currentLang = getCurrentLang();
+        
+        // Set welcome message immediately based on language
+        if (currentLang === 'vi') {
+            welcomeElement.textContent = 'Xin chào! Vui lòng cho tôi biết nếu bạn có bất kỳ câu hỏi nào.';
+        } else {
+            welcomeElement.textContent = 'Hi there! Please let me know if you have any questions.';
+        }
+        
+        // Wait for translations.js to be loaded, then update with translation function
+        function waitForTranslations() {
+            if (window.t && typeof window.t === 'function') {
+                // Translations are ready, update with translation function
+                initializeChatbotLanguage();
+                initialized = true;
+            } else {
+                // Wait a bit and try again (max 2 seconds)
+                setTimeout(waitForTranslations, 50);
+            }
+        }
+        
+        // Start waiting for translations
+        waitForTranslations();
+        
+        // Also try to initialize after a short delay
+        setTimeout(function() {
+            if (!initialized) {
+                initializeChatbotLanguage();
+                initialized = true;
+            }
+        }, 200);
+    }
+    
+    // Try to initialize when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', tryInitialize);
+    } else {
+        // DOM is already ready
+        tryInitialize();
+    }
+    
+    // Also try after window load
+    window.addEventListener('load', function() {
+        setTimeout(tryInitialize, 100);
+    });
+    
+    // Translate when language changes
+    window.addEventListener('languagechange', function() {
+        initializeChatbotLanguage();
+        // Mark as new chat when language changes so it reinitializes on next open
+        isNewChat = true;
+        // Clear chat history when language changes to ensure consistent language
+        chatHistory = [];
+    });
+    
+    // Hook into applyTranslations if it exists
+    if (window.applyTranslations) {
+        const originalApplyTranslations = window.applyTranslations;
+        window.applyTranslations = function(lang) {
+            originalApplyTranslations(lang);
+            setTimeout(function() {
+                initializeChatbotLanguage();
+                isNewChat = true; // Mark as new chat when language changes
+            }, 50);
+        };
+    }
+})();
+</script>
+
