@@ -8,14 +8,54 @@
 <div style="display: flex; justify-content: center; align-items: center; min-height: 60vh; flex-direction: column;">
     <div style="text-align: center; max-width: 600px; padding: 40px;">
         <i class="fas fa-tools" style="font-size: 64px; color: #667eea; margin-bottom: 20px;"></i>
-        <h2 style="color: #333; margin-bottom: 16px; font-size: 28px;">This Function is Under Development</h2>
-        <p style="color: #666; font-size: 16px; line-height: 1.6;">
+        <h2 id="underDevTitle" style="color: #333; margin-bottom: 16px; font-size: 28px;">This Function is Under Development</h2>
+        <p id="underDevMessage" style="color: #666; font-size: 16px; line-height: 1.6;">
             We're working hard to bring you this feature. Please check back soon!
         </p>
         <a href="/dashboard" style="display: inline-block; margin-top: 24px; padding: 12px 24px; background: #667eea; color: white; text-decoration: none; border-radius: 6px; font-weight: 500; transition: background 0.2s ease;">
-            <i class="fas fa-arrow-left" style="margin-right: 8px;"></i>Back to Dashboard
+            <i class="fas fa-arrow-left" style="margin-right: 8px;"></i><span id="backToDashboardText">Back to Dashboard</span>
         </a>
     </div>
 </div>
+
+<script>
+// Function to update under development page translations
+function updateUnderDevelopmentTranslations() {
+    if (!window.t) return;
+    
+    const titleEl = document.getElementById('underDevTitle');
+    if (titleEl) {
+        titleEl.textContent = window.t('ui.sidebar.home.underDevelopment.title', 'This Function is Under Development');
+    }
+    
+    const messageEl = document.getElementById('underDevMessage');
+    if (messageEl) {
+        messageEl.textContent = window.t('ui.sidebar.home.underDevelopment.message', 'We\'re working hard to bring you this feature. Please check back soon!');
+    }
+    
+    const backBtnEl = document.getElementById('backToDashboardText');
+    if (backBtnEl) {
+        backBtnEl.textContent = window.t('ui.sidebar.home.underDevelopment.backToDashboard', 'Back to Dashboard');
+    }
+}
+
+// Wait for translations to be loaded, then update
+document.addEventListener('DOMContentLoaded', function() {
+    function initTranslations() {
+        if (window.t && window.getCurrentLanguage) {
+            updateUnderDevelopmentTranslations();
+        } else {
+            setTimeout(initTranslations, 100);
+        }
+    }
+    
+    initTranslations();
+    
+    // Listen for language changes
+    window.addEventListener('languagechange', function() {
+        updateUnderDevelopmentTranslations();
+    });
+});
+</script>
 {% endblock %}
 

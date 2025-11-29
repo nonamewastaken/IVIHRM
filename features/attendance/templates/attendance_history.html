@@ -143,49 +143,49 @@
 <div class="history-container">
     <div class="history-card">
         <h1 style="text-align: center; color: #2c3e50; margin-bottom: 30px;">
-                <i class="fas fa-history"></i> Attendance History
+                <i class="fas fa-history"></i> <span id="attendanceHistoryTitle">Attendance History</span>
         </h1>
         
             <!-- Filter Section -->
         <div class="filter-section">
                 <h3 style="margin-bottom: 15px; color: #333;">
-                    <i class="fas fa-filter"></i> Filter Records
+                    <i class="fas fa-filter"></i> <span id="filterRecordsTitle">Filter Records</span>
                 </h3>
             <div class="filter-row">
                     <div class="filter-group">
-                        <label for="employeeSelect">Employee</label>
+                        <label for="employeeSelect" id="employeeLabel">Employee</label>
                         <select id="employeeSelect">
-                            <option value="">All Employees</option>
+                            <option value="" id="allEmployeesOption">All Employees</option>
                             <option value="1">John Doe</option>
                             <option value="2">Jane Smith</option>
                             <option value="3">Mike Johnson</option>
                         </select>
                     </div>
                     <div class="filter-group">
-                        <label for="dateFrom">From Date</label>
+                        <label for="dateFrom" id="fromDateLabel">From Date</label>
                         <input type="date" id="dateFrom">
                     </div>
                     <div class="filter-group">
-                        <label for="dateTo">To Date</label>
+                        <label for="dateTo" id="toDateLabel">To Date</label>
                         <input type="date" id="dateTo">
                     </div>
                     <div class="filter-group">
-                        <label for="statusSelect">Status</label>
+                        <label for="statusSelect" id="statusLabel">Status</label>
                         <select id="statusSelect">
-                            <option value="">All Status</option>
-                            <option value="present">Present</option>
-                            <option value="late">Late</option>
-                            <option value="absent">Absent</option>
+                            <option value="" id="allStatusOption">All Status</option>
+                            <option value="present" id="statusPresentOption">Present</option>
+                            <option value="late" id="statusLateOption">Late</option>
+                            <option value="absent" id="statusAbsentOption">Absent</option>
                         </select>
                 </div>
                     <div class="filter-group">
                         <button class="btn btn-primary" onclick="filterRecords()">
-                            <i class="fas fa-search"></i> Filter
+                            <i class="fas fa-search"></i> <span id="filterButtonText">Filter</span>
                         </button>
                 </div>
                     <div class="filter-group">
                         <button class="btn btn-secondary" onclick="clearFilters()">
-                            <i class="fas fa-times"></i> Clear
+                            <i class="fas fa-times"></i> <span id="clearButtonText">Clear</span>
                 </button>
             </div>
             </div>
@@ -196,13 +196,13 @@
                 <table class="history-table">
                 <thead>
                     <tr>
-                            <th>Date</th>
-                            <th>Employee</th>
-                            <th>Check In</th>
-                            <th>Check Out</th>
-                            <th>Work Hours</th>
-                            <th>Status</th>
-                            <th>Notes</th>
+                            <th id="tableHeaderDate">Date</th>
+                            <th id="tableHeaderEmployee">Employee</th>
+                            <th id="tableHeaderCheckIn">Check In</th>
+                            <th id="tableHeaderCheckOut">Check Out</th>
+                            <th id="tableHeaderWorkHours">Work Hours</th>
+                            <th id="tableHeaderStatus">Status</th>
+                            <th id="tableHeaderNotes">Notes</th>
                     </tr>
                 </thead>
                     <tbody>
@@ -212,7 +212,7 @@
                             <td>09:00</td>
                             <td>17:30</td>
                             <td>8.5</td>
-                            <td><span class="status-present">Present</span></td>
+                            <td><span class="status-present" data-status="present">Present</span></td>
                             <td>-</td>
                         </tr>
                         <tr>
@@ -221,7 +221,7 @@
                             <td>08:45</td>
                             <td>18:00</td>
                             <td>9.25</td>
-                            <td><span class="status-present">Present</span></td>
+                            <td><span class="status-present" data-status="present">Present</span></td>
                             <td>Overtime</td>
                         </tr>
                         <tr>
@@ -230,7 +230,7 @@
                             <td>09:15</td>
                             <td>17:45</td>
                             <td>8.5</td>
-                            <td><span class="status-late">Late</span></td>
+                            <td><span class="status-late" data-status="late">Late</span></td>
                             <td>Traffic delay</td>
                         </tr>
                         <tr>
@@ -239,7 +239,7 @@
                             <td>09:00</td>
                             <td>16:30</td>
                             <td>7.5</td>
-                            <td><span class="status-present">Present</span></td>
+                            <td><span class="status-present" data-status="present">Present</span></td>
                             <td>Early leave - appointment</td>
                         </tr>
                         <tr>
@@ -248,7 +248,7 @@
                             <td>-</td>
                             <td>-</td>
                             <td>0</td>
-                            <td><span class="status-absent">Absent</span></td>
+                            <td><span class="status-absent" data-status="absent">Absent</span></td>
                             <td>Sick leave</td>
                         </tr>
                         <tr>
@@ -257,7 +257,7 @@
                             <td>08:30</td>
                             <td>17:00</td>
                             <td>8.5</td>
-                            <td><span class="status-present">Present</span></td>
+                            <td><span class="status-present" data-status="present">Present</span></td>
                             <td>-</td>
                         </tr>
                         <tr>
@@ -266,7 +266,7 @@
                             <td>09:00</td>
                             <td>18:30</td>
                             <td>9.5</td>
-                            <td><span class="status-present">Present</span></td>
+                            <td><span class="status-present" data-status="present">Present</span></td>
                             <td>Overtime</td>
                         </tr>
                         <tr>
@@ -275,7 +275,7 @@
                             <td>09:00</td>
                             <td>17:30</td>
                             <td>8.5</td>
-                            <td><span class="status-present">Present</span></td>
+                            <td><span class="status-present" data-status="present">Present</span></td>
                             <td>-</td>
                         </tr>
                 </tbody>
@@ -298,6 +298,130 @@
 
 {% block extra_js %}
 <script>
+// Function to update Attendance History translations
+function updateAttendanceHistoryTranslations() {
+    if (!window.t) return;
+    
+    // Title
+    const titleEl = document.getElementById('attendanceHistoryTitle');
+    if (titleEl) {
+        titleEl.textContent = window.t('ui.sidebar.attendance.attendanceHistoryTitle', 'Attendance History');
+    }
+    
+    // Filter section
+    const filterRecordsEl = document.getElementById('filterRecordsTitle');
+    if (filterRecordsEl) {
+        filterRecordsEl.textContent = window.t('ui.sidebar.attendance.filterRecords', 'Filter Records');
+    }
+    
+    // Filter labels
+    const employeeLabelEl = document.getElementById('employeeLabel');
+    if (employeeLabelEl) {
+        employeeLabelEl.textContent = window.t('ui.sidebar.attendance.employee', 'Employee');
+    }
+    
+    const fromDateLabelEl = document.getElementById('fromDateLabel');
+    if (fromDateLabelEl) {
+        fromDateLabelEl.textContent = window.t('ui.sidebar.attendance.fromDate', 'From Date');
+    }
+    
+    const toDateLabelEl = document.getElementById('toDateLabel');
+    if (toDateLabelEl) {
+        toDateLabelEl.textContent = window.t('ui.sidebar.attendance.toDate', 'To Date');
+    }
+    
+    const statusLabelEl = document.getElementById('statusLabel');
+    if (statusLabelEl) {
+        statusLabelEl.textContent = window.t('ui.sidebar.attendance.status', 'Status');
+    }
+    
+    // Filter options
+    const allEmployeesOptionEl = document.getElementById('allEmployeesOption');
+    if (allEmployeesOptionEl) {
+        allEmployeesOptionEl.textContent = window.t('ui.sidebar.attendance.allEmployees', 'All Employees');
+    }
+    
+    const allStatusOptionEl = document.getElementById('allStatusOption');
+    if (allStatusOptionEl) {
+        allStatusOptionEl.textContent = window.t('ui.sidebar.attendance.allStatus', 'All Status');
+    }
+    
+    const statusPresentOptionEl = document.getElementById('statusPresentOption');
+    if (statusPresentOptionEl) {
+        statusPresentOptionEl.textContent = window.t('ui.sidebar.attendance.present', 'Present');
+    }
+    
+    const statusLateOptionEl = document.getElementById('statusLateOption');
+    if (statusLateOptionEl) {
+        statusLateOptionEl.textContent = window.t('ui.sidebar.attendance.late', 'Late');
+    }
+    
+    const statusAbsentOptionEl = document.getElementById('statusAbsentOption');
+    if (statusAbsentOptionEl) {
+        statusAbsentOptionEl.textContent = window.t('ui.sidebar.attendance.absent', 'Absent');
+    }
+    
+    // Buttons
+    const filterButtonEl = document.getElementById('filterButtonText');
+    if (filterButtonEl) {
+        filterButtonEl.textContent = window.t('ui.sidebar.attendance.filter', 'Filter');
+    }
+    
+    const clearButtonEl = document.getElementById('clearButtonText');
+    if (clearButtonEl) {
+        clearButtonEl.textContent = window.t('ui.sidebar.attendance.clear', 'Clear');
+    }
+    
+    // Table headers
+    const dateHeaderEl = document.getElementById('tableHeaderDate');
+    if (dateHeaderEl) {
+        dateHeaderEl.textContent = window.t('ui.sidebar.attendance.date', 'Date');
+    }
+    
+    const employeeHeaderEl = document.getElementById('tableHeaderEmployee');
+    if (employeeHeaderEl) {
+        employeeHeaderEl.textContent = window.t('ui.sidebar.attendance.employee', 'Employee');
+    }
+    
+    const checkInHeaderEl = document.getElementById('tableHeaderCheckIn');
+    if (checkInHeaderEl) {
+        checkInHeaderEl.textContent = window.t('ui.sidebar.attendance.checkIn', 'Check In');
+    }
+    
+    const checkOutHeaderEl = document.getElementById('tableHeaderCheckOut');
+    if (checkOutHeaderEl) {
+        checkOutHeaderEl.textContent = window.t('ui.sidebar.attendance.checkOut', 'Check Out');
+    }
+    
+    const workHoursHeaderEl = document.getElementById('tableHeaderWorkHours');
+    if (workHoursHeaderEl) {
+        workHoursHeaderEl.textContent = window.t('ui.sidebar.attendance.workHours', 'Work Hours');
+    }
+    
+    const statusHeaderEl = document.getElementById('tableHeaderStatus');
+    if (statusHeaderEl) {
+        statusHeaderEl.textContent = window.t('ui.sidebar.attendance.status', 'Status');
+    }
+    
+    const notesHeaderEl = document.getElementById('tableHeaderNotes');
+    if (notesHeaderEl) {
+        notesHeaderEl.textContent = window.t('ui.sidebar.attendance.notes', 'Notes');
+    }
+    
+    // Status values in table rows
+    const statusSpans = document.querySelectorAll('span[data-status]');
+    statusSpans.forEach(span => {
+        const statusType = span.getAttribute('data-status');
+        if (statusType === 'present') {
+            span.textContent = window.t('ui.sidebar.attendance.present', 'Present');
+        } else if (statusType === 'late') {
+            span.textContent = window.t('ui.sidebar.attendance.late', 'Late');
+        } else if (statusType === 'absent') {
+            span.textContent = window.t('ui.sidebar.attendance.absent', 'Absent');
+        }
+    });
+}
+
 // Initialize sidebar for Attendance category
 document.addEventListener('DOMContentLoaded', function() {
     // Set active sidebar item
@@ -305,6 +429,22 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Generate sidebar for Attendance category
     // Sidebar is handled by main sidebar component
+    
+    // Wait for translations to be loaded, then update
+    function initTranslations() {
+        if (window.t && window.getCurrentLanguage) {
+            updateAttendanceHistoryTranslations();
+        } else {
+            setTimeout(initTranslations, 100);
+        }
+    }
+    
+    initTranslations();
+    
+    // Listen for language changes
+    window.addEventListener('languagechange', function() {
+        updateAttendanceHistoryTranslations();
+    });
 });
 
 // Filter functionality

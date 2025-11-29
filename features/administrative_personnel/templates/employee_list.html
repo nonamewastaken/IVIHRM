@@ -2,7 +2,7 @@
 
 {% block title %}Employee List - HRM System{% endblock %}
 
-{% block page_title %}<i class="fas fa-list"></i> Employee List{% endblock %}
+{% block page_title %}<i class="fas fa-list"></i> <span id="pageTitleEmployeeList">Employee List</span>{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -275,11 +275,11 @@
         <div class="personnel-card">
             <div class="page-header">
                 <h1 class="page-title">
-                    <i class="fas fa-users"></i> Employee Directory
+                    <i class="fas fa-users"></i> <span id="employeeDirectoryTitle">Employee Directory</span>
                 </h1>
                 <div>
                     <a href="/personnel/add" class="btn btn-primary">
-                        <i class="fas fa-user-plus"></i> Add Employee
+                        <i class="fas fa-user-plus"></i> <span id="addEmployeeButtonText">Add Employee</span>
                     </a>
                 </div>
             </div>
@@ -288,56 +288,56 @@
             <div class="stats-cards">
                 <div class="stat-card">
                     <h3 id="totalEmployees">0</h3>
-                    <p>Total Employees</p>
+                    <p id="totalEmployeesLabel">Total Employees</p>
                 </div>
                 <div class="stat-card">
                     <h3 id="maleEmployees">0</h3>
-                    <p>Male Employees</p>
+                    <p id="maleEmployeesLabel">Male Employees</p>
                 </div>
                 <div class="stat-card">
                     <h3 id="femaleEmployees">0</h3>
-                    <p>Female Employees</p>
+                    <p id="femaleEmployeesLabel">Female Employees</p>
                 </div>
                 <div class="stat-card">
                     <h3 id="recentEmployees">0</h3>
-                    <p>Added This Month</p>
+                    <p id="addedThisMonthLabel">Added This Month</p>
                 </div>
             </div>
 
             <!-- Filters -->
             <div class="filters">
                 <div class="filter-group">
-                    <label>Search</label>
+                    <label id="searchLabel">Search</label>
                     <input type="text" id="searchInput" class="form-control" placeholder="Search by name, phone, email...">
                 </div>
                 <div class="filter-group">
-                    <label>Gender</label>
+                    <label id="genderLabel">Gender</label>
                     <select id="genderFilter" class="form-control">
-                        <option value="">All Genders</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
+                        <option value="" id="allGendersOption">All Genders</option>
+                        <option value="male" id="maleOption">Male</option>
+                        <option value="female" id="femaleOption">Female</option>
                     </select>
                 </div>
                 <div class="filter-group">
-                    <label>Sort By</label>
+                    <label id="sortByLabel">Sort By</label>
                     <select id="sortBy" class="form-control">
-                        <option value="created_at">Date Added</option>
-                        <option value="full_name">Name</option>
-                        <option value="personal_phone">Phone</option>
+                        <option value="created_at" id="dateAddedOption">Date Added</option>
+                        <option value="full_name" id="nameOption">Name</option>
+                        <option value="personal_phone" id="phoneOption">Phone</option>
                     </select>
                 </div>
                 <div class="filter-group">
-                    <label>Order</label>
+                    <label id="orderLabel">Order</label>
                     <select id="sortOrder" class="form-control">
-                        <option value="desc">Newest First</option>
-                        <option value="asc">Oldest First</option>
+                        <option value="desc" id="newestFirstOption">Newest First</option>
+                        <option value="asc" id="oldestFirstOption">Oldest First</option>
                     </select>
                 </div>
                 <button class="btn btn-primary" onclick="loadEmployees()">
-                    <i class="fas fa-search"></i> Filter
+                    <i class="fas fa-search"></i> <span id="filterButtonText">Filter</span>
                 </button>
                 <button class="btn btn-secondary" onclick="clearFilters()">
-                    <i class="fas fa-times"></i> Clear
+                    <i class="fas fa-times"></i> <span id="clearButtonText">Clear</span>
                 </button>
             </div>
 
@@ -347,16 +347,16 @@
             <!-- Loading State -->
             <div id="loadingState" class="loading" style="display: none;">
                 <i class="fas fa-spinner fa-spin"></i>
-                <p>Loading employees...</p>
+                <p id="loadingEmployeesText">Loading employees...</p>
             </div>
 
             <!-- No Data State -->
             <div id="noDataState" class="no-data" style="display: none;">
                 <i class="fas fa-users"></i>
-                <h3>No Employees Found</h3>
-                <p>No employees match your search criteria or no employees have been added yet.</p>
+                <h3 id="noEmployeesFoundTitle">No Employees Found</h3>
+                <p id="noEmployeesMessage">No employees match your search criteria or no employees have been added yet.</p>
                 <a href="/personnel/add" class="btn btn-primary">
-                    <i class="fas fa-user-plus"></i> Add First Employee
+                    <i class="fas fa-user-plus"></i> <span id="addFirstEmployeeText">Add First Employee</span>
                 </a>
             </div>
 
@@ -365,12 +365,12 @@
                 <table class="employees-table">
                     <thead>
                         <tr>
-                            <th>Employee</th>
-                            <th>Contact</th>
-                            <th>ID Card</th>
-                            <th>Address</th>
-                            <th>Date Added</th>
-                            <th>Actions</th>
+                            <th id="tableHeaderEmployee">Employee</th>
+                            <th id="tableHeaderContact">Contact</th>
+                            <th id="tableHeaderIdCard">ID Card</th>
+                            <th id="tableHeaderAddress">Address</th>
+                            <th id="tableHeaderDateAdded">Date Added</th>
+                            <th id="tableHeaderActions">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="employeesTableBody">
@@ -390,11 +390,204 @@
 let allEmployees = [];
 let filteredEmployees = [];
 let currentPage = 1;
-const itemsPerPage = 10;
+const itemsPerPage = 10; // Fixed: 10 employees per page
+
+// Function to translate Employee Directory page
+function translateEmployeeDirectory() {
+    if (!window.t) return;
+    
+    // Page title
+    const pageTitleEl = document.getElementById('pageTitleEmployeeList');
+    if (pageTitleEl) {
+        pageTitleEl.textContent = window.t('ui.sidebar.personnel.employeeDirectory.title', 'Employee Directory');
+    }
+    
+    // Title
+    const titleEl = document.getElementById('employeeDirectoryTitle');
+    if (titleEl) {
+        titleEl.textContent = window.t('ui.sidebar.personnel.employeeDirectory.title', 'Employee Directory');
+    }
+    
+    // Add Employee button
+    const addEmployeeBtn = document.getElementById('addEmployeeButtonText');
+    if (addEmployeeBtn) {
+        addEmployeeBtn.textContent = window.t('ui.sidebar.personnel.employeeDirectory.addEmployee', 'Add Employee');
+    }
+    
+    // Statistics labels
+    const totalEmployeesLabel = document.getElementById('totalEmployeesLabel');
+    if (totalEmployeesLabel) {
+        totalEmployeesLabel.textContent = window.t('ui.sidebar.personnel.employeeDirectory.totalEmployees', 'Total Employees');
+    }
+    
+    const maleEmployeesLabel = document.getElementById('maleEmployeesLabel');
+    if (maleEmployeesLabel) {
+        maleEmployeesLabel.textContent = window.t('ui.sidebar.personnel.employeeDirectory.maleEmployees', 'Male Employees');
+    }
+    
+    const femaleEmployeesLabel = document.getElementById('femaleEmployeesLabel');
+    if (femaleEmployeesLabel) {
+        femaleEmployeesLabel.textContent = window.t('ui.sidebar.personnel.employeeDirectory.femaleEmployees', 'Female Employees');
+    }
+    
+    const addedThisMonthLabel = document.getElementById('addedThisMonthLabel');
+    if (addedThisMonthLabel) {
+        addedThisMonthLabel.textContent = window.t('ui.sidebar.personnel.employeeDirectory.addedThisMonth', 'Added This Month');
+    }
+    
+    // Filter labels
+    const searchLabel = document.getElementById('searchLabel');
+    if (searchLabel) {
+        searchLabel.textContent = window.t('ui.sidebar.personnel.employeeDirectory.search', 'Search');
+    }
+    
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.placeholder = window.t('ui.sidebar.personnel.employeeDirectory.searchPlaceholder', 'Search by name, phone, email...');
+    }
+    
+    const genderLabel = document.getElementById('genderLabel');
+    if (genderLabel) {
+        genderLabel.textContent = window.t('ui.sidebar.personnel.employeeDirectory.gender', 'Gender');
+    }
+    
+    const allGendersOption = document.getElementById('allGendersOption');
+    if (allGendersOption) {
+        allGendersOption.textContent = window.t('ui.sidebar.personnel.employeeDirectory.allGenders', 'All Genders');
+    }
+    
+    const maleOption = document.getElementById('maleOption');
+    if (maleOption) {
+        maleOption.textContent = window.t('ui.sidebar.personnel.employeeDirectory.male', 'Male');
+    }
+    
+    const femaleOption = document.getElementById('femaleOption');
+    if (femaleOption) {
+        femaleOption.textContent = window.t('ui.sidebar.personnel.employeeDirectory.female', 'Female');
+    }
+    
+    const sortByLabel = document.getElementById('sortByLabel');
+    if (sortByLabel) {
+        sortByLabel.textContent = window.t('ui.sidebar.personnel.employeeDirectory.sortBy', 'Sort By');
+    }
+    
+    const dateAddedOption = document.getElementById('dateAddedOption');
+    if (dateAddedOption) {
+        dateAddedOption.textContent = window.t('ui.sidebar.personnel.employeeDirectory.dateAdded', 'Date Added');
+    }
+    
+    const nameOption = document.getElementById('nameOption');
+    if (nameOption) {
+        nameOption.textContent = window.t('ui.sidebar.personnel.employeeDirectory.name', 'Name');
+    }
+    
+    const phoneOption = document.getElementById('phoneOption');
+    if (phoneOption) {
+        phoneOption.textContent = window.t('ui.sidebar.personnel.employeeDirectory.phone', 'Phone');
+    }
+    
+    const orderLabel = document.getElementById('orderLabel');
+    if (orderLabel) {
+        orderLabel.textContent = window.t('ui.sidebar.personnel.employeeDirectory.order', 'Order');
+    }
+    
+    const newestFirstOption = document.getElementById('newestFirstOption');
+    if (newestFirstOption) {
+        newestFirstOption.textContent = window.t('ui.sidebar.personnel.employeeDirectory.newestFirst', 'Newest First');
+    }
+    
+    const oldestFirstOption = document.getElementById('oldestFirstOption');
+    if (oldestFirstOption) {
+        oldestFirstOption.textContent = window.t('ui.sidebar.personnel.employeeDirectory.oldestFirst', 'Oldest First');
+    }
+    
+    const filterButtonText = document.getElementById('filterButtonText');
+    if (filterButtonText) {
+        filterButtonText.textContent = window.t('ui.sidebar.personnel.employeeDirectory.filter', 'Filter');
+    }
+    
+    const clearButtonText = document.getElementById('clearButtonText');
+    if (clearButtonText) {
+        clearButtonText.textContent = window.t('ui.sidebar.personnel.employeeDirectory.clear', 'Clear');
+    }
+    
+    // Loading and empty states
+    const loadingText = document.getElementById('loadingEmployeesText');
+    if (loadingText) {
+        loadingText.textContent = window.t('ui.sidebar.personnel.employeeDirectory.loadingEmployees', 'Loading employees...');
+    }
+    
+    const noEmployeesTitle = document.getElementById('noEmployeesFoundTitle');
+    if (noEmployeesTitle) {
+        noEmployeesTitle.textContent = window.t('ui.sidebar.personnel.employeeDirectory.noEmployeesFound', 'No Employees Found');
+    }
+    
+    const noEmployeesMessage = document.getElementById('noEmployeesMessage');
+    if (noEmployeesMessage) {
+        noEmployeesMessage.textContent = window.t('ui.sidebar.personnel.employeeDirectory.noEmployeesMessage', 'No employees match your search criteria or no employees have been added yet.');
+    }
+    
+    const addFirstEmployeeText = document.getElementById('addFirstEmployeeText');
+    if (addFirstEmployeeText) {
+        addFirstEmployeeText.textContent = window.t('ui.sidebar.personnel.employeeDirectory.addFirstEmployee', 'Add First Employee');
+    }
+    
+    // Table headers
+    const employeeHeader = document.getElementById('tableHeaderEmployee');
+    if (employeeHeader) {
+        employeeHeader.textContent = window.t('ui.sidebar.personnel.employeeDirectory.employee', 'Employee');
+    }
+    
+    const contactHeader = document.getElementById('tableHeaderContact');
+    if (contactHeader) {
+        contactHeader.textContent = window.t('ui.sidebar.personnel.employeeDirectory.contact', 'Contact');
+    }
+    
+    const idCardHeader = document.getElementById('tableHeaderIdCard');
+    if (idCardHeader) {
+        idCardHeader.textContent = window.t('ui.sidebar.personnel.employeeDirectory.idCard', 'ID Card');
+    }
+    
+    const addressHeader = document.getElementById('tableHeaderAddress');
+    if (addressHeader) {
+        addressHeader.textContent = window.t('ui.sidebar.personnel.employeeDirectory.address', 'Address');
+    }
+    
+    const dateAddedHeader = document.getElementById('tableHeaderDateAdded');
+    if (dateAddedHeader) {
+        dateAddedHeader.textContent = window.t('ui.sidebar.personnel.employeeDirectory.dateAdded', 'Date Added');
+    }
+    
+    const actionsHeader = document.getElementById('tableHeaderActions');
+    if (actionsHeader) {
+        actionsHeader.textContent = window.t('ui.sidebar.personnel.employeeDirectory.actions', 'Actions');
+    }
+}
 
 document.addEventListener('DOMContentLoaded', function() {
     setActiveSidebarItem('/personnel/list');
     // Sidebar is handled by main sidebar component
+    
+    // Wait for translations to be loaded
+    function initTranslations() {
+        if (window.t && window.getCurrentLanguage) {
+            translateEmployeeDirectory();
+        } else {
+            setTimeout(initTranslations, 100);
+        }
+    }
+    
+    initTranslations();
+    
+    // Listen for language changes
+    window.addEventListener('languagechange', function() {
+        translateEmployeeDirectory();
+        // Re-display employees to update dynamic content
+        if (filteredEmployees.length > 0) {
+            displayEmployees();
+        }
+    });
+    
     loadEmployees();
     
     // Add event listeners for filters
@@ -419,11 +612,13 @@ async function loadEmployees() {
             updateStatistics();
             filterEmployees();
         } else {
-            showError(`Failed to load employees: ${data.error}`);
+            const errorMsg = window.t ? window.t('ui.sidebar.personnel.employeeDirectory.failedToLoad', 'Failed to load employees: {error}').replace('{error}', data.error) : `Failed to load employees: ${data.error}`;
+            showError(errorMsg);
         }
     } catch (error) {
         console.error('Error loading employees:', error);
-        showError(`Failed to load employees: ${error.message}`);
+        const errorMsg = window.t ? window.t('ui.sidebar.personnel.employeeDirectory.failedToLoad', 'Failed to load employees: {error}').replace('{error}', error.message) : `Failed to load employees: ${error.message}`;
+        showError(errorMsg);
     } finally {
         showLoading(false);
     }
@@ -482,15 +677,26 @@ function displayEmployees() {
     if (filteredEmployees.length === 0) {
         tableContainer.style.display = 'none';
         noDataState.style.display = 'block';
+        document.getElementById('pagination').innerHTML = '';
         return;
     }
     
     tableContainer.style.display = 'block';
     noDataState.style.display = 'none';
     
-    // Calculate pagination
+    // Calculate pagination - always show exactly 10 employees per page (or fewer on last page)
+    const totalPages = Math.ceil(filteredEmployees.length / itemsPerPage);
+    
+    // Ensure currentPage is within valid range
+    if (currentPage > totalPages) {
+        currentPage = totalPages || 1;
+    }
+    if (currentPage < 1) {
+        currentPage = 1;
+    }
+    
     const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, filteredEmployees.length);
     const pageEmployees = filteredEmployees.slice(startIndex, endIndex);
     
     // Generate table rows
@@ -503,7 +709,7 @@ function displayEmployees() {
                          onerror="this.src='/static/images/user.png'">
                     <div class="employee-details">
                         <h6>${employee.full_name || 'N/A'}</h6>
-                        <small>${employee.gender === 'male' ? 'Male' : employee.gender === 'female' ? 'Female' : 'N/A'}</small>
+                        <small data-gender="${employee.gender || ''}">${employee.gender === 'male' ? (window.t ? window.t('ui.sidebar.personnel.employeeDirectory.male', 'Male') : 'Male') : employee.gender === 'female' ? (window.t ? window.t('ui.sidebar.personnel.employeeDirectory.female', 'Female') : 'Female') : 'N/A'}</small>
                     </div>
                 </div>
             </td>
@@ -516,7 +722,7 @@ function displayEmployees() {
             <td>
                 <div>
                     <strong>${employee.id_card_number || 'N/A'}</strong><br>
-                    <small>Issued: ${employee.id_card_issue_date || 'N/A'}</small>
+                    <small data-issued="${employee.id_card_issue_date || ''}">${window.t ? window.t('ui.sidebar.personnel.employeeDirectory.issued', 'Issued:') : 'Issued:'} ${employee.id_card_issue_date || 'N/A'}</small>
                 </div>
             </td>
             <td>
@@ -533,10 +739,10 @@ function displayEmployees() {
             </td>
             <td>
                 <button class="btn btn-sm btn-primary" onclick="viewEmployee(${employee.id})">
-                    <i class="fas fa-eye"></i> View
+                    <i class="fas fa-eye"></i> <span class="view-button-text">${window.t ? window.t('ui.sidebar.personnel.employeeDirectory.view', 'View') : 'View'}</span>
                 </button>
                 <button class="btn btn-sm btn-danger" onclick="deleteEmployee(${employee.id})">
-                    <i class="fas fa-trash"></i> Delete
+                    <i class="fas fa-trash"></i> <span class="delete-button-text">${window.t ? window.t('ui.sidebar.personnel.employeeDirectory.delete', 'Delete') : 'Delete'}</span>
                 </button>
             </td>
         </tr>
@@ -568,9 +774,18 @@ function updatePagination() {
     const totalPages = Math.ceil(filteredEmployees.length / itemsPerPage);
     const pagination = document.getElementById('pagination');
     
+    // Only show pagination if there are more than 10 employees
     if (totalPages <= 1) {
         pagination.innerHTML = '';
         return;
+    }
+    
+    // Ensure currentPage is valid
+    if (currentPage > totalPages) {
+        currentPage = totalPages;
+    }
+    if (currentPage < 1) {
+        currentPage = 1;
     }
     
     let paginationHTML = `
@@ -606,6 +821,11 @@ function changePage(page) {
     if (page >= 1 && page <= totalPages) {
         currentPage = page;
         displayEmployees();
+        // Scroll to top of table when changing pages
+        const tableContainer = document.getElementById('employeesTable');
+        if (tableContainer) {
+            tableContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
     }
 }
 
@@ -666,7 +886,8 @@ function viewEmployee(id) {
 }
 
 function deleteEmployee(id) {
-    if (confirm('Are you sure you want to delete this employee?')) {
+    const confirmMsg = window.t ? window.t('ui.sidebar.personnel.employeeDirectory.deleteConfirm', 'Are you sure you want to delete this employee?') : 'Are you sure you want to delete this employee?';
+    if (confirm(confirmMsg)) {
         alert(`Delete employee ${id} - Feature coming soon!`);
     }
 }

@@ -124,7 +124,7 @@ const sidebarData = {
         icon: 'fas fa-money-bill-wave',
         sections: [
             {
-                title: 'Payroll Management',
+                title: (window.t && window.t('ui.sidebar.salary.payrollManagement', 'Payroll Management')) || 'Payroll Management',
                 items: [
                     { icon: 'fas fa-chart-pie', text: (window.t && window.t('ui.sidebar.salary.overview', 'Overview')) || 'Overview', href: '/salary/overview' },
                     { icon: 'fas fa-calculator', text: (window.t && window.t('ui.sidebar.salary.calculate', 'Calculate Salary')) || 'Calculate Salary', href: '/salary/calculate' },
@@ -132,16 +132,16 @@ const sidebarData = {
                 ]
             },
             {
-                title: 'Salary Components',
+                title: (window.t && window.t('ui.sidebar.salary.salaryComponents', 'Salary Components')) || 'Salary Components',
                 items: [
                     { icon: 'fas fa-plus', text: (window.t && window.t('ui.sidebar.salary.basic', 'Basic Salary')) || 'Basic Salary', href: '/salary/basic' },
                     { icon: 'fas fa-star', text: (window.t && window.t('ui.sidebar.salary.allowances', 'Allowances')) || 'Allowances', href: '/salary/allowances' },
                     { icon: 'fas fa-percentage', text: (window.t && window.t('ui.sidebar.salary.deductions', 'Deductions')) || 'Deductions', href: '/salary/deductions' },
-                    { icon: 'fas fa-gift', text: (window.t && window.t('ui.sidebar.salary.bonuses', 'Bonuses')) || 'Bonuses' }
+                    { icon: 'fas fa-gift', text: (window.t && window.t('ui.sidebar.salary.bonuses', 'Bonuses')) || 'Bonuses', href: '/salary/bonuses' }
                 ]
             },
             {
-                title: 'Reports & Documents',
+                title: (window.t && window.t('ui.sidebar.salary.reportsDocuments', 'Reports & Documents')) || 'Reports & Documents',
                 items: [
                     { icon: 'fas fa-file-pdf', text: (window.t && window.t('ui.sidebar.salary.slips', 'Salary Slips')) || 'Salary Slips', href: '/salary/slips' },
                     { icon: 'fas fa-chart-line', text: (window.t && window.t('ui.sidebar.salary.reports', 'Salary Reports')) || 'Salary Reports', href: '/salary/reports' },
@@ -155,16 +155,16 @@ const sidebarData = {
         icon: 'fas fa-gavel',
         sections: [
             {
-                title: 'Decision Making',
+                title: (window.t && window.t('ui.sidebar.decision.sections.decisionMaking', 'Decision Making')) || 'Decision Making',
                 items: [
                     { icon: 'fas fa-plus', text: (window.t && window.t('ui.sidebar.decision.newDecision', 'New Decision')) || 'New Decision', href: '/decision/create' },
                     { icon: 'fas fa-list', text: (window.t && window.t('ui.sidebar.decision.allDecisions', 'All Decisions')) || 'All Decisions', href: '/decision/list' },
                     { icon: 'fas fa-edit', text: (window.t && window.t('ui.sidebar.decision.editDecision', 'Edit Decision')) || 'Edit Decision', href: '/decision/edit' },
-                    { icon: 'fas fa-check', text: (window.t && window.t('ui.sidebar.decision.approveDecision', 'Approve Decision')) || 'Approve Decision' }
+                    { icon: 'fas fa-check', text: (window.t && window.t('ui.sidebar.decision.approveDecision', 'Approve Decision')) || 'Approve Decision', href: '/decision/approve' }
                 ]
             },
             {
-                title: 'Decision Types',
+                title: (window.t && window.t('ui.sidebar.decision.sections.decisionTypes', 'Decision Types')) || 'Decision Types',
                 items: [
                     { icon: 'fas fa-user-plus', text: (window.t && window.t('ui.sidebar.decision.hiring', 'Hiring Decisions')) || 'Hiring Decisions', href: '/decision/hiring' },
                     { icon: 'fas fa-user-times', text: (window.t && window.t('ui.sidebar.decision.termination', 'Termination Decisions')) || 'Termination Decisions', href: '/decision/termination' },
@@ -173,11 +173,11 @@ const sidebarData = {
                 ]
             },
             {
-                title: 'Review & Audit',
+                title: (window.t && window.t('ui.sidebar.decision.sections.reviewAudit', 'Review & Audit')) || 'Review & Audit',
                 items: [
                     { icon: 'fas fa-search', text: (window.t && window.t('ui.sidebar.decision.search', 'Search Decisions')) || 'Search Decisions', href: '/decision/search' },
                     { icon: 'fas fa-history', text: (window.t && window.t('ui.sidebar.decision.history', 'Decision History')) || 'Decision History', href: '/decision/history' },
-                    { icon: 'fas fa-chart-bar', text: (window.t && window.t('ui.sidebar.decision.analytics', 'Decision Analytics')) || 'Decision Analytics' }
+                    { icon: 'fas fa-chart-bar', text: (window.t && window.t('ui.sidebar.decision.analytics', 'Decision Analytics')) || 'Decision Analytics', href: '/decision/analytics' }
                 ]
             }
         ]
@@ -313,7 +313,13 @@ function translateSidebar() {
                 'Overview': 'ui.sidebar.personnel.sections.overview',
                 'Employee Management': 'ui.sidebar.personnel.sections.employeeManagement',
                 'Department Management': 'ui.sidebar.personnel.sections.departmentManagement',
-                'Reports': 'ui.sidebar.personnel.sections.reports'
+                'Reports': 'ui.sidebar.personnel.sections.reports',
+                'Payroll Management': 'ui.sidebar.salary.payrollManagement',
+                'Salary Components': 'ui.sidebar.salary.salaryComponents',
+                'Reports & Documents': 'ui.sidebar.salary.reportsDocuments',
+                'Decision Making': 'ui.sidebar.decision.sections.decisionMaking',
+                'Decision Types': 'ui.sidebar.decision.sections.decisionTypes',
+                'Review & Audit': 'ui.sidebar.decision.sections.reviewAudit'
             };
             if (sectionMap[text] && t) {
                 el.textContent = t(sectionMap[text], text);

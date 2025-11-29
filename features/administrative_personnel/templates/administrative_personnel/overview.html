@@ -225,22 +225,22 @@
 {% block content %}
 <div class="personnel-overview">
     <section class="hero">
-        <h1><i class="fas fa-users-cog"></i> Personnel Overview</h1>
-        <p>Monitor headcount, onboarding progress, and compliance readiness for your organization.</p>
+        <h1><i class="fas fa-users-cog"></i> <span id="overviewTitle">Personnel Overview</span></h1>
+        <p id="overviewSubtitle">Monitor headcount, onboarding progress, and compliance readiness for your organization.</p>
     </section>
 
     <section class="summary-grid">
         {% for card in overview.summary_cards %}
         <div class="summary-card">
             <div class="summary-icon"><i class="{{ card.icon }}"></i></div>
-            <div class="summary-title">{{ card.label }}</div>
+            <div class="summary-title" data-label="{{ card.label }}">{{ card.label }}</div>
             <div class="summary-value">{{ card.value }}</div>
         </div>
         {% endfor %}
     </section>
 
     <section class="panel">
-        <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+        <h3><i class="fas fa-bolt"></i> <span id="quickActionsTitle">Quick Actions</span></h3>
         <div class="quick-actions">
             {% for action in overview.quick_actions %}
             <a href="{{ action.href }}" class="quick-action">
@@ -252,41 +252,41 @@
 
     <section class="two-column">
         <div class="panel">
-            <h3><i class="fas fa-lightbulb"></i> Workforce Highlights</h3>
+            <h3><i class="fas fa-lightbulb"></i> <span id="workforceHighlightsTitle">Workforce Highlights</span></h3>
             <ul class="list">
                 {% if overview.highlights %}
                     {% for highlight in overview.highlights %}
-                    <li class="list-item">
+                    <li class="list-item highlight-item">
                         <span class="bullet"><i class="fas fa-circle"></i></span>
-                        <span>{{ highlight }}</span>
+                        <span class="highlight-text" data-text="{{ highlight }}">{{ highlight }}</span>
                     </li>
                     {% endfor %}
                 {% else %}
-                    <li class="empty-state">Highlights will appear once personnel data is available.</li>
+                    <li class="empty-state" id="highlightsEmpty">Highlights will appear once personnel data is available.</li>
                 {% endif %}
             </ul>
         </div>
         <div class="panel">
-            <h3><i class="fas fa-file-shield"></i> Records Requiring Attention</h3>
+            <h3><i class="fas fa-file-shield"></i> <span id="recordsRequiringAttentionTitle">Records Requiring Attention</span></h3>
             {% if overview.attention %}
                 {% for item in overview.attention %}
                 <div class="attention-entry">
                     <div>
                         <div class="name">{{ item.name }}</div>
-                        <div class="meta">{{ item.meta }}</div>
+                        <div class="meta attention-meta" data-meta="{{ item.meta }}">{{ item.meta }}</div>
                     </div>
-                    <div class="status">{{ item.status }}</div>
+                    <div class="status attention-status" data-status="{{ item.status }}">{{ item.status }}</div>
                 </div>
                 {% endfor %}
             {% else %}
-                <p class="empty-state">All personnel files are currently compliant.</p>
+                <p class="empty-state" id="attentionEmpty">All personnel files are currently compliant.</p>
             {% endif %}
         </div>
     </section>
 
     <section class="two-column">
         <div class="panel">
-            <h3><i class="fas fa-user-plus"></i> Recent Onboarding</h3>
+            <h3><i class="fas fa-user-plus"></i> <span id="recentOnboardingTitle">Recent Onboarding</span></h3>
             <ul class="list">
                 {% if overview.onboarding %}
                     {% for item in overview.onboarding %}
@@ -294,62 +294,386 @@
                         <span class="bullet"><i class="fas fa-user"></i></span>
                         <span>
                             <strong>{{ item.name }}</strong><br>
-                            <span class="meta">{{ item.started }} · {{ item.status }}</span>
+                            <span class="meta onboarding-meta" data-started="{{ item.started }}" data-status="{{ item.status }}">{{ item.started }} · {{ item.status }}</span>
                         </span>
                     </li>
                     {% endfor %}
                 {% else %}
-                    <li class="empty-state">New hires will appear here once added.</li>
+                    <li class="empty-state" id="onboardingEmpty">New hires will appear here once added.</li>
                 {% endif %}
             </ul>
         </div>
         <div class="panel">
-            <h3><i class="fas fa-chart-pie"></i> Personnel Composition</h3>
+            <h3><i class="fas fa-chart-pie"></i> <span id="personnelCompositionTitle">Personnel Composition</span></h3>
             {% if overview.composition %}
             <ul class="list">
                 <li class="list-item">
                     <span class="bullet"><i class="fas fa-id-card-alt"></i></span>
-                    <span><strong>Profiles Complete:</strong> {{ overview.composition.profiles_complete }} / {{ overview.summary_cards[0].value }}</span>
+                    <span><strong id="profilesCompleteLabel">Profiles Complete:</strong> {{ overview.composition.profiles_complete }} / {{ overview.summary_cards[0].value }}</span>
                 </li>
                 <li class="list-item">
                     <span class="bullet"><i class="fas fa-file-signature"></i></span>
-                    <span><strong>Documents Pending:</strong> {{ overview.composition.documents_pending }}</span>
+                    <span><strong id="documentsPendingLabel">Documents Pending:</strong> {{ overview.composition.documents_pending }}</span>
                 </li>
                 <li class="list-item">
                     <span class="bullet"><i class="fas fa-venus-mars"></i></span>
                     <span>
-                        <strong>Gender Mix:</strong>
-                        Female {{ overview.composition.gender.female }},
-                        Male {{ overview.composition.gender.male }},
-                        Other {{ overview.composition.gender.other }},
-                        Unspecified {{ overview.composition.gender.unspecified }}
+                        <strong id="genderMixLabel">Gender Mix:</strong>
+                        <span id="femaleLabel">Female</span> {{ overview.composition.gender.female }},
+                        <span id="maleLabel">Male</span> {{ overview.composition.gender.male }},
+                        <span id="otherLabel">Other</span> {{ overview.composition.gender.other }},
+                        <span id="unspecifiedLabel">Unspecified</span> {{ overview.composition.gender.unspecified }}
                     </span>
                 </li>
             </ul>
             {% else %}
-                <p class="empty-state">Personnel composition will appear once we have employee data.</p>
+                <p class="empty-state" id="compositionEmpty">Personnel composition will appear once we have employee data.</p>
             {% endif %}
         </div>
     </section>
 
     <section class="panel">
-        <h3><i class="fas fa-clock"></i> Recent Employee Activity</h3>
+        <h3><i class="fas fa-clock"></i> <span id="recentEmployeeActivityTitle">Recent Employee Activity</span></h3>
         <div class="recent-activity">
             {% if overview.recent_activity %}
                 {% for activity in overview.recent_activity %}
                 <div class="activity-entry">
                     <div>
                         <strong>{{ activity.title }}</strong><br>
-                        <span class="meta">{{ activity.meta }}</span>
+                        <span class="meta activity-meta">{{ activity.meta }}</span>
                     </div>
-                    <span class="meta">{{ activity.time }}</span>
+                    <span class="meta activity-time" data-time="{{ activity.time }}">{{ activity.time }}</span>
                 </div>
                 {% endfor %}
             {% else %}
-                <p class="empty-state">Recent activity will appear here as employees are added.</p>
+                <p class="empty-state" id="activityEmpty">Recent activity will appear here as employees are added.</p>
             {% endif %}
         </div>
     </section>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Function to translate Personnel Overview page
+function translatePersonnelOverview() {
+    if (!window.t) return;
+    
+    // Title and subtitle
+    const titleEl = document.getElementById('overviewTitle');
+    if (titleEl) {
+        titleEl.textContent = window.t('ui.sidebar.personnel.overviewPage.title', 'Personnel Overview');
+    }
+    
+    const subtitleEl = document.getElementById('overviewSubtitle');
+    if (subtitleEl) {
+        subtitleEl.textContent = window.t('ui.sidebar.personnel.overviewPage.subtitle', 'Monitor headcount, onboarding progress, and compliance readiness for your organization.');
+    }
+    
+    // Section titles
+    const quickActionsEl = document.getElementById('quickActionsTitle');
+    if (quickActionsEl) {
+        quickActionsEl.textContent = window.t('ui.sidebar.personnel.overviewPage.quickActions', 'Quick Actions');
+    }
+    
+    const highlightsEl = document.getElementById('workforceHighlightsTitle');
+    if (highlightsEl) {
+        highlightsEl.textContent = window.t('ui.sidebar.personnel.overviewPage.workforceHighlights', 'Workforce Highlights');
+    }
+    
+    const attentionEl = document.getElementById('recordsRequiringAttentionTitle');
+    if (attentionEl) {
+        attentionEl.textContent = window.t('ui.sidebar.personnel.overviewPage.recordsRequiringAttention', 'Records Requiring Attention');
+    }
+    
+    const onboardingEl = document.getElementById('recentOnboardingTitle');
+    if (onboardingEl) {
+        onboardingEl.textContent = window.t('ui.sidebar.personnel.overviewPage.recentOnboarding', 'Recent Onboarding');
+    }
+    
+    const compositionEl = document.getElementById('personnelCompositionTitle');
+    if (compositionEl) {
+        compositionEl.textContent = window.t('ui.sidebar.personnel.overviewPage.personnelComposition', 'Personnel Composition');
+    }
+    
+    const activityEl = document.getElementById('recentEmployeeActivityTitle');
+    if (activityEl) {
+        activityEl.textContent = window.t('ui.sidebar.personnel.overviewPage.recentEmployeeActivity', 'Recent Employee Activity');
+    }
+    
+    // Empty states
+    const highlightsEmptyEl = document.getElementById('highlightsEmpty');
+    if (highlightsEmptyEl) {
+        highlightsEmptyEl.textContent = window.t('ui.sidebar.personnel.overviewPage.highlightsEmpty', 'Highlights will appear once personnel data is available.');
+    }
+    
+    const attentionEmptyEl = document.getElementById('attentionEmpty');
+    if (attentionEmptyEl) {
+        attentionEmptyEl.textContent = window.t('ui.sidebar.personnel.overviewPage.attentionEmpty', 'All personnel files are currently compliant.');
+    }
+    
+    const onboardingEmptyEl = document.getElementById('onboardingEmpty');
+    if (onboardingEmptyEl) {
+        onboardingEmptyEl.textContent = window.t('ui.sidebar.personnel.overviewPage.onboardingEmpty', 'New hires will appear here once added.');
+    }
+    
+    const compositionEmptyEl = document.getElementById('compositionEmpty');
+    if (compositionEmptyEl) {
+        compositionEmptyEl.textContent = window.t('ui.sidebar.personnel.overviewPage.compositionEmpty', 'Personnel composition will appear once we have employee data.');
+    }
+    
+    const activityEmptyEl = document.getElementById('activityEmpty');
+    if (activityEmptyEl) {
+        activityEmptyEl.textContent = window.t('ui.sidebar.personnel.overviewPage.activityEmpty', 'Recent activity will appear here as employees are added.');
+    }
+    
+    // Summary cards labels
+    const summaryCards = document.querySelectorAll('.summary-title');
+    summaryCards.forEach(card => {
+        const originalLabel = card.getAttribute('data-label') || card.textContent.trim();
+        const labelMap = {
+            'Total Employees': window.t('ui.sidebar.personnel.overviewPage.totalEmployees', 'Total Employees'),
+            'Profiles Completed': window.t('ui.sidebar.personnel.overviewPage.profilesCompleted', 'Profiles Completed'),
+            'Docs Pending': window.t('ui.sidebar.personnel.overviewPage.docsPending', 'Docs Pending'),
+            'New Hires (30d)': window.t('ui.sidebar.personnel.overviewPage.newHires30d', 'New Hires (30d)'),
+            'New Hires (30D)': window.t('ui.sidebar.personnel.overviewPage.newHires30d', 'New Hires (30d)')
+        };
+        if (labelMap[originalLabel]) {
+            card.textContent = labelMap[originalLabel].toUpperCase();
+        }
+    });
+    
+    // Quick actions labels
+    const quickActionLinks = document.querySelectorAll('.quick-action');
+    quickActionLinks.forEach(link => {
+        const text = link.textContent.trim();
+        const actionMap = {
+            'Add Employee': window.t('ui.sidebar.personnel.overviewPage.addEmployee', 'Add Employee'),
+            'View Employees': window.t('ui.sidebar.personnel.overviewPage.viewEmployees', 'View Employees'),
+            'Departments': window.t('ui.sidebar.personnel.overviewPage.departments', 'Departments'),
+            'Create Decision': window.t('ui.sidebar.personnel.overviewPage.createDecision', 'Create Decision')
+        };
+        if (actionMap[text]) {
+            const icon = link.querySelector('i');
+            link.innerHTML = icon ? `${icon.outerHTML} ${actionMap[text]}` : actionMap[text];
+        }
+    });
+    
+    // Composition labels
+    const profilesCompleteEl = document.getElementById('profilesCompleteLabel');
+    if (profilesCompleteEl) {
+        profilesCompleteEl.textContent = window.t('ui.sidebar.personnel.overviewPage.profilesComplete', 'Profiles Complete:');
+    }
+    
+    const documentsPendingEl = document.getElementById('documentsPendingLabel');
+    if (documentsPendingEl) {
+        documentsPendingEl.textContent = window.t('ui.sidebar.personnel.overviewPage.documentsPending', 'Documents Pending:');
+    }
+    
+    const genderMixEl = document.getElementById('genderMixLabel');
+    if (genderMixEl) {
+        genderMixEl.textContent = window.t('ui.sidebar.personnel.overviewPage.genderMix', 'Gender Mix:');
+    }
+    
+    const femaleEl = document.getElementById('femaleLabel');
+    if (femaleEl) {
+        femaleEl.textContent = window.t('ui.sidebar.personnel.overviewPage.female', 'Female');
+    }
+    
+    const maleEl = document.getElementById('maleLabel');
+    if (maleEl) {
+        maleEl.textContent = window.t('ui.sidebar.personnel.overviewPage.male', 'Male');
+    }
+    
+    const otherEl = document.getElementById('otherLabel');
+    if (otherEl) {
+        otherEl.textContent = window.t('ui.sidebar.personnel.overviewPage.other', 'Other');
+    }
+    
+    const unspecifiedEl = document.getElementById('unspecifiedLabel');
+    if (unspecifiedEl) {
+        unspecifiedEl.textContent = window.t('ui.sidebar.personnel.overviewPage.unspecified', 'Unspecified');
+    }
+    
+    // Translate status badges
+    const statusBadges = document.querySelectorAll('.status');
+    statusBadges.forEach(badge => {
+        if (badge.textContent.trim() === 'Action Needed') {
+            badge.textContent = window.t('ui.sidebar.personnel.overviewPage.actionNeeded', 'Action Needed');
+        }
+    });
+    
+    // Translate attention status badges
+    const attentionStatuses = document.querySelectorAll('.attention-status');
+    attentionStatuses.forEach(status => {
+        const originalStatus = status.getAttribute('data-status') || status.textContent.trim();
+        if (originalStatus === 'Action Needed') {
+            status.textContent = window.t('ui.sidebar.personnel.overviewPage.actionNeeded', 'Action Needed');
+        }
+    });
+    
+    // Translate attention meta (missing documents)
+    const attentionMetas = document.querySelectorAll('.attention-meta');
+    attentionMetas.forEach(meta => {
+        let originalMeta = meta.getAttribute('data-meta');
+        if (!originalMeta) {
+            originalMeta = meta.textContent.trim();
+            meta.setAttribute('data-meta', originalMeta);
+        }
+        
+        const lang = window.getCurrentLanguage ? window.getCurrentLanguage() : 'en';
+        
+        // Parse "Missing ID & CV · Added Nov 27" or "Missing ID · Added Nov 17"
+        // Also handle Vietnamese "Thiếu ID & CV · Đã thêm Nov 27"
+        const missingMatch = originalMeta.match(/(?:Missing|Thiếu)\s+([^·]+)\s*·\s*(?:Added|Đã thêm)\s+(.+)/i);
+        if (missingMatch) {
+            const missingDocs = missingMatch[1].trim();
+            const addedDate = missingMatch[2].trim();
+            if (lang === 'vi') {
+                const missingText = window.t('ui.sidebar.personnel.overviewPage.missingDocuments', 'Missing {documents} · Added {date}')
+                    .replace('{documents}', missingDocs)
+                    .replace('{date}', addedDate);
+                meta.textContent = missingText;
+            } else {
+                // Restore English
+                meta.textContent = `Missing ${missingDocs} · Added ${addedDate}`;
+            }
+        }
+    });
+    
+    // Translate highlights
+    const highlightTexts = document.querySelectorAll('.highlight-text');
+    highlightTexts.forEach(highlight => {
+        // Always use the original data-text attribute to ensure correct translation
+        let originalText = highlight.getAttribute('data-text');
+        if (!originalText) {
+            // If no data attribute, store the current text as original
+            originalText = highlight.textContent.trim();
+            highlight.setAttribute('data-text', originalText);
+        }
+        
+        const lang = window.getCurrentLanguage ? window.getCurrentLanguage() : 'en';
+        
+        if (lang === 'vi') {
+            let translated = originalText;
+            
+            // Translate "Current headcount: X team member(s)."
+            translated = translated.replace(/Current headcount:\s*(\d+)\s*team member(s)?\./i, (match, count, plural) => {
+                const memberText = count === '1' ? 
+                    window.t('ui.sidebar.personnel.overviewPage.teamMember', 'team member') :
+                    window.t('ui.sidebar.personnel.overviewPage.teamMembers', 'team members');
+                return window.t('ui.sidebar.personnel.overviewPage.currentHeadcount', 'Current headcount: {count} {members}.')
+                    .replace('{count}', count)
+                    .replace('{members}', memberText);
+            });
+            
+            // Translate "X personnel profiles have been completed (X% onboarding)."
+            translated = translated.replace(/(\d+)\s*personnel profiles have been completed\s*\((\d+)%\s*onboarding\)\./i, (match, completed, percentage) => {
+                return window.t('ui.sidebar.personnel.overviewPage.profilesCompletedText', '{completed} personnel profiles have been completed ({percentage}% onboarding).')
+                    .replace('{completed}', completed)
+                    .replace('{percentage}', percentage);
+            });
+            
+            // Translate "X record(s) still require document uploads."
+            translated = translated.replace(/(\d+)\s*record(s)?\s*still require document uploads\./i, (match, count, plural) => {
+                const recordText = count === '1' ?
+                    window.t('ui.sidebar.personnel.overviewPage.record', 'record') :
+                    window.t('ui.sidebar.personnel.overviewPage.records', 'records');
+                return window.t('ui.sidebar.personnel.overviewPage.recordsRequireDocuments', '{count} {records} still require document uploads.')
+                    .replace('{count}', count)
+                    .replace('{records}', recordText);
+            });
+            
+            // Translate "All active personnel files have required documents on file."
+            translated = translated.replace(/All active personnel files have required documents on file\./i, 
+                window.t('ui.sidebar.personnel.overviewPage.allDocumentsOnFile', 'All active personnel files have required documents on file.'));
+            
+            // Translate "Primary location: X (X employees)."
+            translated = translated.replace(/Primary location:\s*([^(]+)\s*\((\d+)\s*employees\)\./i, (match, location, count) => {
+                return window.t('ui.sidebar.personnel.overviewPage.primaryLocation', 'Primary location: {location} ({count} employees).')
+                    .replace('{location}', location.trim())
+                    .replace('{count}', count);
+            });
+            
+            highlight.textContent = translated;
+        } else {
+            // Restore English text
+            highlight.textContent = originalText;
+        }
+    });
+    
+    // Translate onboarding status
+    const onboardingMetas = document.querySelectorAll('.onboarding-meta');
+    onboardingMetas.forEach(meta => {
+        const originalStatus = meta.getAttribute('data-status') || '';
+        const started = meta.getAttribute('data-started') || '';
+        const lang = window.getCurrentLanguage ? window.getCurrentLanguage() : 'en';
+        
+        let statusText = originalStatus;
+        if (lang === 'vi') {
+            if (originalStatus === 'In Progress') {
+                statusText = window.t('ui.sidebar.personnel.overviewPage.inProgress', 'In Progress');
+            } else if (originalStatus === 'Complete') {
+                statusText = window.t('ui.sidebar.personnel.overviewPage.complete', 'Complete');
+            }
+        }
+        meta.textContent = `${started} · ${statusText}`;
+    });
+    
+    // Translate activity time
+    const activityTimes = document.querySelectorAll('.activity-time');
+    activityTimes.forEach(timeEl => {
+        let originalTime = timeEl.getAttribute('data-time');
+        if (!originalTime) {
+            originalTime = timeEl.textContent.trim();
+            timeEl.setAttribute('data-time', originalTime);
+        }
+        
+        const lang = window.getCurrentLanguage ? window.getCurrentLanguage() : 'en';
+        
+        if (lang === 'vi') {
+            let translated = originalTime;
+            // Translate time ago patterns (handle both English and already translated)
+            translated = translated.replace(/(\d+)\s*minute(s)?\s*ago/i, (match, minutes) => {
+                return `${minutes} phút trước`;
+            });
+            translated = translated.replace(/(\d+)\s*hour(s)?\s*ago/i, (match, hours) => {
+                return `${hours} giờ trước`;
+            });
+            translated = translated.replace(/(\d+)\s*day(s)?\s*ago/i, (match, days) => {
+                return `${days} ngày trước`;
+            });
+            translated = translated.replace(/(\d+)\s*week(s)?\s*ago/i, (match, weeks) => {
+                return `${weeks} tuần trước`;
+            });
+            translated = translated.replace(/Just now/i, 'Vừa xong');
+            translated = translated.replace(/Unknown/i, 'Không xác định');
+            
+            timeEl.textContent = translated;
+        } else {
+            // Restore English - use original time from data attribute
+            timeEl.textContent = originalTime;
+        }
+    });
+}
+
+// Initialize translations
+document.addEventListener('DOMContentLoaded', function() {
+    function initTranslations() {
+        if (window.t && window.getCurrentLanguage) {
+            translatePersonnelOverview();
+        } else {
+            setTimeout(initTranslations, 100);
+        }
+    }
+    
+    initTranslations();
+    
+    // Listen for language changes
+    window.addEventListener('languagechange', function() {
+        translatePersonnelOverview();
+    });
+});
+</script>
 {% endblock %}
 

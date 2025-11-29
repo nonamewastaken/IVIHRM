@@ -3,7 +3,7 @@
 {% block title %}Employee Profile - HRM System{% endblock %}
 
 {% block page_title %}
-    <i class="fas fa-id-badge"></i> Employee Profile
+    <i class="fas fa-id-badge"></i> <span id="pageTitleEmployeeProfile">Employee Profile</span>
 {% endblock %}
 
 {% block extra_css %}
@@ -247,10 +247,10 @@
     <div class="profile-header">
         <h2>
             <i class="fas fa-user-circle"></i>
-            {{ employee.full_name or 'Employee Profile' }}
+            <span id="employeeNameHeader">{{ employee.full_name or 'Employee Profile' }}</span>
         </h2>
         <a href="/personnel/list" class="back-button">
-            <i class="fas fa-arrow-left"></i> Back to Directory
+            <i class="fas fa-arrow-left"></i> <span id="backToDirectoryText">Back to Directory</span>
         </a>
     </div>
 
@@ -267,66 +267,67 @@
                         {{ employee.full_name or 'N/A' }}
                     </div>
                     <div class="profile-meta">
+                        <span id="dobLabel">DOB:</span>
                         {% if employee.date_of_birth %}
-                            DOB: {{ employee.date_of_birth }}
+                            {{ employee.date_of_birth }}
                         {% else %}
-                            DOB: N/A
+                            N/A
                         {% endif %}
                     </div>
                     <div class="profile-meta">
                         {% if employee.hometown %}
-                            Hometown: {{ employee.hometown }}
+                            <span id="hometownLabel">Hometown:</span> {{ employee.hometown }}
                         {% endif %}
                     </div>
                     <div style="margin-top: 10px;">
                         {% if employee.gender == 'male' %}
-                            <span class="badge-pill badge-male">
-                                <i class="fas fa-mars"></i> Male
+                            <span class="badge-pill badge-male" data-gender="male">
+                                <i class="fas fa-mars"></i> <span class="gender-text-male">Male</span>
                             </span>
                         {% elif employee.gender == 'female' %}
-                            <span class="badge-pill badge-female">
-                                <i class="fas fa-venus"></i> Female
+                            <span class="badge-pill badge-female" data-gender="female">
+                                <i class="fas fa-venus"></i> <span class="gender-text-female">Female</span>
                             </span>
                         {% else %}
-                            <span class="badge-pill badge-other">
-                                <i class="fas fa-genderless"></i> {{ employee.gender or 'Unspecified' }}
+                            <span class="badge-pill badge-other" data-gender="unspecified">
+                                <i class="fas fa-genderless"></i> <span class="gender-text-unspecified">{{ employee.gender or 'Unspecified' }}</span>
                             </span>
                         {% endif %}
                     </div>
                     <div class="meta-row">
                         <span class="meta-chip muted">
                             <i class="fas fa-calendar-plus"></i>
-                            Added: {{ employee.created_at.strftime('%b %d, %Y') if employee.created_at else 'N/A' }}
+                            <span id="addedLabel">Added:</span> {{ employee.created_at.strftime('%b %d, %Y') if employee.created_at else 'N/A' }}
                         </span>
                         <span class="meta-chip muted">
                             <i class="fas fa-clock"></i>
-                            Updated: {{ employee.updated_at.strftime('%b %d, %Y') if employee.updated_at else 'N/A' }}
+                            <span id="updatedLabel">Updated:</span> {{ employee.updated_at.strftime('%b %d, %Y') if employee.updated_at else 'N/A' }}
                         </span>
-                        <span class="meta-chip {{ 'warning' if 'Missing' in docs_status else '' }}">
+                        <span class="meta-chip {{ 'warning' if 'Missing' in docs_status else '' }}" id="docsStatusChip" data-status="{{ docs_status }}">
                             <i class="fas fa-file-medical"></i>
-                            {{ docs_status }}
+                            <span id="docsStatusText">{{ docs_status }}</span>
                         </span>
                     </div>
                 </div>
             </div>
 
             <div class="profile-card">
-                <div class="section-title">Contact</div>
+                <div class="section-title" id="contactSectionTitle">Contact</div>
                 <div class="detail-grid">
                     <div class="detail-item">
-                        <div class="detail-label">Personal Phone</div>
+                        <div class="detail-label" id="personalPhoneLabel">Personal Phone</div>
                         <div class="detail-value">{{ employee.personal_phone or 'N/A' }}</div>
                     </div>
                     <div class="detail-item full-width">
-                        <div class="detail-label">Personal Email</div>
+                        <div class="detail-label" id="personalEmailLabel">Personal Email</div>
                         <div class="detail-value email">{{ employee.personal_email or 'N/A' }}</div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-label">Emergency Contact</div>
+                        <div class="detail-label" id="emergencyContactLabel">Emergency Contact</div>
                         <div class="detail-value">{{ employee.emergency_contact or 'N/A' }}</div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-label">Health Status</div>
+                        <div class="detail-label" id="healthStatusLabel">Health Status</div>
                         <div class="detail-value">{{ employee.health_status or 'N/A' }}</div>
                     </div>
                 </div>
@@ -336,114 +337,114 @@
         <!-- Right: Detailed information -->
         <div>
             <div class="profile-card">
-                <div class="section-title">Personal Information</div>
+                <div class="section-title" id="personalInformationSectionTitle">Personal Information</div>
                 <div class="detail-grid">
                     <div class="detail-item">
-                        <div class="detail-label">Place of Birth</div>
+                        <div class="detail-label" id="placeOfBirthLabel">Place of Birth</div>
                         <div class="detail-value">{{ employee.place_of_birth or 'N/A' }}</div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-label">Marital Status</div>
+                        <div class="detail-label" id="maritalStatusLabel">Marital Status</div>
                         <div class="detail-value">{{ employee.marital_status or 'N/A' }}</div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-label">Ethnicity</div>
+                        <div class="detail-label" id="ethnicityLabel">Ethnicity</div>
                         <div class="detail-value">{{ employee.ethnicity or 'N/A' }}</div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-label">Religion</div>
+                        <div class="detail-label" id="religionLabel">Religion</div>
                         <div class="detail-value">{{ employee.religion or 'N/A' }}</div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-label">Personal Tax Code</div>
+                        <div class="detail-label" id="personalTaxCodeLabel">Personal Tax Code</div>
                         <div class="detail-value">{{ employee.personal_tax_code or 'N/A' }}</div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-label">Social Insurance Code</div>
+                        <div class="detail-label" id="socialInsuranceCodeLabel">Social Insurance Code</div>
                         <div class="detail-value">{{ employee.social_insurance_code or 'N/A' }}</div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-label">Party Join Date</div>
+                        <div class="detail-label" id="partyJoinDateLabel">Party Join Date</div>
                         <div class="detail-value">{{ employee.party_join_date or 'N/A' }}</div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-label">Party Join Place</div>
+                        <div class="detail-label" id="partyJoinPlaceLabel">Party Join Place</div>
                         <div class="detail-value">{{ employee.party_join_place or 'N/A' }}</div>
                     </div>
                 </div>
             </div>
 
             <div class="profile-card">
-                <div class="section-title">Address</div>
+                <div class="section-title" id="addressSectionTitle">Address</div>
                 <div class="detail-grid">
                     <div class="detail-item">
-                        <div class="detail-label">Permanent Address</div>
+                        <div class="detail-label" id="permanentAddressLabel">Permanent Address</div>
                         <div class="detail-value">{{ employee.permanent_address or 'N/A' }}</div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-label">Current Address</div>
+                        <div class="detail-label" id="currentAddressLabel">Current Address</div>
                         <div class="detail-value">{{ employee.current_address or 'N/A' }}</div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-label">Permanent Province</div>
+                        <div class="detail-label" id="permanentProvinceLabel">Permanent Province</div>
                         <div class="detail-value">{{ employee.permanent_province or 'N/A' }}</div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-label">Current Province</div>
+                        <div class="detail-label" id="currentProvinceLabel">Current Province</div>
                         <div class="detail-value">{{ employee.current_province or 'N/A' }}</div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-label">Permanent Ward</div>
+                        <div class="detail-label" id="permanentWardLabel">Permanent Ward</div>
                         <div class="detail-value">{{ employee.permanent_ward or 'N/A' }}</div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-label">Current Ward</div>
+                        <div class="detail-label" id="currentWardLabel">Current Ward</div>
                         <div class="detail-value">{{ employee.current_ward or 'N/A' }}</div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-label">Permanent Street</div>
+                        <div class="detail-label" id="permanentStreetLabel">Permanent Street</div>
                         <div class="detail-value">{{ employee.permanent_street or 'N/A' }}</div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-label">Current Street</div>
+                        <div class="detail-label" id="currentStreetLabel">Current Street</div>
                         <div class="detail-value">{{ employee.current_street or 'N/A' }}</div>
                     </div>
                 </div>
             </div>
 
             <div class="profile-card">
-                <div class="section-title">ID Card &amp; Passport</div>
+                <div class="section-title" id="idCardPassportSectionTitle">ID Card &amp; Passport</div>
                 <div class="detail-grid">
                     <div class="detail-item">
-                        <div class="detail-label">ID Card Number</div>
+                        <div class="detail-label" id="idCardNumberLabel">ID Card Number</div>
                         <div class="detail-value">{{ employee.id_card_number or 'N/A' }}</div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-label">ID Issue Date</div>
+                        <div class="detail-label" id="idIssueDateLabel">ID Issue Date</div>
                         <div class="detail-value">{{ employee.id_card_issue_date or 'N/A' }}</div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-label">ID Expiry Date</div>
+                        <div class="detail-label" id="idExpiryDateLabel">ID Expiry Date</div>
                         <div class="detail-value">{{ employee.id_card_expiry_date or 'N/A' }}</div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-label">ID Issue Place</div>
+                        <div class="detail-label" id="idIssuePlaceLabel">ID Issue Place</div>
                         <div class="detail-value">{{ employee.id_card_issue_place or 'N/A' }}</div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-label">Passport Number</div>
+                        <div class="detail-label" id="passportNumberLabel">Passport Number</div>
                         <div class="detail-value">{{ employee.passport_number or 'N/A' }}</div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-label">Passport Issue Date</div>
+                        <div class="detail-label" id="passportIssueDateLabel">Passport Issue Date</div>
                         <div class="detail-value">{{ employee.passport_issue_date or 'N/A' }}</div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-label">Passport Expiry Date</div>
+                        <div class="detail-label" id="passportExpiryDateLabel">Passport Expiry Date</div>
                         <div class="detail-value">{{ employee.passport_expiry_date or 'N/A' }}</div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-label">Passport Issue Place</div>
+                        <div class="detail-label" id="passportIssuePlaceLabel">Passport Issue Place</div>
                         <div class="detail-value">{{ employee.passport_issue_place or 'N/A' }}</div>
                     </div>
                 </div>
@@ -451,14 +452,14 @@
 
             {% if employee_account_email %}
             <div class="profile-card">
-                <div class="section-title">Account Information</div>
+                <div class="section-title" id="accountInformationSectionTitle">Account Information</div>
                 <div class="detail-grid">
                     <div class="detail-item">
-                        <div class="detail-label">Email</div>
+                        <div class="detail-label" id="emailLabel">Email</div>
                         <div class="detail-value">{{ employee_account_email }}</div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-label">Password</div>
+                        <div class="detail-label" id="passwordLabel">Password</div>
                         <div class="detail-value" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                             <span id="passwordDisplay" style="font-family: monospace; letter-spacing: 2px; user-select: all;">{% if employee_account_password %}{{ employee_account_password }}{% else %}••••••••{% endif %}</span>
                             <button type="button" id="togglePassword" onclick="togglePasswordVisibility()" style="background: none; border: none; cursor: pointer; padding: 4px; color: #667eea; font-size: 1rem;" title="Toggle password visibility">
@@ -466,13 +467,13 @@
                             </button>
                             {% if not employee_account_password and has_account %}
                             <button type="button" id="resetPasswordBtn" onclick="resetPassword()" style="background: #667eea; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; margin-left: 8px;" title="Reset password to generate new one">
-                                <i class="fas fa-key"></i> Reset Password
+                                <i class="fas fa-key"></i> <span id="resetPasswordButtonText">Reset Password</span>
                             </button>
                             {% endif %}
                         </div>
                         {% if employee_account_password %}
-                        <div style="margin-top: 4px; font-size: 0.85rem; color: #ff9800;">
-                            <i class="fas fa-exclamation-triangle"></i> Please save this password - it won't be shown again after page refresh
+                        <div style="margin-top: 4px; font-size: 0.85rem; color: #ff9800;" id="passwordWarning">
+                            <i class="fas fa-exclamation-triangle"></i> <span id="passwordWarningText">Please save this password - it won't be shown again after page refresh</span>
                         </div>
                         {% endif %}
                     </div>
@@ -482,12 +483,12 @@
 
             <div class="profile-card">
                 <div class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
-                    <span>Files</span>
+                    <span id="filesSectionTitle">Files</span>
                     <form id="uploadFilesForm" action="/personnel/{{ employee.id }}/files/upload" method="post" enctype="multipart/form-data" style="margin: 0;">
                         <input type="file" id="extraFilesInput" name="files" multiple style="display: none;" onchange="document.getElementById('uploadFilesForm').submit();">
                         <button type="button" class="btn btn-sm btn-primary" onclick="document.getElementById('extraFilesInput').click()">
                             <i class="fas fa-cloud-upload-alt"></i>
-                            <span>Upload</span>
+                            <span id="uploadButtonText">Upload</span>
                         </button>
                     </form>
                 </div>
@@ -504,7 +505,7 @@
                         {% endfor %}
                     {% else %}
                         <div class="detail-item full-width">
-                            <div class="detail-value">No files here</div>
+                            <div class="detail-value" id="noFilesText">No files here</div>
                         </div>
                     {% endif %}
                 </div>
@@ -519,13 +520,297 @@
 let passwordVisible = {% if employee_account_password %}true{% else %}false{% endif %};
 const originalPassword = {% if employee_account_password %}"{{ employee_account_password }}"{% else %}null{% endif %};
 
+// Function to translate Employee Profile page
+function translateEmployeeProfile() {
+    if (!window.t) return;
+    
+    // Page title
+    const pageTitleEl = document.getElementById('pageTitleEmployeeProfile');
+    if (pageTitleEl) {
+        pageTitleEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.title', 'Employee Profile');
+    }
+    
+    // Back button
+    const backToDirectoryEl = document.getElementById('backToDirectoryText');
+    if (backToDirectoryEl) {
+        backToDirectoryEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.backToDirectory', 'Back to Directory');
+    }
+    
+    // Profile meta labels
+    const dobLabelEl = document.getElementById('dobLabel');
+    if (dobLabelEl) {
+        dobLabelEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.dob', 'DOB:');
+    }
+    
+    const hometownLabelEl = document.getElementById('hometownLabel');
+    if (hometownLabelEl) {
+        hometownLabelEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.hometown', 'Hometown:');
+    }
+    
+    // Gender badges
+    const genderMaleEl = document.querySelector('.gender-text-male');
+    if (genderMaleEl) {
+        genderMaleEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.male', 'Male');
+    }
+    
+    const genderFemaleEl = document.querySelector('.gender-text-female');
+    if (genderFemaleEl) {
+        genderFemaleEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.female', 'Female');
+    }
+    
+    const genderUnspecifiedEl = document.querySelector('.gender-text-unspecified');
+    if (genderUnspecifiedEl) {
+        genderUnspecifiedEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.unspecified', 'Unspecified');
+    }
+    
+    // Meta chips
+    const addedLabelEl = document.getElementById('addedLabel');
+    if (addedLabelEl) {
+        addedLabelEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.added', 'Added:');
+    }
+    
+    const updatedLabelEl = document.getElementById('updatedLabel');
+    if (updatedLabelEl) {
+        updatedLabelEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.updated', 'Updated:');
+    }
+    
+    // Docs status
+    const docsStatusTextEl = document.getElementById('docsStatusText');
+    if (docsStatusTextEl) {
+        const originalStatus = document.getElementById('docsStatusChip')?.getAttribute('data-status') || docsStatusTextEl.textContent.trim();
+        const lang = window.getCurrentLanguage ? window.getCurrentLanguage() : 'en';
+        
+        if (lang === 'vi' && originalStatus.includes('Missing:')) {
+            const missingMatch = originalStatus.match(/Missing:\s*(.+)/i);
+            if (missingMatch) {
+                const missingDocs = missingMatch[1].trim();
+                docsStatusTextEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.missing', 'Missing:') + ' ' + missingDocs;
+            }
+        } else if (lang === 'en' && originalStatus.includes('Thiếu:')) {
+            const missingMatch = originalStatus.match(/Thiếu:\s*(.+)/i);
+            if (missingMatch) {
+                const missingDocs = missingMatch[1].trim();
+                docsStatusTextEl.textContent = 'Missing: ' + missingDocs;
+            }
+        }
+    }
+    
+    // Section titles
+    const contactTitleEl = document.getElementById('contactSectionTitle');
+    if (contactTitleEl) {
+        contactTitleEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.contact', 'Contact');
+    }
+    
+    const personalInfoTitleEl = document.getElementById('personalInformationSectionTitle');
+    if (personalInfoTitleEl) {
+        personalInfoTitleEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.personalInformation', 'Personal Information');
+    }
+    
+    const addressTitleEl = document.getElementById('addressSectionTitle');
+    if (addressTitleEl) {
+        addressTitleEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.address', 'Address');
+    }
+    
+    const idCardPassportTitleEl = document.getElementById('idCardPassportSectionTitle');
+    if (idCardPassportTitleEl) {
+        idCardPassportTitleEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.idCardPassport', 'ID Card & Passport');
+    }
+    
+    const accountInfoTitleEl = document.getElementById('accountInformationSectionTitle');
+    if (accountInfoTitleEl) {
+        accountInfoTitleEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.accountInformation', 'Account Information');
+    }
+    
+    const filesTitleEl = document.getElementById('filesSectionTitle');
+    if (filesTitleEl) {
+        filesTitleEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.files', 'Files');
+    }
+    
+    // Contact labels
+    const personalPhoneLabelEl = document.getElementById('personalPhoneLabel');
+    if (personalPhoneLabelEl) {
+        personalPhoneLabelEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.personalPhone', 'Personal Phone');
+    }
+    
+    const personalEmailLabelEl = document.getElementById('personalEmailLabel');
+    if (personalEmailLabelEl) {
+        personalEmailLabelEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.personalEmail', 'Personal Email');
+    }
+    
+    const emergencyContactLabelEl = document.getElementById('emergencyContactLabel');
+    if (emergencyContactLabelEl) {
+        emergencyContactLabelEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.emergencyContact', 'Emergency Contact');
+    }
+    
+    const healthStatusLabelEl = document.getElementById('healthStatusLabel');
+    if (healthStatusLabelEl) {
+        healthStatusLabelEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.healthStatus', 'Health Status');
+    }
+    
+    // Personal Information labels
+    const placeOfBirthLabelEl = document.getElementById('placeOfBirthLabel');
+    if (placeOfBirthLabelEl) {
+        placeOfBirthLabelEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.placeOfBirth', 'Place of Birth');
+    }
+    
+    const maritalStatusLabelEl = document.getElementById('maritalStatusLabel');
+    if (maritalStatusLabelEl) {
+        maritalStatusLabelEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.maritalStatus', 'Marital Status');
+    }
+    
+    const ethnicityLabelEl = document.getElementById('ethnicityLabel');
+    if (ethnicityLabelEl) {
+        ethnicityLabelEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.ethnicity', 'Ethnicity');
+    }
+    
+    const religionLabelEl = document.getElementById('religionLabel');
+    if (religionLabelEl) {
+        religionLabelEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.religion', 'Religion');
+    }
+    
+    const personalTaxCodeLabelEl = document.getElementById('personalTaxCodeLabel');
+    if (personalTaxCodeLabelEl) {
+        personalTaxCodeLabelEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.personalTaxCode', 'Personal Tax Code');
+    }
+    
+    const socialInsuranceCodeLabelEl = document.getElementById('socialInsuranceCodeLabel');
+    if (socialInsuranceCodeLabelEl) {
+        socialInsuranceCodeLabelEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.socialInsuranceCode', 'Social Insurance Code');
+    }
+    
+    const partyJoinDateLabelEl = document.getElementById('partyJoinDateLabel');
+    if (partyJoinDateLabelEl) {
+        partyJoinDateLabelEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.partyJoinDate', 'Party Join Date');
+    }
+    
+    const partyJoinPlaceLabelEl = document.getElementById('partyJoinPlaceLabel');
+    if (partyJoinPlaceLabelEl) {
+        partyJoinPlaceLabelEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.partyJoinPlace', 'Party Join Place');
+    }
+    
+    // Address labels
+    const permanentAddressLabelEl = document.getElementById('permanentAddressLabel');
+    if (permanentAddressLabelEl) {
+        permanentAddressLabelEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.permanentAddress', 'Permanent Address');
+    }
+    
+    const currentAddressLabelEl = document.getElementById('currentAddressLabel');
+    if (currentAddressLabelEl) {
+        currentAddressLabelEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.currentAddress', 'Current Address');
+    }
+    
+    const permanentProvinceLabelEl = document.getElementById('permanentProvinceLabel');
+    if (permanentProvinceLabelEl) {
+        permanentProvinceLabelEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.permanentProvince', 'Permanent Province');
+    }
+    
+    const currentProvinceLabelEl = document.getElementById('currentProvinceLabel');
+    if (currentProvinceLabelEl) {
+        currentProvinceLabelEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.currentProvince', 'Current Province');
+    }
+    
+    const permanentWardLabelEl = document.getElementById('permanentWardLabel');
+    if (permanentWardLabelEl) {
+        permanentWardLabelEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.permanentWard', 'Permanent Ward');
+    }
+    
+    const currentWardLabelEl = document.getElementById('currentWardLabel');
+    if (currentWardLabelEl) {
+        currentWardLabelEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.currentWard', 'Current Ward');
+    }
+    
+    const permanentStreetLabelEl = document.getElementById('permanentStreetLabel');
+    if (permanentStreetLabelEl) {
+        permanentStreetLabelEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.permanentStreet', 'Permanent Street');
+    }
+    
+    const currentStreetLabelEl = document.getElementById('currentStreetLabel');
+    if (currentStreetLabelEl) {
+        currentStreetLabelEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.currentStreet', 'Current Street');
+    }
+    
+    // ID Card & Passport labels
+    const idCardNumberLabelEl = document.getElementById('idCardNumberLabel');
+    if (idCardNumberLabelEl) {
+        idCardNumberLabelEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.idCardNumber', 'ID Card Number');
+    }
+    
+    const idIssueDateLabelEl = document.getElementById('idIssueDateLabel');
+    if (idIssueDateLabelEl) {
+        idIssueDateLabelEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.idIssueDate', 'ID Issue Date');
+    }
+    
+    const idExpiryDateLabelEl = document.getElementById('idExpiryDateLabel');
+    if (idExpiryDateLabelEl) {
+        idExpiryDateLabelEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.idExpiryDate', 'ID Expiry Date');
+    }
+    
+    const idIssuePlaceLabelEl = document.getElementById('idIssuePlaceLabel');
+    if (idIssuePlaceLabelEl) {
+        idIssuePlaceLabelEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.idIssuePlace', 'ID Issue Place');
+    }
+    
+    const passportNumberLabelEl = document.getElementById('passportNumberLabel');
+    if (passportNumberLabelEl) {
+        passportNumberLabelEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.passportNumber', 'Passport Number');
+    }
+    
+    const passportIssueDateLabelEl = document.getElementById('passportIssueDateLabel');
+    if (passportIssueDateLabelEl) {
+        passportIssueDateLabelEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.passportIssueDate', 'Passport Issue Date');
+    }
+    
+    const passportExpiryDateLabelEl = document.getElementById('passportExpiryDateLabel');
+    if (passportExpiryDateLabelEl) {
+        passportExpiryDateLabelEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.passportExpiryDate', 'Passport Expiry Date');
+    }
+    
+    const passportIssuePlaceLabelEl = document.getElementById('passportIssuePlaceLabel');
+    if (passportIssuePlaceLabelEl) {
+        passportIssuePlaceLabelEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.passportIssuePlace', 'Passport Issue Place');
+    }
+    
+    // Account Information labels
+    const emailLabelEl = document.getElementById('emailLabel');
+    if (emailLabelEl) {
+        emailLabelEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.email', 'Email');
+    }
+    
+    const passwordLabelEl = document.getElementById('passwordLabel');
+    if (passwordLabelEl) {
+        passwordLabelEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.password', 'Password');
+    }
+    
+    const resetPasswordBtnTextEl = document.getElementById('resetPasswordButtonText');
+    if (resetPasswordBtnTextEl) {
+        resetPasswordBtnTextEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.resetPassword', 'Reset Password');
+    }
+    
+    const passwordWarningTextEl = document.getElementById('passwordWarningText');
+    if (passwordWarningTextEl) {
+        passwordWarningTextEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.passwordWarning', 'Please save this password - it won\'t be shown again after page refresh');
+    }
+    
+    // Files section
+    const uploadButtonTextEl = document.getElementById('uploadButtonText');
+    if (uploadButtonTextEl) {
+        uploadButtonTextEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.upload', 'Upload');
+    }
+    
+    const noFilesTextEl = document.getElementById('noFilesText');
+    if (noFilesTextEl) {
+        noFilesTextEl.textContent = window.t('ui.sidebar.personnel.employeeProfile.noFiles', 'No files here');
+    }
+}
+
 function togglePasswordVisibility() {
     const passwordDisplay = document.getElementById('passwordDisplay');
     const passwordIcon = document.getElementById('passwordIcon');
     
     if (!originalPassword) {
         // Password not available, prompt to reset
-        if (confirm('Password is currently hidden. Would you like to reset it to generate a new password that you can view?')) {
+        const confirmMsg = window.t ? window.t('ui.sidebar.personnel.employeeProfile.passwordHidden', 'Password is currently hidden. Would you like to reset it to generate a new password that you can view?') : 'Password is currently hidden. Would you like to reset it to generate a new password that you can view?';
+        if (confirm(confirmMsg)) {
             resetPassword();
         }
         return;
@@ -547,15 +832,17 @@ function togglePasswordVisibility() {
 }
 
 function resetPassword() {
-    if (!confirm('Are you sure you want to reset the password? The new password will be shown once, then hidden again after page refresh.')) {
+    const confirmMsg = window.t ? window.t('ui.sidebar.personnel.employeeProfile.resetPasswordConfirm', 'Are you sure you want to reset the password? The new password will be shown once, then hidden again after page refresh.') : 'Are you sure you want to reset the password? The new password will be shown once, then hidden again after page refresh.';
+    if (!confirm(confirmMsg)) {
         return;
     }
     
     const resetBtn = document.getElementById('resetPasswordBtn');
+    const resettingText = window.t ? window.t('ui.sidebar.personnel.employeeProfile.resetting', 'Resetting...') : 'Resetting...';
     const originalText = resetBtn ? resetBtn.innerHTML : '';
     if (resetBtn) {
         resetBtn.disabled = true;
-        resetBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Resetting...';
+        resetBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${resettingText}`;
     }
     
     fetch('/personnel/{{ employee.id }}/reset-password', {
@@ -570,7 +857,8 @@ function resetPassword() {
             // Reload page to show new password
             window.location.reload();
         } else {
-            alert('Error: ' + (data.error || 'Failed to reset password'));
+            const errorMsg = data.error || (window.t ? window.t('ui.sidebar.personnel.employeeProfile.resetPasswordFailed', 'Failed to reset password') : 'Failed to reset password');
+            alert('Error: ' + errorMsg);
             if (resetBtn) {
                 resetBtn.disabled = false;
                 resetBtn.innerHTML = originalText;
@@ -579,13 +867,32 @@ function resetPassword() {
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error resetting password. Please try again.');
+        const errorMsg = window.t ? window.t('ui.sidebar.personnel.employeeProfile.resetPasswordError', 'Error resetting password. Please try again.') : 'Error resetting password. Please try again.';
+        alert(errorMsg);
         if (resetBtn) {
             resetBtn.disabled = false;
             resetBtn.innerHTML = originalText;
         }
     });
 }
+
+// Initialize translations
+document.addEventListener('DOMContentLoaded', function() {
+    function initTranslations() {
+        if (window.t && window.getCurrentLanguage) {
+            translateEmployeeProfile();
+        } else {
+            setTimeout(initTranslations, 100);
+        }
+    }
+    
+    initTranslations();
+    
+    // Listen for language changes
+    window.addEventListener('languagechange', function() {
+        translateEmployeeProfile();
+    });
+});
 </script>
 {% endblock %}
 

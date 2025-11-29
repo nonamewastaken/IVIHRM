@@ -87,47 +87,47 @@
     <div class="work-data-container">
         <div class="work-data-card">
             <h1 style="text-align: center; color: #2c3e50; margin-bottom: 30px;">
-                <i class="fas fa-database"></i> Work Data
+                <i class="fas fa-database"></i> <span id="workDataTitle">Work Data</span>
             </h1>
 
             <!-- Data Overview Cards -->
             <div class="data-grid">
                 <div class="data-item">
-                    <h3>Total Work Hours</h3>
+                    <h3 id="totalWorkHoursTitle">Total Work Hours</h3>
                     <div class="value">1,250</div>
-                    <div class="label">Hours this month</div>
+                    <div class="label" id="hoursThisMonth">Hours this month</div>
                 </div>
                 <div class="data-item">
-                    <h3>Average Daily Hours</h3>
+                    <h3 id="averageDailyHoursTitle">Average Daily Hours</h3>
                     <div class="value">8.2</div>
-                    <div class="label">Hours per day</div>
+                    <div class="label" id="hoursPerDay">Hours per day</div>
                 </div>
                 <div class="data-item">
-                    <h3>Overtime Hours</h3>
+                    <h3 id="overtimeHoursTitle">Overtime Hours</h3>
                     <div class="value">45</div>
-                    <div class="label">Extra hours worked</div>
+                    <div class="label" id="extraHoursWorked">Extra hours worked</div>
                 </div>
                 <div class="data-item">
-                    <h3>Efficiency Rate</h3>
+                    <h3 id="efficiencyRateTitle">Efficiency Rate</h3>
                     <div class="value">94.5%</div>
-                    <div class="label">Productivity score</div>
+                    <div class="label" id="productivityScore">Productivity score</div>
                 </div>
             </div>
 
             <!-- Work Data Table -->
             <div class="table-container">
                 <h3 style="margin-bottom: 20px; color: #333;">
-                    <i class="fas fa-table"></i> Recent Work Records
+                    <i class="fas fa-table"></i> <span id="recentWorkRecordsTitle">Recent Work Records</span>
                 </h3>
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>Date</th>
-                            <th>Employee</th>
-                            <th>Check In</th>
-                            <th>Check Out</th>
-                            <th>Work Hours</th>
-                            <th>Status</th>
+                            <th id="tableHeaderDate">Date</th>
+                            <th id="tableHeaderEmployee">Employee</th>
+                            <th id="tableHeaderCheckIn">Check In</th>
+                            <th id="tableHeaderCheckOut">Check Out</th>
+                            <th id="tableHeaderWorkHours">Work Hours</th>
+                            <th id="tableHeaderStatus">Status</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -137,7 +137,7 @@
                             <td>09:00</td>
                             <td>17:30</td>
                             <td>8.5</td>
-                            <td><span style="color: #28a745;">Present</span></td>
+                            <td><span style="color: #28a745;" id="status1" data-status="present">Present</span></td>
                         </tr>
                         <tr>
                             <td>2024-01-15</td>
@@ -145,7 +145,7 @@
                             <td>08:45</td>
                             <td>18:00</td>
                             <td>9.25</td>
-                            <td><span style="color: #28a745;">Present</span></td>
+                            <td><span style="color: #28a745;" id="status2" data-status="present">Present</span></td>
                         </tr>
                         <tr>
                             <td>2024-01-15</td>
@@ -153,7 +153,7 @@
                             <td>09:15</td>
                             <td>17:45</td>
                             <td>8.5</td>
-                            <td><span style="color: #ffc107;">Late</span></td>
+                            <td><span style="color: #ffc107;" id="status3" data-status="late">Late</span></td>
                         </tr>
                         <tr>
                             <td>2024-01-14</td>
@@ -161,7 +161,7 @@
                             <td>09:00</td>
                             <td>16:30</td>
                             <td>7.5</td>
-                            <td><span style="color: #28a745;">Present</span></td>
+                            <td><span style="color: #28a745;" id="status4" data-status="present">Present</span></td>
                         </tr>
                         <tr>
                             <td>2024-01-14</td>
@@ -169,7 +169,7 @@
                             <td>-</td>
                             <td>-</td>
                             <td>0</td>
-                            <td><span style="color: #dc3545;">Absent</span></td>
+                            <td><span style="color: #dc3545;" id="status5" data-status="absent">Absent</span></td>
                         </tr>
                     </tbody>
                 </table>
@@ -178,12 +178,12 @@
             <!-- Work Analytics -->
             <div class="table-container">
                 <h3 style="margin-bottom: 20px; color: #333;">
-                    <i class="fas fa-chart-pie"></i> Work Analytics
+                    <i class="fas fa-chart-pie"></i> <span id="workAnalyticsTitle">Work Analytics</span>
                 </h3>
                 <div style="height: 300px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #666;">
                     <div style="text-align: center;">
                         <i class="fas fa-chart-pie" style="font-size: 3rem; margin-bottom: 10px; opacity: 0.5;"></i>
-                        <p>Work analytics charts will be displayed here</p>
+                        <p id="analyticsPlaceholder">Work analytics charts will be displayed here</p>
                     </div>
                 </div>
             </div>
@@ -193,6 +193,122 @@
 
 {% block extra_js %}
 <script>
+// Function to update Work Data translations
+function updateWorkDataTranslations() {
+    if (!window.t) return;
+    
+    // Title
+    const titleEl = document.getElementById('workDataTitle');
+    if (titleEl) {
+        titleEl.textContent = window.t('ui.sidebar.attendance.workDataTitle', 'Work Data');
+    }
+    
+    // Key metrics
+    const totalWorkHoursEl = document.getElementById('totalWorkHoursTitle');
+    if (totalWorkHoursEl) {
+        totalWorkHoursEl.textContent = window.t('ui.sidebar.attendance.totalWorkHours', 'Total Work Hours');
+    }
+    
+    const hoursThisMonthEl = document.getElementById('hoursThisMonth');
+    if (hoursThisMonthEl) {
+        hoursThisMonthEl.textContent = window.t('ui.sidebar.attendance.hoursThisMonth', 'Hours this month');
+    }
+    
+    const averageDailyHoursEl = document.getElementById('averageDailyHoursTitle');
+    if (averageDailyHoursEl) {
+        averageDailyHoursEl.textContent = window.t('ui.sidebar.attendance.averageDailyHours', 'Average Daily Hours');
+    }
+    
+    const hoursPerDayEl = document.getElementById('hoursPerDay');
+    if (hoursPerDayEl) {
+        hoursPerDayEl.textContent = window.t('ui.sidebar.attendance.hoursPerDay', 'Hours per day');
+    }
+    
+    const overtimeHoursEl = document.getElementById('overtimeHoursTitle');
+    if (overtimeHoursEl) {
+        overtimeHoursEl.textContent = window.t('ui.sidebar.attendance.overtimeHours', 'Overtime Hours');
+    }
+    
+    const extraHoursWorkedEl = document.getElementById('extraHoursWorked');
+    if (extraHoursWorkedEl) {
+        extraHoursWorkedEl.textContent = window.t('ui.sidebar.attendance.extraHoursWorked', 'Extra hours worked');
+    }
+    
+    const efficiencyRateEl = document.getElementById('efficiencyRateTitle');
+    if (efficiencyRateEl) {
+        efficiencyRateEl.textContent = window.t('ui.sidebar.attendance.efficiencyRate', 'Efficiency Rate');
+    }
+    
+    const productivityScoreEl = document.getElementById('productivityScore');
+    if (productivityScoreEl) {
+        productivityScoreEl.textContent = window.t('ui.sidebar.attendance.productivityScore', 'Productivity score');
+    }
+    
+    // Table section
+    const recentWorkRecordsEl = document.getElementById('recentWorkRecordsTitle');
+    if (recentWorkRecordsEl) {
+        recentWorkRecordsEl.textContent = window.t('ui.sidebar.attendance.recentWorkRecords', 'Recent Work Records');
+    }
+    
+    // Table headers
+    const dateHeaderEl = document.getElementById('tableHeaderDate');
+    if (dateHeaderEl) {
+        dateHeaderEl.textContent = window.t('ui.sidebar.attendance.date', 'Date');
+    }
+    
+    const employeeHeaderEl = document.getElementById('tableHeaderEmployee');
+    if (employeeHeaderEl) {
+        employeeHeaderEl.textContent = window.t('ui.sidebar.attendance.employee', 'Employee');
+    }
+    
+    const checkInHeaderEl = document.getElementById('tableHeaderCheckIn');
+    if (checkInHeaderEl) {
+        checkInHeaderEl.textContent = window.t('ui.sidebar.attendance.checkIn', 'Check In');
+    }
+    
+    const checkOutHeaderEl = document.getElementById('tableHeaderCheckOut');
+    if (checkOutHeaderEl) {
+        checkOutHeaderEl.textContent = window.t('ui.sidebar.attendance.checkOut', 'Check Out');
+    }
+    
+    const workHoursHeaderEl = document.getElementById('tableHeaderWorkHours');
+    if (workHoursHeaderEl) {
+        workHoursHeaderEl.textContent = window.t('ui.sidebar.attendance.workHours', 'Work Hours');
+    }
+    
+    const statusHeaderEl = document.getElementById('tableHeaderStatus');
+    if (statusHeaderEl) {
+        statusHeaderEl.textContent = window.t('ui.sidebar.attendance.status', 'Status');
+    }
+    
+    // Status values
+    const statusElements = ['status1', 'status2', 'status3', 'status4', 'status5'];
+    statusElements.forEach(statusId => {
+        const statusEl = document.getElementById(statusId);
+        if (statusEl) {
+            const statusType = statusEl.getAttribute('data-status');
+            if (statusType === 'present') {
+                statusEl.textContent = window.t('ui.sidebar.attendance.present', 'Present');
+            } else if (statusType === 'late') {
+                statusEl.textContent = window.t('ui.sidebar.attendance.late', 'Late');
+            } else if (statusType === 'absent') {
+                statusEl.textContent = window.t('ui.sidebar.attendance.absent', 'Absent');
+            }
+        }
+    });
+    
+    // Work Analytics
+    const workAnalyticsEl = document.getElementById('workAnalyticsTitle');
+    if (workAnalyticsEl) {
+        workAnalyticsEl.textContent = window.t('ui.sidebar.attendance.workAnalytics', 'Work Analytics');
+    }
+    
+    const analyticsPlaceholderEl = document.getElementById('analyticsPlaceholder');
+    if (analyticsPlaceholderEl) {
+        analyticsPlaceholderEl.textContent = window.t('ui.sidebar.attendance.analyticsPlaceholder', 'Work analytics charts will be displayed here');
+    }
+}
+
 // Initialize sidebar for Attendance category
 document.addEventListener('DOMContentLoaded', function() {
     // Set active sidebar item
@@ -200,6 +316,22 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Generate sidebar for Attendance category
     // Sidebar is handled by main sidebar component
+    
+    // Wait for translations to be loaded, then update
+    function initTranslations() {
+        if (window.t && window.getCurrentLanguage) {
+            updateWorkDataTranslations();
+        } else {
+            setTimeout(initTranslations, 100);
+        }
+    }
+    
+    initTranslations();
+    
+    // Listen for language changes
+    window.addEventListener('languagechange', function() {
+        updateWorkDataTranslations();
+    });
 });
 </script>
 {% endblock %}

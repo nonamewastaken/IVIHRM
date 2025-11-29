@@ -198,8 +198,8 @@
 <div class="overview-container">
     <!-- Header Section -->
     <div class="overview-header">
-        <h1><i class="fas fa-chart-line"></i> Attendance Overview</h1>
-        <p>Monitor and manage employee attendance with comprehensive insights</p>
+        <h1><i class="fas fa-chart-line"></i> <span id="attendanceOverviewTitle">Attendance Overview</span></h1>
+        <p id="attendanceOverviewSubtitle">Monitor and manage employee attendance with comprehensive insights</p>
     </div>
 
     <!-- Statistics Cards -->
@@ -209,7 +209,7 @@
                 <i class="fas fa-users"></i>
             </div>
             <div class="number">156</div>
-            <div class="label">Total Employees</div>
+            <div class="label" id="statTotalEmployees">Total Employees</div>
         </div>
         
         <div class="stat-card">
@@ -217,7 +217,7 @@
                 <i class="fas fa-calendar-check"></i>
             </div>
             <div class="number">98.5%</div>
-            <div class="label">Attendance Rate</div>
+            <div class="label" id="statAttendanceRate">Attendance Rate</div>
         </div>
         
         <div class="stat-card">
@@ -225,7 +225,7 @@
                 <i class="fas fa-clock"></i>
             </div>
             <div class="number">8.2</div>
-            <div class="label">Avg. Hours/Day</div>
+            <div class="label" id="statAvgHours">Avg. Hours/Day</div>
         </div>
         
         <div class="stat-card">
@@ -233,44 +233,44 @@
                 <i class="fas fa-exclamation-triangle"></i>
             </div>
             <div class="number">3</div>
-            <div class="label">Late Arrivals</div>
+            <div class="label" id="statLateArrivals">Late Arrivals</div>
         </div>
     </div>
 
     <!-- Quick Actions -->
     <div class="quick-actions">
-        <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+        <h3><i class="fas fa-bolt"></i> <span id="quickActionsTitle">Quick Actions</span></h3>
         <div class="actions-grid">
             <a href="/attendance/monthly_attendance_detail" class="action-btn">
                 <i class="fas fa-calendar-alt"></i>
-                Monthly Detail
+                <span id="monthlyDetailBtn">Monthly Detail</span>
             </a>
             <a href="/attendance/attendance_summary" class="action-btn">
                 <i class="fas fa-chart-bar"></i>
-                Summary Report
+                <span id="summaryReportBtn">Summary Report</span>
             </a>
             <a href="/attendance/work_data" class="action-btn">
                 <i class="fas fa-database"></i>
-                Work Data
+                <span id="workDataBtn">Work Data</span>
             </a>
             <a href="/attendance/history" class="action-btn">
                 <i class="fas fa-history"></i>
-                View History
+                <span id="viewHistoryBtn">View History</span>
             </a>
         </div>
     </div>
 
     <!-- Recent Activity -->
     <div class="recent-activity">
-        <h3><i class="fas fa-clock"></i> Recent Activity</h3>
+        <h3><i class="fas fa-clock"></i> <span id="recentActivityTitle">Recent Activity</span></h3>
         
         <div class="activity-item">
             <div class="icon">
                 <i class="fas fa-user-check"></i>
             </div>
             <div class="content">
-                <div class="title">John Doe checked in</div>
-                <div class="time">2 minutes ago</div>
+                <div class="title" id="activity1Title" data-name="John Doe" data-type="checkedIn">John Doe checked in</div>
+                <div class="time" id="activity1Time" data-count="2" data-unit="minutes">2 minutes ago</div>
             </div>
         </div>
         
@@ -279,8 +279,8 @@
                 <i class="fas fa-user-times"></i>
             </div>
             <div class="content">
-                <div class="title">Jane Smith checked out</div>
-                <div class="time">15 minutes ago</div>
+                <div class="title" id="activity2Title" data-name="Jane Smith" data-type="checkedOut">Jane Smith checked out</div>
+                <div class="time" id="activity2Time" data-count="15" data-unit="minutes">15 minutes ago</div>
             </div>
         </div>
         
@@ -289,8 +289,8 @@
                 <i class="fas fa-exclamation-circle"></i>
             </div>
             <div class="content">
-                <div class="title">Late arrival reported</div>
-                <div class="time">1 hour ago</div>
+                <div class="title" id="activity3Title" data-type="lateArrival">Late arrival reported</div>
+                <div class="time" id="activity3Time" data-count="1" data-unit="hour">1 hour ago</div>
             </div>
         </div>
         
@@ -299,8 +299,8 @@
                 <i class="fas fa-file-export"></i>
             </div>
             <div class="content">
-                <div class="title">Monthly report generated</div>
-                <div class="time">2 hours ago</div>
+                <div class="title" id="activity4Title" data-type="reportGenerated">Monthly report generated</div>
+                <div class="time" id="activity4Time" data-count="2" data-unit="hours">2 hours ago</div>
             </div>
         </div>
     </div>
@@ -309,9 +309,166 @@
 
 {% block extra_js %}
 <script>
+// Function to update Attendance Overview translations
+function updateAttendanceOverviewTranslations() {
+    if (!window.t) return;
+    
+    // Header
+    const titleEl = document.getElementById('attendanceOverviewTitle');
+    if (titleEl) {
+        titleEl.textContent = window.t('ui.sidebar.attendance.overviewTitle', 'Attendance Overview');
+    }
+    
+    const subtitleEl = document.getElementById('attendanceOverviewSubtitle');
+    if (subtitleEl) {
+        subtitleEl.textContent = window.t('ui.sidebar.attendance.overviewSubtitle', 'Monitor and manage employee attendance with comprehensive insights');
+    }
+    
+    // Stat cards
+    const totalEmployeesEl = document.getElementById('statTotalEmployees');
+    if (totalEmployeesEl) {
+        totalEmployeesEl.textContent = window.t('ui.sidebar.attendance.totalEmployees', 'Total Employees');
+    }
+    
+    const attendanceRateEl = document.getElementById('statAttendanceRate');
+    if (attendanceRateEl) {
+        attendanceRateEl.textContent = window.t('ui.sidebar.attendance.attendanceRate', 'Attendance Rate');
+    }
+    
+    const avgHoursEl = document.getElementById('statAvgHours');
+    if (avgHoursEl) {
+        avgHoursEl.textContent = window.t('ui.sidebar.attendance.avgHoursDay', 'Avg. Hours/Day');
+    }
+    
+    const lateArrivalsEl = document.getElementById('statLateArrivals');
+    if (lateArrivalsEl) {
+        lateArrivalsEl.textContent = window.t('ui.sidebar.attendance.lateArrivals', 'Late Arrivals');
+    }
+    
+    // Quick Actions
+    const quickActionsTitleEl = document.getElementById('quickActionsTitle');
+    if (quickActionsTitleEl) {
+        quickActionsTitleEl.textContent = window.t('ui.sidebar.attendance.quickActions', 'Quick Actions');
+    }
+    
+    const monthlyDetailBtnEl = document.getElementById('monthlyDetailBtn');
+    if (monthlyDetailBtnEl) {
+        monthlyDetailBtnEl.textContent = window.t('ui.sidebar.attendance.monthlyDetailBtn', 'Monthly Detail');
+    }
+    
+    const summaryReportBtnEl = document.getElementById('summaryReportBtn');
+    if (summaryReportBtnEl) {
+        summaryReportBtnEl.textContent = window.t('ui.sidebar.attendance.summaryReport', 'Summary Report');
+    }
+    
+    const workDataBtnEl = document.getElementById('workDataBtn');
+    if (workDataBtnEl) {
+        workDataBtnEl.textContent = window.t('ui.sidebar.attendance.workDataBtn', 'Work Data');
+    }
+    
+    const viewHistoryBtnEl = document.getElementById('viewHistoryBtn');
+    if (viewHistoryBtnEl) {
+        viewHistoryBtnEl.textContent = window.t('ui.sidebar.attendance.viewHistory', 'View History');
+    }
+    
+    // Recent Activity
+    const recentActivityTitleEl = document.getElementById('recentActivityTitle');
+    if (recentActivityTitleEl) {
+        recentActivityTitleEl.textContent = window.t('ui.sidebar.attendance.recentActivity', 'Recent Activity');
+    }
+    
+    // Activity 1: Check-in
+    const activity1TitleEl = document.getElementById('activity1Title');
+    if (activity1TitleEl) {
+        const name = activity1TitleEl.getAttribute('data-name');
+        if (name) {
+            const template = window.t('ui.sidebar.attendance.checkedIn', '{name} checked in');
+            activity1TitleEl.textContent = template.replace('{name}', name);
+        }
+    }
+    
+    const activity1TimeEl = document.getElementById('activity1Time');
+    if (activity1TimeEl) {
+        const count = activity1TimeEl.getAttribute('data-count');
+        const unit = activity1TimeEl.getAttribute('data-unit');
+        if (count && unit === 'minutes') {
+            const template = window.t('ui.sidebar.attendance.minutesAgo', '{count} minutes ago');
+            activity1TimeEl.textContent = template.replace('{count}', count);
+        }
+    }
+    
+    // Activity 2: Check-out
+    const activity2TitleEl = document.getElementById('activity2Title');
+    if (activity2TitleEl) {
+        const name = activity2TitleEl.getAttribute('data-name');
+        if (name) {
+            const template = window.t('ui.sidebar.attendance.checkedOut', '{name} checked out');
+            activity2TitleEl.textContent = template.replace('{name}', name);
+        }
+    }
+    
+    const activity2TimeEl = document.getElementById('activity2Time');
+    if (activity2TimeEl) {
+        const count = activity2TimeEl.getAttribute('data-count');
+        const unit = activity2TimeEl.getAttribute('data-unit');
+        if (count && unit === 'minutes') {
+            const template = window.t('ui.sidebar.attendance.minutesAgo', '{count} minutes ago');
+            activity2TimeEl.textContent = template.replace('{count}', count);
+        }
+    }
+    
+    // Activity 3: Late arrival
+    const activity3TitleEl = document.getElementById('activity3Title');
+    if (activity3TitleEl) {
+        activity3TitleEl.textContent = window.t('ui.sidebar.attendance.lateArrivalReported', 'Late arrival reported');
+    }
+    
+    const activity3TimeEl = document.getElementById('activity3Time');
+    if (activity3TimeEl) {
+        const count = activity3TimeEl.getAttribute('data-count');
+        const unit = activity3TimeEl.getAttribute('data-unit');
+        if (count && unit === 'hour') {
+            const template = window.t('ui.sidebar.attendance.hourAgo', '{count} hour ago');
+            activity3TimeEl.textContent = template.replace('{count}', count);
+        }
+    }
+    
+    // Activity 4: Report generated
+    const activity4TitleEl = document.getElementById('activity4Title');
+    if (activity4TitleEl) {
+        activity4TitleEl.textContent = window.t('ui.sidebar.attendance.monthlyReportGenerated', 'Monthly report generated');
+    }
+    
+    const activity4TimeEl = document.getElementById('activity4Time');
+    if (activity4TimeEl) {
+        const count = activity4TimeEl.getAttribute('data-count');
+        const unit = activity4TimeEl.getAttribute('data-unit');
+        if (count && unit === 'hours') {
+            const template = window.t('ui.sidebar.attendance.hoursAgo', '{count} hours ago');
+            activity4TimeEl.textContent = template.replace('{count}', count);
+        }
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     setActiveSidebarItem('/attendance/overview');
     // Sidebar is handled by main sidebar component
+    
+    // Wait for translations to be loaded, then update
+    function initTranslations() {
+        if (window.t && window.getCurrentLanguage) {
+            updateAttendanceOverviewTranslations();
+        } else {
+            setTimeout(initTranslations, 100);
+        }
+    }
+    
+    initTranslations();
+    
+    // Listen for language changes
+    window.addEventListener('languagechange', function() {
+        updateAttendanceOverviewTranslations();
+    });
 });
 </script>
 {% endblock %}

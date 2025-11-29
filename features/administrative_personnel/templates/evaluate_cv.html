@@ -205,9 +205,9 @@
 <div class="evaluate-container">
     <div class="evaluate-card">
         <h2 style="text-align: center; color: #2c3e50; margin-bottom: 30px;">
-            <i class="fas fa-brain"></i> CV Evaluation System
+            <i class="fas fa-brain"></i> <span id="cvEvaluationSystemTitle">CV Evaluation System</span>
         </h2>
-        <p style="text-align: center; color: #666; margin-bottom: 30px;">
+        <p style="text-align: center; color: #666; margin-bottom: 30px;" id="cvEvaluationDescription">
             Upload a CV and select a department to evaluate the candidate's suitability
         </p>
 
@@ -217,13 +217,13 @@
         <!-- Upload Section -->
         <div class="upload-section" id="uploadSection">
             <i class="fas fa-cloud-upload-alt upload-icon"></i>
-            <h4>Upload CV (Image or PDF)</h4>
-            <p style="color: #666; margin: 10px 0 20px 0;">
+            <h4 id="uploadCVTitle">Upload CV (Image or PDF)</h4>
+            <p style="color: #666; margin: 10px 0 20px 0;" id="uploadCVInstruction">
                 Drag and drop your CV file here, or click to browse
             </p>
             <input type="file" id="cvFileInput" accept="image/*,.pdf,application/pdf" style="display: none;">
             <button class="btn btn-primary" onclick="document.getElementById('cvFileInput').click()">
-                <i class="fas fa-upload"></i> Choose File
+                <i class="fas fa-upload"></i> <span id="chooseFileText">Choose File</span>
             </button>
         </div>
 
@@ -232,45 +232,45 @@
             <img id="cvPreview" src="" alt="CV Preview" style="display: none;">
             <div class="file-info" id="fileInfo"></div>
             <button class="btn btn-secondary" onclick="removeFile()" style="margin-top: 15px;">
-                <i class="fas fa-trash"></i> Remove File
+                <i class="fas fa-trash"></i> <span id="removeFileText">Remove File</span>
             </button>
         </div>
 
         <!-- Department Selection -->
         <div class="department-select" id="departmentSelect" style="display: none;">
-            <label>
-                <i class="fas fa-building"></i> Select Department for Evaluation
+            <label id="selectDepartmentLabel">
+                <i class="fas fa-building"></i> <span id="selectDepartmentText">Select Department for Evaluation</span>
             </label>
             <div class="department-grid">
                 <label class="department-option" for="dept-development">
                     <input type="radio" name="department" id="dept-development" value="Development">
                     <i class="fas fa-code department-icon"></i>
-                    <div class="department-name">Development</div>
+                    <div class="department-name" id="deptNameDevelopment">Development</div>
                 </label>
                 <label class="department-option" for="dept-hrm">
                     <input type="radio" name="department" id="dept-hrm" value="HRM">
                     <i class="fas fa-users department-icon"></i>
-                    <div class="department-name">HRM</div>
+                    <div class="department-name" id="deptNameHRM">HRM</div>
                 </label>
                 <label class="department-option" for="dept-sales">
                     <input type="radio" name="department" id="dept-sales" value="Sales">
                     <i class="fas fa-handshake department-icon"></i>
-                    <div class="department-name">Sales</div>
+                    <div class="department-name" id="deptNameSales">Sales</div>
                 </label>
                 <label class="department-option" for="dept-marketing">
                     <input type="radio" name="department" id="dept-marketing" value="Marketing">
                     <i class="fas fa-bullhorn department-icon"></i>
-                    <div class="department-name">Marketing</div>
+                    <div class="department-name" id="deptNameMarketing">Marketing</div>
                 </label>
                 <label class="department-option" for="dept-finance">
                     <input type="radio" name="department" id="dept-finance" value="Finance">
                     <i class="fas fa-dollar-sign department-icon"></i>
-                    <div class="department-name">Finance</div>
+                    <div class="department-name" id="deptNameFinance">Finance</div>
                 </label>
                 <label class="department-option" for="dept-operations">
                     <input type="radio" name="department" id="dept-operations" value="Operations">
                     <i class="fas fa-cogs department-icon"></i>
-                    <div class="department-name">Operations</div>
+                    <div class="department-name" id="deptNameOperations">Operations</div>
                 </label>
             </div>
         </div>
@@ -286,7 +286,7 @@
     <!-- Evaluation Results -->
     <div class="evaluate-card evaluation-results" id="evaluationResults" style="display: none;">
         <h3 style="color: #2c3e50; margin-bottom: 20px;">
-            <i class="fas fa-chart-line"></i> Evaluation Results
+            <i class="fas fa-chart-line"></i> <span id="evaluationResultsTitle">Evaluation Results</span>
         </h3>
         <div id="evaluationContent">
             <!-- Results will be displayed here -->
@@ -323,7 +323,8 @@ uploadSection.addEventListener('drop', (e) => {
     if (file && (file.type.startsWith('image/') || file.type === 'application/pdf')) {
         handleFile(file);
     } else {
-        showMessage('Please upload an image or PDF file', 'error');
+        const msg = window.t ? window.t('ui.sidebar.personnel.cvEvaluation.pleaseUploadImageOrPDF', 'Please upload an image or PDF file') : 'Please upload an image or PDF file';
+        showMessage(msg, 'error');
     }
 });
 
@@ -408,13 +409,15 @@ function fileToBase64(file) {
 
 async function evaluateCV() {
     if (!cvFile) {
-        showMessage('Please upload a CV first', 'error');
+        const msg = window.t ? window.t('ui.sidebar.personnel.cvEvaluation.pleaseUploadCV', 'Please upload a CV first') : 'Please upload a CV first';
+        showMessage(msg, 'error');
         return;
     }
 
     const selectedDept = document.querySelector('input[name="department"]:checked');
     if (!selectedDept) {
-        showMessage('Please select a department', 'error');
+        const msg = window.t ? window.t('ui.sidebar.personnel.cvEvaluation.pleaseSelectDepartment', 'Please select a department') : 'Please select a department';
+        showMessage(msg, 'error');
         return;
     }
 
@@ -422,18 +425,34 @@ async function evaluateCV() {
     const evaluateBtn = document.getElementById('evaluateBtn');
     const originalText = evaluateBtn.innerHTML;
     evaluateBtn.disabled = true;
-    evaluateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing CV...';
+    const analyzingText = window.t ? window.t('ui.sidebar.personnel.cvEvaluation.analyzing', 'Analyzing CV...') : 'Analyzing CV...';
+    evaluateBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${analyzingText}`;
 
     try {
-        showMessage(`Evaluating CV for ${department} department...`, 'info');
+        // Translate department name
+        const departmentMap = {
+            'Development': window.t ? window.t('ui.sidebar.personnel.cvEvaluation.departments.development', 'Development') : 'Development',
+            'HRM': window.t ? window.t('ui.sidebar.personnel.cvEvaluation.departments.hrm', 'HRM') : 'HRM',
+            'Sales': window.t ? window.t('ui.sidebar.personnel.cvEvaluation.departments.sales', 'Sales') : 'Sales',
+            'Marketing': window.t ? window.t('ui.sidebar.personnel.cvEvaluation.departments.marketing', 'Marketing') : 'Marketing',
+            'Finance': window.t ? window.t('ui.sidebar.personnel.cvEvaluation.departments.finance', 'Finance') : 'Finance',
+            'Operations': window.t ? window.t('ui.sidebar.personnel.cvEvaluation.departments.operations', 'Operations') : 'Operations'
+        };
+        const translatedDepartment = departmentMap[department] || department;
+        const evaluatingText = window.t ? window.t('ui.sidebar.personnel.cvEvaluation.evaluatingFor', 'Evaluating CV for {department} department...').replace('{department}', translatedDepartment) : `Evaluating CV for ${translatedDepartment} department...`;
+        showMessage(evaluatingText, 'info');
         const b64 = await fileToBase64(cvFile);
 
+        // Get current language
+        const currentLang = window.getCurrentLanguage ? window.getCurrentLanguage() : 'en';
+        
         const response = await fetch('/personnel/api/evaluate-cv', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 files: [b64],
-                department: department
+                department: department,
+                language: currentLang
             })
         });
 
@@ -441,14 +460,17 @@ async function evaluateCV() {
 
         if (result && result.success && result.evaluation) {
             displayEvaluationResults(result.evaluation);
-            showMessage('CV evaluation completed!', 'success');
+            const completedMsg = window.t ? window.t('ui.sidebar.personnel.cvEvaluation.evaluationCompleted', 'CV evaluation completed!') : 'CV evaluation completed!';
+            showMessage(completedMsg, 'success');
         } else {
-            const errorMsg = result && result.error ? result.error : 'Failed to evaluate CV';
-            showMessage(`Evaluation failed: ${errorMsg}`, 'error');
+            const errorMsg = result && result.error ? result.error : (window.t ? window.t('ui.sidebar.personnel.cvEvaluation.evaluationFailed', 'Failed to evaluate CV') : 'Failed to evaluate CV');
+            const failedMsg = window.t ? window.t('ui.sidebar.personnel.cvEvaluation.evaluationFailed', 'Failed to evaluate CV') : 'Failed to evaluate CV';
+            showMessage(`${failedMsg}: ${errorMsg}`, 'error');
         }
     } catch (error) {
         console.error('CV evaluation error:', error);
-        showMessage('Error evaluating CV. Please try again.', 'error');
+        const errorMsg = window.t ? window.t('ui.sidebar.personnel.cvEvaluation.errorEvaluating', 'Error evaluating CV. Please try again.') : 'Error evaluating CV. Please try again.';
+        showMessage(errorMsg, 'error');
     } finally {
         evaluateBtn.disabled = false;
         evaluateBtn.innerHTML = originalText;
@@ -472,14 +494,27 @@ function displayEvaluationResults(evaluation) {
 
     const statusColor = suitable ? '#28a745' : '#dc3545';
     const statusIcon = suitable ? 'fa-check-circle' : 'fa-times-circle';
-    const statusText = suitable ? 'Suitable' : 'Not Suitable';
+    const suitableText = window.t ? window.t('ui.sidebar.personnel.cvEvaluation.suitable', 'Suitable') : 'Suitable';
+    const notSuitableText = window.t ? window.t('ui.sidebar.personnel.cvEvaluation.notSuitable', 'Not Suitable') : 'Not Suitable';
+    const statusText = suitable ? suitableText : notSuitableText;
+    
+    // Translate department name
+    const departmentMap = {
+        'Development': window.t ? window.t('ui.sidebar.personnel.cvEvaluation.departments.development', 'Development') : 'Development',
+        'HRM': window.t ? window.t('ui.sidebar.personnel.cvEvaluation.departments.hrm', 'HRM') : 'HRM',
+        'Sales': window.t ? window.t('ui.sidebar.personnel.cvEvaluation.departments.sales', 'Sales') : 'Sales',
+        'Marketing': window.t ? window.t('ui.sidebar.personnel.cvEvaluation.departments.marketing', 'Marketing') : 'Marketing',
+        'Finance': window.t ? window.t('ui.sidebar.personnel.cvEvaluation.departments.finance', 'Finance') : 'Finance',
+        'Operations': window.t ? window.t('ui.sidebar.personnel.cvEvaluation.departments.operations', 'Operations') : 'Operations'
+    };
+    const translatedDepartment = departmentMap[evaluation.department] || evaluation.department;
 
     contentDiv.innerHTML = `
         <div style="margin-bottom: 20px;">
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
                 <i class="fas ${statusIcon}" style="color: ${statusColor}; font-size: 24px;"></i>
                 <h4 style="margin: 0; color: ${statusColor};">
-                    ${statusText} for ${evaluation.department} Department
+                    ${statusText} for ${translatedDepartment} ${window.t ? window.t('ui.sidebar.personnel.cvEvaluation.departments.department', 'Department') : 'Department'}
                 </h4>
             </div>
             <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 2px solid ${statusColor};">
@@ -487,7 +522,7 @@ function displayEvaluationResults(evaluation) {
                     <div style="font-size: 48px; font-weight: bold; color: ${statusColor};">
                         ${overallScore.toFixed(1)}/10
                     </div>
-                    <div style="color: #666; margin-top: 5px; font-size: 18px;">Overall Score</div>
+                    <div style="color: #666; margin-top: 5px; font-size: 18px;">${window.t ? window.t('ui.sidebar.personnel.cvEvaluation.overallScore', 'Overall Score') : 'Overall Score'}</div>
                 </div>
             </div>
         </div>
@@ -497,26 +532,26 @@ function displayEvaluationResults(evaluation) {
                 <div style="font-size: 32px; font-weight: bold; color: #667eea;">
                     ${scores.technical_skills?.toFixed(1) || '0'}/10
                 </div>
-                <div style="color: #666; font-size: 14px; margin-top: 5px;">Technical Skills</div>
+                <div style="color: #666; font-size: 14px; margin-top: 5px;">${window.t ? window.t('ui.sidebar.personnel.cvEvaluation.technicalSkills', 'Technical Skills') : 'Technical Skills'}</div>
             </div>
             <div style="background: white; padding: 20px; border-radius: 8px; text-align: center; border: 1px solid #e0e0e0;">
                 <div style="font-size: 32px; font-weight: bold; color: #667eea;">
                     ${scores.experience_relevance?.toFixed(1) || '0'}/10
                 </div>
-                <div style="color: #666; font-size: 14px; margin-top: 5px;">Experience</div>
+                <div style="color: #666; font-size: 14px; margin-top: 5px;">${window.t ? window.t('ui.sidebar.personnel.cvEvaluation.experience', 'Experience') : 'Experience'}</div>
             </div>
             <div style="background: white; padding: 20px; border-radius: 8px; text-align: center; border: 1px solid #e0e0e0;">
                 <div style="font-size: 32px; font-weight: bold; color: #667eea;">
                     ${scores.education_background?.toFixed(1) || '0'}/10
                 </div>
-                <div style="color: #666; font-size: 14px; margin-top: 5px;">Education</div>
+                <div style="color: #666; font-size: 14px; margin-top: 5px;">${window.t ? window.t('ui.sidebar.personnel.cvEvaluation.education', 'Education') : 'Education'}</div>
             </div>
         </div>
 
         ${strengths.length > 0 ? `
         <div style="margin-bottom: 15px;">
             <h5 style="color: #28a745; margin-bottom: 10px;">
-                <i class="fas fa-check-circle"></i> Strengths
+                <i class="fas fa-check-circle"></i> ${window.t ? window.t('ui.sidebar.personnel.cvEvaluation.strengths', 'Strengths') : 'Strengths'}
             </h5>
             <ul style="margin: 0; padding-left: 20px; color: #333;">
                 ${strengths.map(s => `<li style="margin-bottom: 8px;">${s}</li>`).join('')}
@@ -527,7 +562,7 @@ function displayEvaluationResults(evaluation) {
         ${weaknesses.length > 0 ? `
         <div style="margin-bottom: 15px;">
             <h5 style="color: #dc3545; margin-bottom: 10px;">
-                <i class="fas fa-exclamation-circle"></i> Areas for Improvement
+                <i class="fas fa-exclamation-circle"></i> ${window.t ? window.t('ui.sidebar.personnel.cvEvaluation.areasForImprovement', 'Areas for Improvement') : 'Areas for Improvement'}
             </h5>
             <ul style="margin: 0; padding-left: 20px; color: #333;">
                 ${weaknesses.map(w => `<li style="margin-bottom: 8px;">${w}</li>`).join('')}
@@ -538,7 +573,7 @@ function displayEvaluationResults(evaluation) {
         ${keySkills.length > 0 ? `
         <div style="margin-bottom: 15px;">
             <h5 style="color: #667eea; margin-bottom: 10px;">
-                <i class="fas fa-star"></i> Key Skills Found
+                <i class="fas fa-star"></i> ${window.t ? window.t('ui.sidebar.personnel.cvEvaluation.keySkillsFound', 'Key Skills Found') : 'Key Skills Found'}
             </h5>
             <div style="display: flex; flex-wrap: wrap; gap: 8px;">
                 ${keySkills.map(skill => `
@@ -553,7 +588,7 @@ function displayEvaluationResults(evaluation) {
         ${missingSkills.length > 0 ? `
         <div style="margin-bottom: 15px;">
             <h5 style="color: #ff9800; margin-bottom: 10px;">
-                <i class="fas fa-exclamation-triangle"></i> Missing Skills
+                <i class="fas fa-exclamation-triangle"></i> ${window.t ? window.t('ui.sidebar.personnel.cvEvaluation.missingSkills', 'Missing Skills') : 'Missing Skills'}
             </h5>
             <div style="display: flex; flex-wrap: wrap; gap: 8px;">
                 ${missingSkills.map(skill => `
@@ -567,7 +602,7 @@ function displayEvaluationResults(evaluation) {
 
         <div style="background: white; padding: 20px; border-radius: 8px; border-left: 4px solid #667eea; margin-top: 20px;">
             <h5 style="color: #2c3e50; margin-bottom: 10px;">
-                <i class="fas fa-comment-dots"></i> Recommendation
+                <i class="fas fa-comment-dots"></i> ${window.t ? window.t('ui.sidebar.personnel.cvEvaluation.recommendation', 'Recommendation') : 'Recommendation'}
             </h5>
             <p style="margin: 0; color: #333; line-height: 1.8; font-size: 15px;">
                 ${recommendation}
@@ -590,15 +625,100 @@ document.addEventListener('DOMContentLoaded', function() {
             pageTitle.textContent = window.t('ui.navbar.evaluateCV', 'Evaluate CV');
         }
         
+        // Translate main title
+        const systemTitle = document.getElementById('cvEvaluationSystemTitle');
+        if (systemTitle) {
+            systemTitle.textContent = window.t('ui.sidebar.personnel.cvEvaluation.systemTitle', 'CV Evaluation System');
+        }
+        
+        // Translate description
+        const description = document.getElementById('cvEvaluationDescription');
+        if (description) {
+            description.textContent = window.t('ui.sidebar.personnel.cvEvaluation.description', 'Upload a CV and select a department to evaluate the candidate\'s suitability');
+        }
+        
+        // Translate upload section
+        const uploadTitle = document.getElementById('uploadCVTitle');
+        if (uploadTitle) {
+            uploadTitle.textContent = window.t('ui.sidebar.personnel.cvEvaluation.uploadTitle', 'Upload CV (Image or PDF)');
+        }
+        
+        const uploadInstruction = document.getElementById('uploadCVInstruction');
+        if (uploadInstruction) {
+            uploadInstruction.textContent = window.t('ui.sidebar.personnel.cvEvaluation.uploadInstruction', 'Drag and drop your CV file here, or click to browse');
+        }
+        
+        const chooseFileText = document.getElementById('chooseFileText');
+        if (chooseFileText) {
+            chooseFileText.textContent = window.t('ui.sidebar.personnel.cvEvaluation.chooseFile', 'Choose File');
+        }
+        
+        const removeFileText = document.getElementById('removeFileText');
+        if (removeFileText) {
+            removeFileText.textContent = window.t('ui.sidebar.personnel.cvEvaluation.removeFile', 'Remove File');
+        }
+        
+        // Translate department selection
+        const selectDepartmentText = document.getElementById('selectDepartmentText');
+        if (selectDepartmentText) {
+            selectDepartmentText.textContent = window.t('ui.sidebar.personnel.cvEvaluation.selectDepartment', 'Select Department for Evaluation');
+        }
+        
         // Translate button
         const evaluateBtnText = document.getElementById('evaluateBtnText');
         if (evaluateBtnText) {
-            evaluateBtnText.textContent = window.t('ui.navbar.evaluateCV', 'Evaluate CV');
+            evaluateBtnText.textContent = window.t('ui.sidebar.personnel.cvEvaluation.evaluateButton', 'Evaluate CV');
+        }
+        
+        // Translate results title
+        const resultsTitle = document.getElementById('evaluationResultsTitle');
+        if (resultsTitle) {
+            resultsTitle.textContent = window.t('ui.sidebar.personnel.cvEvaluation.evaluationResults', 'Evaluation Results');
+        }
+        
+        // Translate department names
+        const deptDevelopment = document.getElementById('deptNameDevelopment');
+        if (deptDevelopment) {
+            deptDevelopment.textContent = window.t('ui.sidebar.personnel.cvEvaluation.departments.development', 'Development');
+        }
+        
+        const deptHRM = document.getElementById('deptNameHRM');
+        if (deptHRM) {
+            deptHRM.textContent = window.t('ui.sidebar.personnel.cvEvaluation.departments.hrm', 'HRM');
+        }
+        
+        const deptSales = document.getElementById('deptNameSales');
+        if (deptSales) {
+            deptSales.textContent = window.t('ui.sidebar.personnel.cvEvaluation.departments.sales', 'Sales');
+        }
+        
+        const deptMarketing = document.getElementById('deptNameMarketing');
+        if (deptMarketing) {
+            deptMarketing.textContent = window.t('ui.sidebar.personnel.cvEvaluation.departments.marketing', 'Marketing');
+        }
+        
+        const deptFinance = document.getElementById('deptNameFinance');
+        if (deptFinance) {
+            deptFinance.textContent = window.t('ui.sidebar.personnel.cvEvaluation.departments.finance', 'Finance');
+        }
+        
+        const deptOperations = document.getElementById('deptNameOperations');
+        if (deptOperations) {
+            deptOperations.textContent = window.t('ui.sidebar.personnel.cvEvaluation.departments.operations', 'Operations');
+        }
+    }
+    
+    // Wait for translations to be loaded
+    function initTranslations() {
+        if (window.t && window.getCurrentLanguage) {
+            translatePage();
+        } else {
+            setTimeout(initTranslations, 100);
         }
     }
     
     // Translate on load
-    translatePage();
+    initTranslations();
     
     // Translate when language changes
     window.addEventListener('languagechange', translatePage);

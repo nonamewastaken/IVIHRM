@@ -65,42 +65,42 @@
     <div class="summary-container">
         <div class="summary-card">
             <h1 style="text-align: center; color: #2c3e50; margin-bottom: 30px;">
-                <i class="fas fa-chart-line"></i> Attendance Summary
+                <i class="fas fa-chart-line"></i> <span id="attendanceSummaryTitle">Attendance Summary</span>
             </h1>
 
             <!-- Summary Cards -->
             <div class="summary-grid">
                 <div class="summary-item">
-                    <h3>Total Employees</h3>
+                    <h3 id="summaryTotalEmployees">Total Employees</h3>
                     <div class="value">150</div>
-                    <div class="label">Active employees</div>
+                    <div class="label" id="summaryActiveEmployees">Active employees</div>
                 </div>
                 <div class="summary-item">
-                    <h3>Present Today</h3>
+                    <h3 id="summaryPresentToday">Present Today</h3>
                     <div class="value">142</div>
-                    <div class="label">94.7% attendance rate</div>
+                    <div class="label" id="summaryAttendanceRate" data-percentage="94.7%">94.7% attendance rate</div>
                 </div>
                 <div class="summary-item">
-                    <h3>Late Arrivals</h3>
+                    <h3 id="summaryLateArrivals">Late Arrivals</h3>
                     <div class="value">8</div>
-                    <div class="label">5.3% late rate</div>
+                    <div class="label" id="summaryLateRate" data-percentage="5.3%">5.3% late rate</div>
                 </div>
                 <div class="summary-item">
-                    <h3>Absent Today</h3>
+                    <h3 id="summaryAbsentToday">Absent Today</h3>
                     <div class="value">8</div>
-                    <div class="label">5.3% absence rate</div>
+                    <div class="label" id="summaryAbsenceRate" data-percentage="5.3%">5.3% absence rate</div>
                 </div>
             </div>
 
             <!-- Charts Section -->
             <div class="chart-container">
                 <h3 style="margin-bottom: 20px; color: #333;">
-                    <i class="fas fa-chart-bar"></i> Monthly Attendance Trends
+                    <i class="fas fa-chart-bar"></i> <span id="monthlyTrendsTitle">Monthly Attendance Trends</span>
                 </h3>
                 <div style="height: 300px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #666;">
                     <div style="text-align: center;">
                         <i class="fas fa-chart-bar" style="font-size: 3rem; margin-bottom: 10px; opacity: 0.5;"></i>
-                        <p>Attendance Chart will be displayed here</p>
+                        <p id="chartPlaceholder">Attendance Chart will be displayed here</p>
                     </div>
                 </div>
             </div>
@@ -108,12 +108,12 @@
             <!-- Department Summary -->
             <div class="chart-container">
                 <h3 style="margin-bottom: 20px; color: #333;">
-                    <i class="fas fa-building"></i> Department-wise Attendance
+                    <i class="fas fa-building"></i> <span id="departmentWiseTitle">Department-wise Attendance</span>
                 </h3>
                 <div style="height: 200px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #666;">
                     <div style="text-align: center;">
                         <i class="fas fa-building" style="font-size: 3rem; margin-bottom: 10px; opacity: 0.5;"></i>
-                        <p>Department breakdown will be displayed here</p>
+                        <p id="departmentPlaceholder">Department breakdown will be displayed here</p>
                     </div>
                 </div>
             </div>
@@ -123,6 +123,85 @@
 
 {% block extra_js %}
 <script>
+// Function to update Attendance Summary translations
+function updateAttendanceSummaryTranslations() {
+    if (!window.t) return;
+    
+    // Title
+    const titleEl = document.getElementById('attendanceSummaryTitle');
+    if (titleEl) {
+        titleEl.textContent = window.t('ui.sidebar.attendance.summary', 'Attendance Summary');
+    }
+    
+    // Summary cards
+    const totalEmployeesEl = document.getElementById('summaryTotalEmployees');
+    if (totalEmployeesEl) {
+        totalEmployeesEl.textContent = window.t('ui.sidebar.attendance.totalEmployees', 'Total Employees');
+    }
+    
+    const activeEmployeesEl = document.getElementById('summaryActiveEmployees');
+    if (activeEmployeesEl) {
+        activeEmployeesEl.textContent = window.t('ui.sidebar.attendance.activeEmployees', 'Active employees');
+    }
+    
+    const presentTodayEl = document.getElementById('summaryPresentToday');
+    if (presentTodayEl) {
+        presentTodayEl.textContent = window.t('ui.sidebar.attendance.presentToday', 'Present Today');
+    }
+    
+    const attendanceRateEl = document.getElementById('summaryAttendanceRate');
+    if (attendanceRateEl) {
+        const percentage = attendanceRateEl.getAttribute('data-percentage') || '94.7%';
+        const rateLabel = window.t('ui.sidebar.attendance.attendanceRate', 'attendance rate');
+        attendanceRateEl.textContent = `${percentage} ${rateLabel}`;
+    }
+    
+    const lateArrivalsEl = document.getElementById('summaryLateArrivals');
+    if (lateArrivalsEl) {
+        lateArrivalsEl.textContent = window.t('ui.sidebar.attendance.lateArrivals', 'Late Arrivals');
+    }
+    
+    const lateRateEl = document.getElementById('summaryLateRate');
+    if (lateRateEl) {
+        const percentage = lateRateEl.getAttribute('data-percentage') || '5.3%';
+        const rateLabel = window.t('ui.sidebar.attendance.lateRate', 'late rate');
+        lateRateEl.textContent = `${percentage} ${rateLabel}`;
+    }
+    
+    const absentTodayEl = document.getElementById('summaryAbsentToday');
+    if (absentTodayEl) {
+        absentTodayEl.textContent = window.t('ui.sidebar.attendance.absentToday', 'Absent Today');
+    }
+    
+    const absenceRateEl = document.getElementById('summaryAbsenceRate');
+    if (absenceRateEl) {
+        const percentage = absenceRateEl.getAttribute('data-percentage') || '5.3%';
+        const rateLabel = window.t('ui.sidebar.attendance.absenceRate', 'absence rate');
+        absenceRateEl.textContent = `${percentage} ${rateLabel}`;
+    }
+    
+    // Chart sections
+    const monthlyTrendsEl = document.getElementById('monthlyTrendsTitle');
+    if (monthlyTrendsEl) {
+        monthlyTrendsEl.textContent = window.t('ui.sidebar.attendance.monthlyTrends', 'Monthly Attendance Trends');
+    }
+    
+    const chartPlaceholderEl = document.getElementById('chartPlaceholder');
+    if (chartPlaceholderEl) {
+        chartPlaceholderEl.textContent = window.t('ui.sidebar.attendance.chartPlaceholder', 'Attendance Chart will be displayed here');
+    }
+    
+    const departmentWiseEl = document.getElementById('departmentWiseTitle');
+    if (departmentWiseEl) {
+        departmentWiseEl.textContent = window.t('ui.sidebar.attendance.departmentWise', 'Department-wise Attendance');
+    }
+    
+    const departmentPlaceholderEl = document.getElementById('departmentPlaceholder');
+    if (departmentPlaceholderEl) {
+        departmentPlaceholderEl.textContent = window.t('ui.sidebar.attendance.departmentPlaceholder', 'Department breakdown will be displayed here');
+    }
+}
+
 // Initialize sidebar for Attendance category
 document.addEventListener('DOMContentLoaded', function() {
     // Set active sidebar item
@@ -130,6 +209,22 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Generate sidebar for Attendance category
     // Sidebar is handled by main sidebar component
+    
+    // Wait for translations to be loaded, then update
+    function initTranslations() {
+        if (window.t && window.getCurrentLanguage) {
+            updateAttendanceSummaryTranslations();
+        } else {
+            setTimeout(initTranslations, 100);
+        }
+    }
+    
+    initTranslations();
+    
+    // Listen for language changes
+    window.addEventListener('languagechange', function() {
+        updateAttendanceSummaryTranslations();
+    });
 });
 </script>
 {% endblock %}

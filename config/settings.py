@@ -18,12 +18,10 @@ class Config:
     # Get your API key from: https://makersuite.google.com/app/apikey
     # Set it as: export GEMINI_API_KEY="your-api-key-here" or add to .env file
     _gk = os.environ.get('GEMINI_API_KEY')
-    if not _gk:
-        # Fallback to provided API key
-        _gk = "AIzaSyBSnCbQ5KPQ53FshjecEUl0nhuXbqNg9X4"
     GEMINI_API_KEY = _gk
     # Google Maps API key: prefers environment variable, falls back to provided value
     _gmk = os.environ.get('GOOGLE_MAPS_API_KEY')
+    print(f"DEBUG: GEMINI_API_KEY loaded: {GEMINI_API_KEY[:10]}..." if GEMINI_API_KEY else "DEBUG: GEMINI_API_KEY is None")
     if not _gmk:
         # API key provided by user
         _gmk = "AIzaSyCbCnDoaCIG858aOJKmoXhmapxwnhwOzlA"

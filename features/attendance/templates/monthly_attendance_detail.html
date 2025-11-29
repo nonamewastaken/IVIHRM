@@ -139,7 +139,7 @@
     <div class="attendance-container">
         <div class="attendance-card">
             <h1 style="text-align: center; color: #2c3e50; margin-bottom: 30px;">
-                <i class="fas fa-calendar-alt"></i> Monthly Attendance Detail
+                <i class="fas fa-calendar-alt"></i> <span id="monthlyAttendanceTitle">Monthly Attendance Detail</span>
             </h1>
         
                 <div class="attendance-table-container">
@@ -147,19 +147,19 @@
                     <div class="action-buttons">
                         <button class="btn btn-primary" id="exportExcelBtn">
                             <i class="fas fa-file-excel"></i>
-                            Export Excel
+                            <span id="exportExcelText">Export Excel</span>
                         </button>
                         <button class="btn btn-info" id="importExcelBtn">
                             <i class="fas fa-upload"></i>
-                            Import Excel
+                            <span id="importExcelText">Import Excel</span>
                         </button>
                         <button class="btn btn-secondary" id="filterBtn">
                             <i class="fas fa-filter"></i>
-                            Filter
+                            <span id="filterText">Filter</span>
                         </button>
                         <button class="btn btn-primary" id="loadDataBtn">
                             <i class="fas fa-download"></i>
-                            Load Data
+                            <span id="loadDataText">Load Data</span>
                         </button>
                         <select id="yearSelect" style="padding: 10px 15px; border: 1px solid #ddd; border-radius: 5px; background: white; font-size: 14px; min-width: 80px; margin-right: 10px;">
                             <option value="2000">2000</option>
@@ -195,18 +195,18 @@
                             <option value="2030">2030</option>
                         </select>
                         <select id="monthSelect" style="padding: 10px 15px; border: 1px solid #ddd; border-radius: 5px; background: white; font-size: 14px; min-width: 120px;">
-                            <option value="01">January</option>
-                            <option value="02">February</option>
-                            <option value="03">March</option>
-                            <option value="04">April</option>
-                            <option value="05">May</option>
-                            <option value="06">June</option>
-                            <option value="07">July</option>
-                            <option value="08">August</option>
-                            <option value="09" selected>September</option>
-                            <option value="10">October</option>
-                            <option value="11">November</option>
-                            <option value="12">December</option>
+                            <option value="01" data-month="january">January</option>
+                            <option value="02" data-month="february">February</option>
+                            <option value="03" data-month="march">March</option>
+                            <option value="04" data-month="april">April</option>
+                            <option value="05" data-month="may">May</option>
+                            <option value="06" data-month="june">June</option>
+                            <option value="07" data-month="july">July</option>
+                            <option value="08" data-month="august">August</option>
+                            <option value="09" data-month="september" selected>September</option>
+                            <option value="10" data-month="october">October</option>
+                            <option value="11" data-month="november">November</option>
+                            <option value="12" data-month="december">December</option>
                         </select>
                     </div>
                     
@@ -215,7 +215,7 @@
                     
                     <!-- Row limit notice -->
                     <div style="margin-bottom: 15px; padding: 10px; background: #e7f3ff; border: 1px solid #b3d9ff; border-radius: 5px; color: #0066cc; font-size: 14px;">
-                        <i class="fas fa-info-circle"></i> <strong>Note:</strong> Maximum 25 employees allowed per import. You can have 1-25 employees in your Excel file.
+                        <i class="fas fa-info-circle"></i> <strong id="noteLabel">Note:</strong> <span id="noteText">Maximum 25 employees allowed per import. You can have 1-25 employees in your Excel file.</span>
                     </div>
                     
                     <div class="table-responsive">
@@ -234,7 +234,7 @@
                 </div>
                 
                 <div class="loading" id="loading">
-                    <i class="fas fa-spinner fa-spin"></i> Processing...
+                    <i class="fas fa-spinner fa-spin"></i> <span id="processingText">Processing...</span>
                 </div>
                 
                 <div class="error-message" id="errorMessage"></div>
@@ -764,6 +764,86 @@ function updateTableForMonth(monthYear) {
 
 // Sidebar functionality is now handled by base.html
 
+// Function to update translations for Monthly Attendance Detail page
+function updateAttendanceTranslations() {
+    if (!window.t) return;
+    
+    // Title
+    const titleEl = document.getElementById('monthlyAttendanceTitle');
+    if (titleEl) {
+        titleEl.textContent = window.t('ui.sidebar.attendance.monthlyDetail', 'Monthly Attendance Detail');
+    }
+    
+    // Buttons
+    const exportExcelEl = document.getElementById('exportExcelText');
+    if (exportExcelEl) {
+        exportExcelEl.textContent = window.t('ui.sidebar.attendance.exportExcel', 'Export Excel');
+    }
+    
+    const importExcelEl = document.getElementById('importExcelText');
+    if (importExcelEl) {
+        importExcelEl.textContent = window.t('ui.sidebar.attendance.importExcel', 'Import Excel');
+    }
+    
+    const filterEl = document.getElementById('filterText');
+    if (filterEl) {
+        filterEl.textContent = window.t('ui.sidebar.attendance.filter', 'Filter');
+    }
+    
+    const loadDataEl = document.getElementById('loadDataText');
+    if (loadDataEl) {
+        loadDataEl.textContent = window.t('ui.sidebar.attendance.loadData', 'Load Data');
+    }
+    
+    // Note
+    const noteLabelEl = document.getElementById('noteLabel');
+    if (noteLabelEl) {
+        noteLabelEl.textContent = window.t('ui.sidebar.attendance.noteLabel', 'Note:');
+    }
+    
+    const noteTextEl = document.getElementById('noteText');
+    if (noteTextEl) {
+        noteTextEl.textContent = window.t('ui.sidebar.attendance.note', 'Maximum 25 employees allowed per import. You can have 1-25 employees in your Excel file.');
+    }
+    
+    // Processing text
+    const processingEl = document.getElementById('processingText');
+    if (processingEl) {
+        processingEl.textContent = window.t('ui.sidebar.attendance.processing', 'Processing...');
+    }
+    
+    // Month options - display as month names in English, "Tháng" + number in Vietnamese
+    const monthSelect = document.getElementById('monthSelect');
+    if (monthSelect) {
+        const currentLang = window.getCurrentLanguage ? window.getCurrentLanguage() : 'en';
+        const monthMap = {
+            '01': { en: 'January', vi: '1' },
+            '02': { en: 'February', vi: '2' },
+            '03': { en: 'March', vi: '3' },
+            '04': { en: 'April', vi: '4' },
+            '05': { en: 'May', vi: '5' },
+            '06': { en: 'June', vi: '6' },
+            '07': { en: 'July', vi: '7' },
+            '08': { en: 'August', vi: '8' },
+            '09': { en: 'September', vi: '9' },
+            '10': { en: 'October', vi: '10' },
+            '11': { en: 'November', vi: '11' },
+            '12': { en: 'December', vi: '12' }
+        };
+        
+        Array.from(monthSelect.options).forEach(option => {
+            const monthValue = option.value;
+            if (monthMap[monthValue]) {
+                if (currentLang === 'vi') {
+                    option.textContent = `Tháng ${monthMap[monthValue].vi}`;
+                } else {
+                    option.textContent = monthMap[monthValue].en;
+                }
+            }
+        });
+    }
+}
+
 // Initialize table with current month and sidebar
 document.addEventListener('DOMContentLoaded', function() {
     // Set current year and month as default
@@ -785,6 +865,22 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Generate sidebar for Attendance category
     // Sidebar is handled by main sidebar component
+    
+    // Wait for translations to be loaded, then update
+    function initTranslations() {
+        if (window.t && window.getCurrentLanguage) {
+            updateAttendanceTranslations();
+        } else {
+            setTimeout(initTranslations, 100);
+        }
+    }
+    
+    initTranslations();
+    
+    // Listen for language changes
+    window.addEventListener('languagechange', function() {
+        updateAttendanceTranslations();
+    });
 });
 </script>
 {% endblock %}

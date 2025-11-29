@@ -225,66 +225,66 @@
         <div class="dashboard-card">
             <!-- Welcome Section -->
             <div class="welcome-section">
-                <h1>Welcome back, {{ user.first_name }}!</h1>
-                <p>Here's what's happening in your HR system today</p>
+                <h1 id="welcomeMessage">Welcome back, {{ user.first_name }}!</h1>
+                <p id="welcomeSubtitle">Here's what's happening in your HR system today</p>
             </div>
 
             <!-- Statistics Grid -->
             <div class="stats-grid">
                 <div class="stat-card">
-                    <h3>Total Employees</h3>
+                    <h3 id="statTotalEmployees">Total Employees</h3>
                     <div class="value">156</div>
-                    <div class="label">Active employees</div>
-                    <div class="change positive">+5 this month</div>
+                    <div class="label" id="statActiveEmployees">Active employees</div>
+                    <div class="change positive" id="statEmployeesChange" data-number="+5" data-period="thisMonth">+5 this month</div>
                 </div>
                 <div class="stat-card">
-                    <h3>Present Today</h3>
+                    <h3 id="statPresentToday">Present Today</h3>
                     <div class="value">142</div>
-                    <div class="label">91% attendance rate</div>
-                    <div class="change positive">+2% from yesterday</div>
+                    <div class="label" id="statAttendanceRate" data-percentage="91%">91% attendance rate</div>
+                    <div class="change positive" id="statAttendanceChange" data-number="+2%" data-period="fromYesterday">+2% from yesterday</div>
                 </div>
                 <div class="stat-card">
-                    <h3>Pending Requests</h3>
+                    <h3 id="statPendingRequests">Pending Requests</h3>
                     <div class="value">8</div>
-                    <div class="label">Leave requests</div>
-                    <div class="change negative">+3 new today</div>
+                    <div class="label" id="statLeaveRequests">Leave requests</div>
+                    <div class="change negative" id="statRequestsChange" data-number="+3" data-period="newToday">+3 new today</div>
                 </div>
                 <div class="stat-card">
-                    <h3>Monthly Payroll</h3>
+                    <h3 id="statMonthlyPayroll">Monthly Payroll</h3>
                     <div class="value">$45,230</div>
-                    <div class="label">Total processed</div>
-                    <div class="change positive">+5.2% from last month</div>
+                    <div class="label" id="statTotalProcessed">Total processed</div>
+                    <div class="change positive" id="statPayrollChange" data-number="+5.2%" data-period="fromLastMonth">+5.2% from last month</div>
                 </div>
             </div>
 
             <!-- Quick Actions (Hidden for employee accounts) -->
             {% if not user.role or user.role != 'employee' %}
             <div class="quick-actions">
-                <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+                <h3><i class="fas fa-bolt"></i> <span id="quickActionsTitle">Quick Actions</span></h3>
                 <div class="actions-grid">
                     <a href="/attendance" class="action-btn" onclick="updateSidebarForCategory('Attendance')">
                         <i class="fas fa-clock"></i>
-                        <span>View Attendance</span>
+                        <span id="quickActionViewAttendance">View Attendance</span>
                     </a>
                     <a href="/personnel" class="action-btn" onclick="updateSidebarForCategory('Administrative Personnel')">
                         <i class="fas fa-users"></i>
-                        <span>Manage Personnel</span>
+                        <span id="quickActionManagePersonnel">Manage Personnel</span>
                     </a>
                     <a href="/salary" class="action-btn" onclick="updateSidebarForCategory('Salary')">
                         <i class="fas fa-money-bill-wave"></i>
-                        <span>Process Payroll</span>
+                        <span id="quickActionProcessPayroll">Process Payroll</span>
                     </a>
                     <a href="/decision" class="action-btn" onclick="updateSidebarForCategory('Decision')">
                         <i class="fas fa-gavel"></i>
-                        <span>Make Decisions</span>
+                        <span id="quickActionMakeDecisions">Make Decisions</span>
                     </a>
                     <a href="/attendance/monthly_attendance_detail" class="action-btn">
                         <i class="fas fa-calendar-alt"></i>
-                        <span>Monthly Report</span>
+                        <span id="quickActionMonthlyReport">Monthly Report</span>
                     </a>
                     <a href="/personnel/add" class="action-btn">
                         <i class="fas fa-user-plus"></i>
-                        <span>Add Employee</span>
+                        <span id="quickActionAddEmployee">Add Employee</span>
                     </a>
                 </div>
             </div>
@@ -292,46 +292,46 @@
 
             <!-- Recent Activity -->
             <div class="recent-activity">
-                <h3><i class="fas fa-history"></i> Recent Activity</h3>
+                <h3><i class="fas fa-history"></i> <span id="recentActivityTitle">Recent Activity</span></h3>
                 <div class="activity-item">
                     <div class="activity-icon check-in">
                         <i class="fas fa-sign-in-alt"></i>
                     </div>
                     <div class="activity-content">
-                        <h4>John Doe checked in</h4>
-                        <p>Arrived at 9:15 AM</p>
+                        <h4 id="activity1Title" data-name="John Doe" data-type="checkedIn">John Doe checked in</h4>
+                        <p id="activity1Subtitle" data-time="9:15 AM" data-type="arrivedAt">Arrived at 9:15 AM</p>
                     </div>
-                    <div class="activity-time">2 minutes ago</div>
+                    <div class="activity-time" id="activity1Time" data-count="2" data-unit="minutes">2 minutes ago</div>
                 </div>
                 <div class="activity-item">
                     <div class="activity-icon new-employee">
                         <i class="fas fa-user-plus"></i>
                     </div>
                     <div class="activity-content">
-                        <h4>New employee added</h4>
-                        <p>Sarah Wilson joined the Marketing team</p>
+                        <h4 id="activity2Title" data-type="newEmployee">New employee added</h4>
+                        <p id="activity2Subtitle" data-name="Sarah Wilson" data-team="Marketing" data-type="joinedTeam">Sarah Wilson joined the Marketing team</p>
                     </div>
-                    <div class="activity-time">1 hour ago</div>
+                    <div class="activity-time" id="activity2Time" data-count="1" data-unit="hour">1 hour ago</div>
                 </div>
                 <div class="activity-item">
                     <div class="activity-icon leave-request">
                         <i class="fas fa-calendar-times"></i>
                     </div>
                     <div class="activity-content">
-                        <h4>Leave request submitted</h4>
-                        <p>Mike Johnson requested 3 days off</p>
+                        <h4 id="activity3Title" data-type="leaveRequest">Leave request submitted</h4>
+                        <p id="activity3Subtitle" data-name="Mike Johnson" data-days="3" data-type="requestedDaysOff">Mike Johnson requested 3 days off</p>
                     </div>
-                    <div class="activity-time">3 hours ago</div>
+                    <div class="activity-time" id="activity3Time" data-count="3" data-unit="hours">3 hours ago</div>
                 </div>
                 <div class="activity-item">
                     <div class="activity-icon check-out">
                         <i class="fas fa-sign-out-alt"></i>
                     </div>
                     <div class="activity-content">
-                        <h4>Jane Smith checked out</h4>
-                        <p>Left at 5:30 PM</p>
+                        <h4 id="activity4Title" data-name="Jane Smith" data-type="checkedOut">Jane Smith checked out</h4>
+                        <p id="activity4Subtitle" data-time="5:30 PM" data-type="leftAt">Left at 5:30 PM</p>
                     </div>
-                    <div class="activity-time">Yesterday</div>
+                    <div class="activity-time" id="activity4Time" data-type="yesterday">Yesterday</div>
                 </div>
             </div>
         </div>
@@ -340,6 +340,271 @@
 
 {% block extra_js %}
 <script>
+// Function to update welcome message translation
+function updateWelcomeMessage() {
+    const welcomeEl = document.getElementById('welcomeMessage');
+    const subtitleEl = document.getElementById('welcomeSubtitle');
+    const userName = '{{ user.first_name }}';
+    
+    if (welcomeEl && window.t) {
+        const welcomeText = window.t('ui.sidebar.home.welcomeBack', 'Welcome back, {name}!');
+        welcomeEl.textContent = welcomeText.replace('{name}', userName);
+    }
+    
+    if (subtitleEl && window.t) {
+        subtitleEl.textContent = window.t('ui.sidebar.home.welcomeSubtitle', 'Here\'s what\'s happening in your HR system today');
+    }
+}
+
+// Function to update stat cards translation
+function updateStatCards() {
+    if (!window.t) return;
+    
+    // Total Employees card
+    const totalEmployeesEl = document.getElementById('statTotalEmployees');
+    if (totalEmployeesEl) {
+        totalEmployeesEl.textContent = window.t('ui.sidebar.home.stats.totalEmployees', 'Total Employees');
+    }
+    
+    const activeEmployeesEl = document.getElementById('statActiveEmployees');
+    if (activeEmployeesEl) {
+        activeEmployeesEl.textContent = window.t('ui.sidebar.home.stats.activeEmployees', 'Active employees');
+    }
+    
+    const employeesChangeEl = document.getElementById('statEmployeesChange');
+    if (employeesChangeEl) {
+        const number = employeesChangeEl.getAttribute('data-number');
+        const periodType = employeesChangeEl.getAttribute('data-period');
+        if (number && periodType === 'thisMonth') {
+            const period = window.t('ui.sidebar.home.stats.thisMonth', 'this month');
+            employeesChangeEl.textContent = `${number} ${period}`;
+        }
+    }
+    
+    // Present Today card
+    const presentTodayEl = document.getElementById('statPresentToday');
+    if (presentTodayEl) {
+        presentTodayEl.textContent = window.t('ui.sidebar.home.stats.presentToday', 'Present Today');
+    }
+    
+    const attendanceRateEl = document.getElementById('statAttendanceRate');
+    if (attendanceRateEl) {
+        const percentage = attendanceRateEl.getAttribute('data-percentage') || '91%';
+        const rateLabel = window.t('ui.sidebar.home.stats.attendanceRate', 'attendance rate');
+        attendanceRateEl.textContent = `${percentage} ${rateLabel}`;
+    }
+    
+    const attendanceChangeEl = document.getElementById('statAttendanceChange');
+    if (attendanceChangeEl) {
+        const number = attendanceChangeEl.getAttribute('data-number');
+        const periodType = attendanceChangeEl.getAttribute('data-period');
+        if (number && periodType === 'fromYesterday') {
+            const period = window.t('ui.sidebar.home.stats.fromYesterday', 'from yesterday');
+            attendanceChangeEl.textContent = `${number} ${period}`;
+        }
+    }
+    
+    // Pending Requests card
+    const pendingRequestsEl = document.getElementById('statPendingRequests');
+    if (pendingRequestsEl) {
+        pendingRequestsEl.textContent = window.t('ui.sidebar.home.stats.pendingRequests', 'Pending Requests');
+    }
+    
+    const leaveRequestsEl = document.getElementById('statLeaveRequests');
+    if (leaveRequestsEl) {
+        leaveRequestsEl.textContent = window.t('ui.sidebar.home.stats.leaveRequests', 'Leave requests');
+    }
+    
+    const requestsChangeEl = document.getElementById('statRequestsChange');
+    if (requestsChangeEl) {
+        const number = requestsChangeEl.getAttribute('data-number');
+        const periodType = requestsChangeEl.getAttribute('data-period');
+        if (number && periodType === 'newToday') {
+            const period = window.t('ui.sidebar.home.stats.newToday', 'new today');
+            requestsChangeEl.textContent = `${number} ${period}`;
+        }
+    }
+    
+    // Monthly Payroll card
+    const monthlyPayrollEl = document.getElementById('statMonthlyPayroll');
+    if (monthlyPayrollEl) {
+        monthlyPayrollEl.textContent = window.t('ui.sidebar.home.stats.monthlyPayroll', 'Monthly Payroll');
+    }
+    
+    const totalProcessedEl = document.getElementById('statTotalProcessed');
+    if (totalProcessedEl) {
+        totalProcessedEl.textContent = window.t('ui.sidebar.home.stats.totalProcessed', 'Total processed');
+    }
+    
+    const payrollChangeEl = document.getElementById('statPayrollChange');
+    if (payrollChangeEl) {
+        const number = payrollChangeEl.getAttribute('data-number');
+        const periodType = payrollChangeEl.getAttribute('data-period');
+        if (number && periodType === 'fromLastMonth') {
+            const period = window.t('ui.sidebar.home.stats.fromLastMonth', 'from last month');
+            payrollChangeEl.textContent = `${number} ${period}`;
+        }
+    }
+}
+
+// Function to update Quick Actions translation
+function updateQuickActions() {
+    if (!window.t) return;
+    
+    const quickActionsTitleEl = document.getElementById('quickActionsTitle');
+    if (quickActionsTitleEl) {
+        quickActionsTitleEl.textContent = window.t('ui.sidebar.home.quickActions.title', 'Quick Actions');
+    }
+    
+    const viewAttendanceEl = document.getElementById('quickActionViewAttendance');
+    if (viewAttendanceEl) {
+        viewAttendanceEl.textContent = window.t('ui.sidebar.home.quickActions.viewAttendance', 'View Attendance');
+    }
+    
+    const managePersonnelEl = document.getElementById('quickActionManagePersonnel');
+    if (managePersonnelEl) {
+        managePersonnelEl.textContent = window.t('ui.sidebar.home.quickActions.managePersonnel', 'Manage Personnel');
+    }
+    
+    const processPayrollEl = document.getElementById('quickActionProcessPayroll');
+    if (processPayrollEl) {
+        processPayrollEl.textContent = window.t('ui.sidebar.home.quickActions.processPayroll', 'Process Payroll');
+    }
+    
+    const makeDecisionsEl = document.getElementById('quickActionMakeDecisions');
+    if (makeDecisionsEl) {
+        makeDecisionsEl.textContent = window.t('ui.sidebar.home.quickActions.makeDecisions', 'Make Decisions');
+    }
+    
+    const monthlyReportEl = document.getElementById('quickActionMonthlyReport');
+    if (monthlyReportEl) {
+        monthlyReportEl.textContent = window.t('ui.sidebar.home.quickActions.monthlyReport', 'Monthly Report');
+    }
+    
+    const addEmployeeEl = document.getElementById('quickActionAddEmployee');
+    if (addEmployeeEl) {
+        addEmployeeEl.textContent = window.t('ui.sidebar.home.quickActions.addEmployee', 'Add Employee');
+    }
+}
+
+// Function to update Recent Activity translation
+function updateRecentActivity() {
+    if (!window.t) return;
+    
+    const recentActivityTitleEl = document.getElementById('recentActivityTitle');
+    if (recentActivityTitleEl) {
+        recentActivityTitleEl.textContent = window.t('ui.sidebar.home.recentActivity.title', 'Recent Activity');
+    }
+    
+    // Activity 1: Check-in
+    const activity1TitleEl = document.getElementById('activity1Title');
+    if (activity1TitleEl) {
+        const name = activity1TitleEl.getAttribute('data-name');
+        if (name) {
+            const template = window.t('ui.sidebar.home.recentActivity.checkedIn', '{name} checked in');
+            activity1TitleEl.textContent = template.replace('{name}', name);
+        }
+    }
+    
+    const activity1SubtitleEl = document.getElementById('activity1Subtitle');
+    if (activity1SubtitleEl) {
+        const time = activity1SubtitleEl.getAttribute('data-time');
+        if (time) {
+            const template = window.t('ui.sidebar.home.recentActivity.arrivedAt', 'Arrived at {time}');
+            activity1SubtitleEl.textContent = template.replace('{time}', time);
+        }
+    }
+    
+    const activity1TimeEl = document.getElementById('activity1Time');
+    if (activity1TimeEl) {
+        const count = activity1TimeEl.getAttribute('data-count');
+        const unit = activity1TimeEl.getAttribute('data-unit');
+        if (count && unit === 'minutes') {
+            const template = window.t('ui.sidebar.home.recentActivity.minutesAgo', '{count} minutes ago');
+            activity1TimeEl.textContent = template.replace('{count}', count);
+        }
+    }
+    
+    // Activity 2: New employee
+    const activity2TitleEl = document.getElementById('activity2Title');
+    if (activity2TitleEl) {
+        activity2TitleEl.textContent = window.t('ui.sidebar.home.recentActivity.newEmployeeAdded', 'New employee added');
+    }
+    
+    const activity2SubtitleEl = document.getElementById('activity2Subtitle');
+    if (activity2SubtitleEl) {
+        const name = activity2SubtitleEl.getAttribute('data-name');
+        const team = activity2SubtitleEl.getAttribute('data-team');
+        if (name && team) {
+            const template = window.t('ui.sidebar.home.recentActivity.joinedTeam', '{name} joined the {team} team');
+            activity2SubtitleEl.textContent = template.replace('{name}', name).replace('{team}', team);
+        }
+    }
+    
+    const activity2TimeEl = document.getElementById('activity2Time');
+    if (activity2TimeEl) {
+        const count = activity2TimeEl.getAttribute('data-count');
+        const unit = activity2TimeEl.getAttribute('data-unit');
+        if (count && unit === 'hour') {
+            const template = window.t('ui.sidebar.home.recentActivity.hourAgo', '{count} hour ago');
+            activity2TimeEl.textContent = template.replace('{count}', count);
+        }
+    }
+    
+    // Activity 3: Leave request
+    const activity3TitleEl = document.getElementById('activity3Title');
+    if (activity3TitleEl) {
+        activity3TitleEl.textContent = window.t('ui.sidebar.home.recentActivity.leaveRequestSubmitted', 'Leave request submitted');
+    }
+    
+    const activity3SubtitleEl = document.getElementById('activity3Subtitle');
+    if (activity3SubtitleEl) {
+        const name = activity3SubtitleEl.getAttribute('data-name');
+        const days = activity3SubtitleEl.getAttribute('data-days');
+        if (name && days) {
+            const template = window.t('ui.sidebar.home.recentActivity.requestedDaysOff', '{name} requested {days} days off');
+            activity3SubtitleEl.textContent = template.replace('{name}', name).replace('{days}', days);
+        }
+    }
+    
+    const activity3TimeEl = document.getElementById('activity3Time');
+    if (activity3TimeEl) {
+        const count = activity3TimeEl.getAttribute('data-count');
+        const unit = activity3TimeEl.getAttribute('data-unit');
+        if (count && unit === 'hours') {
+            const template = window.t('ui.sidebar.home.recentActivity.hoursAgo', '{count} hours ago');
+            activity3TimeEl.textContent = template.replace('{count}', count);
+        }
+    }
+    
+    // Activity 4: Check-out
+    const activity4TitleEl = document.getElementById('activity4Title');
+    if (activity4TitleEl) {
+        const name = activity4TitleEl.getAttribute('data-name');
+        if (name) {
+            const template = window.t('ui.sidebar.home.recentActivity.checkedOut', '{name} checked out');
+            activity4TitleEl.textContent = template.replace('{name}', name);
+        }
+    }
+    
+    const activity4SubtitleEl = document.getElementById('activity4Subtitle');
+    if (activity4SubtitleEl) {
+        const time = activity4SubtitleEl.getAttribute('data-time');
+        if (time) {
+            const template = window.t('ui.sidebar.home.recentActivity.leftAt', 'Left at {time}');
+            activity4SubtitleEl.textContent = template.replace('{time}', time);
+        }
+    }
+    
+    const activity4TimeEl = document.getElementById('activity4Time');
+    if (activity4TimeEl) {
+        const type = activity4TimeEl.getAttribute('data-type');
+        if (type === 'yesterday') {
+            activity4TimeEl.textContent = window.t('ui.sidebar.home.recentActivity.yesterday', 'Yesterday');
+        }
+    }
+}
+
 // Initialize sidebar for Home category
 document.addEventListener('DOMContentLoaded', function() {
     // Set active sidebar item
@@ -347,6 +612,29 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Generate sidebar for Home category
     // Sidebar is handled by main sidebar component
+    
+    // Wait for translations to be loaded, then update welcome message, stat cards, quick actions, and recent activity
+    function initTranslations() {
+        if (window.t && window.getCurrentLanguage) {
+            updateWelcomeMessage();
+            updateStatCards();
+            updateQuickActions();
+            updateRecentActivity();
+        } else {
+            // Retry after a short delay if translations aren't loaded yet
+            setTimeout(initTranslations, 100);
+        }
+    }
+    
+    initTranslations();
+    
+    // Listen for language changes
+    window.addEventListener('languagechange', function() {
+        updateWelcomeMessage();
+        updateStatCards();
+        updateQuickActions();
+        updateRecentActivity();
+    });
 });
 </script>
 {% endblock %}

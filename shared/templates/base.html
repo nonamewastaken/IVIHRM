@@ -13,10 +13,8 @@
     <div class="top-header">
         <div class="header-left">
             <a href="/dashboard" class="logo-container">
-                <img src="{{ url_for('static', filename='images/1.png') }}" alt="iViHRM Logo" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
-                <span style="display:none; color: white; font-weight: bold; font-size: 1.2rem;">iViHRM</span>
+                <img src="{{ url_for('static', filename='images/ivihrm-home-logo.png') }}" alt="iViHRM Logo" class="logo-img">
             </a>
-            <h1>{% block page_title %}{% endblock %}</h1>
         </div>
         <div class="header-right">
             <div class="time-display">
@@ -30,7 +28,7 @@
                 <div class="user-info" id="userProfileBtn" onclick="toggleProfileDropdown()">
                     <i class="fas fa-user-circle"></i>
                     <span>{% block user_name %}{{ user.first_name }} {{ user.last_name }}{% endblock %}</span>
-                    <i class="fas fa-chevron-down" style="font-size: 0.7rem; margin-left: 5px;"></i>
+                    <i class="fas fa-chevron-down" style="font-size: 0.9rem; margin-left: 5px;"></i>
                 </div>
                 <div class="profile-dropdown-menu" id="profileDropdown">
                     {% if user.role == 'employee' %}

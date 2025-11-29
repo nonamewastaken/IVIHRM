@@ -1413,6 +1413,7 @@ def evaluate_cv():
         payload = request.get_json() or {}
         files = payload.get('files') or []
         department = payload.get('department', 'Development')  # Default to Development
+        language = payload.get('language', 'en')  # Get language from request, default to English
         
         if not files:
             return jsonify({'success': False, 'error': 'No files provided'}), 400
@@ -1470,6 +1471,25 @@ def evaluate_cv():
 
         req = department_requirements.get(department, department_requirements['Development'])
 
+        # Determine if we should use Vietnamese
+        is_vietnamese = language == 'vi'
+        lang_instruction = ""
+        if is_vietnamese:
+            lang_instruction = (
+                "\n\n**IMPORTANT LANGUAGE INSTRUCTIONS:**\n"
+                "- The CV/resume you are analyzing is written in Vietnamese.\n"
+                "- You must understand and analyze the Vietnamese content correctly.\n"
+                "- ALL text fields in your response (strengths, weaknesses, recommendation, key_skills_found, missing_skills) MUST be written in Vietnamese.\n"
+                "- Keep the JSON structure exactly the same, only the text content should be in Vietnamese.\n"
+                "- Use proper Vietnamese grammar and terminology.\n"
+            )
+        else:
+            lang_instruction = (
+                "\n\n**LANGUAGE INSTRUCTIONS:**\n"
+                "- The CV/resume may be in English or other languages.\n"
+                "- All text fields in your response should be in English.\n"
+            )
+
         instructions = (
             f"You are an HR evaluation expert. Analyze the provided CV/resume and evaluate if the candidate "
             f"is suitable for the {department} department.\n\n"
@@ -1482,6 +1502,7 @@ def evaluate_cv():
             f"2. Experience Relevance (0-10): Rate how relevant their work experience is to the department\n"
             f"3. Education Background (0-10): Rate how relevant their education is\n"
             f"4. Overall Suitability (0-10): Overall rating for the department\n\n"
+            f"{lang_instruction}\n"
             f"**Return a JSON object with the following structure:**\n"
             f"{{\n"
             f"  \"suitable\": true/false,\n"
@@ -1593,3 +1614,15 @@ def personnel_analytics():
         return redirect('/login')
     
     return render_template('under_development.html', user=user, page_title="Analytics")
+
+@administrative_personnel_bp.route('/personnel/roles')
+@login_required
+def personnel_roles():
+    """Roles & Positions Page - Under Development"""
+    user = User.query.get(session['user_id'])
+    
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    return render_template('under_development.html', user=user, page_title="Roles & Positions")

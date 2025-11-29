@@ -146,13 +146,35 @@ def payroll_list():
 @salary_bp.route('/salary/slips')
 @login_required
 def salary_slips():
-    """Salary Slips Page"""
+    """Salary Slips Page - Under Development"""
     user = User.query.get(session['user_id'])
     if not user:
         session.pop('user_id', None)
         return redirect('/login')
     
-    return render_template('salary_slips.html', user=user)
+    return render_template('under_development.html', user=user, page_title="Salary Slips")
+
+@salary_bp.route('/salary/reports')
+@login_required
+def salary_reports():
+    """Salary Reports Page - Under Development"""
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    return render_template('under_development.html', user=user, page_title="Salary Reports")
+
+@salary_bp.route('/salary/print')
+@login_required
+def salary_print():
+    """Print Documents Page - Under Development"""
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    return render_template('under_development.html', user=user, page_title="Print Documents")
 
 
 @salary_bp.route('/salary/basic')
