@@ -7,18 +7,9 @@ class Config:
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SECURE = False  # Set to True in production with HTTPS
     SESSION_COOKIE_SAMESITE = 'Lax'
-    # Gemini API key: prefers environment variable, falls back to obfuscated inline value provided by owner
-    _gk = os.environ.get('GEMINI_API_KEY')
-    if not _gk:
-        # Simple obfuscation to avoid accidental plain-text scanning in code
-        _parts = [
-            "AIzaSyD-",
-            "QFqOjJ5F1",
-            "Mg6bQF4rK2",
-            "MEwjhn0GX4UQ"
-        ]
-        _gk = "".join(_parts)
-    GEMINI_API_KEY = _gk
+    # Gemini API key: prefers environment variable, falls back to hardcoded value
+    # Get your API key from: https://makersuite.google.com/app/apikey
+    GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY') or "AIzaSyDT8TD5DMWW_NK-pvDgIovFbJ6CUsHdgLo"
     # Google Maps API key: prefers environment variable, falls back to provided value
     _gmk = os.environ.get('GOOGLE_MAPS_API_KEY')
     if not _gmk:

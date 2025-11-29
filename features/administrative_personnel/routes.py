@@ -74,6 +74,45 @@ def empty_to_none(value):
     return value
 
 
+def sync_employee_user_name(employee):
+    """Sync employee user account name from employee.full_name if name is missing or doesn't match"""
+    if not employee or not employee.full_name:
+        return
+    
+    employee_user = User.query.filter_by(employee_id=employee.id).first()
+    if not employee_user:
+        return
+    
+    # Extract expected name from employee.full_name
+    name_parts = employee.full_name.strip().split()
+    if not name_parts:
+        return
+    
+    expected_first = name_parts[0].capitalize()
+    if len(name_parts) > 1:
+        # Capitalize each word in last_name
+        last_name_parts = [part.capitalize() for part in name_parts[1:]]
+        expected_last = ' '.join(last_name_parts)
+    else:
+        expected_last = None
+    
+    # Check if name needs updating (missing or doesn't match)
+    needs_update = False
+    if not employee_user.first_name or not employee_user.last_name:
+        needs_update = True
+    elif employee_user.first_name != expected_first or employee_user.last_name != expected_last:
+        needs_update = True
+    
+    if needs_update:
+        employee_user.first_name = expected_first
+        employee_user.last_name = expected_last
+        try:
+            db.session.commit()
+            print(f"DEBUG: Synced user account name for employee {employee.id}: {employee_user.first_name} {employee_user.last_name}")
+        except Exception as e:
+            db.session.rollback()
+            print(f"ERROR: Failed to sync user account name for employee {employee.id}: {str(e)}")
+
 def sanitize_employee_payload(data, include_missing=True):
     """Return sanitized employee data ready for persistence."""
     sanitized = {}
@@ -527,6 +566,9 @@ def view_employee_profile(employee_id):
 
     employee = Employee.query.get_or_404(employee_id)
     
+    # Sync employee user account name if needed
+    sync_employee_user_name(employee)
+    
     # Get user account for employee
     employee_user = None
     employee_account_email = None
@@ -589,7 +631,7 @@ def view_employee_profile(employee_id):
     if reset_password:
         employee_account_password = reset_password
         is_new_account = True
-    
+
     return render_template(
         'employee_profile.html',
         user=user,
@@ -1066,6 +1108,18 @@ def save_employee():
             current_user = User.query.get(session['user_id'])
             organization_id = current_user.organization_id if current_user else None
             
+            # Extract first_name and last_name from employee.full_name
+            first_name = None
+            last_name = None
+            if employee.full_name:
+                name_parts = employee.full_name.strip().split()
+                if name_parts:
+                    first_name = name_parts[0].capitalize()
+                    if len(name_parts) > 1:
+                        # Capitalize each word in last_name
+                        last_name_parts = [part.capitalize() for part in name_parts[1:]]
+                        last_name = ' '.join(last_name_parts)
+            
             # Create employee user account
             employee_user = User(
                 email=account_email,
@@ -1073,11 +1127,13 @@ def save_employee():
                 role='employee',
                 employee_id=employee.id,
                 organization_id=organization_id,
-                profile_completed=True  # Employee accounts don't need onboarding
+                profile_completed=True,  # Employee accounts don't need onboarding
+                first_name=first_name,
+                last_name=last_name
             )
             
             db.session.add(employee_user)
-            print(f"DEBUG: Employee user account created - Email: {account_email}, Employee ID: {employee.id}")
+            print(f"DEBUG: Employee user account created - Email: {account_email}, Employee ID: {employee.id}, Name: {first_name} {last_name}")
         
         # Commit all changes
         db.session.commit()
@@ -1120,6 +1176,9 @@ def update_employee(employee_id):
 
         for field, value in sanitized_payload.items():
             setattr(employee, field, value)
+
+        # Always sync user account name after updating employee (ensures names stay in sync)
+        sync_employee_user_name(employee)
 
         db.session.commit()
 

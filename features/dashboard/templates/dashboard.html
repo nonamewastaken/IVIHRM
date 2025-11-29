@@ -257,7 +257,8 @@
                 </div>
             </div>
 
-            <!-- Quick Actions -->
+            <!-- Quick Actions (Hidden for employee accounts) -->
+            {% if not user.role or user.role != 'employee' %}
             <div class="quick-actions">
                 <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
                 <div class="actions-grid">
@@ -287,6 +288,7 @@
                     </a>
                 </div>
             </div>
+            {% endif %}
 
             <!-- Recent Activity -->
             <div class="recent-activity">

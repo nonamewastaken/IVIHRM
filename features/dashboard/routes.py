@@ -1,5 +1,5 @@
 from flask import render_template, redirect, session, request, jsonify
-from models import User, Organization
+from models import User, Organization, Employee
 from core.database import db
 from core.auth import login_required
 from config.settings import Config
@@ -11,9 +11,6 @@ def root():
     if 'user_id' in session:
         user = User.query.get(session['user_id'])
         if user:
-            # Redirect employee accounts to maintenance page
-            if hasattr(user, 'role') and user.role == 'employee':
-                return redirect('/employee/maintenance')
             # If profile is not completed, redirect to complete profile
             if not user.profile_completed:
                 return redirect('/complete-profile')
@@ -25,9 +22,6 @@ def login_page():
     if 'user_id' in session:
         user = User.query.get(session['user_id'])
         if user:
-            # Redirect employee accounts to maintenance page
-            if hasattr(user, 'role') and user.role == 'employee':
-                return redirect('/employee/maintenance')
             # If profile is not completed, redirect to complete profile
             if not user.profile_completed:
                 return redirect('/complete-profile')
@@ -66,10 +60,6 @@ def dashboard():
     if not user:
         session.pop('user_id', None)
         return redirect('/login')
-    
-    # Redirect employee accounts to maintenance page
-    if hasattr(user, 'role') and user.role == 'employee':
-        return redirect('/employee/maintenance')
     
     # If profile is not completed, redirect to complete profile
     if not user.profile_completed:
@@ -171,6 +161,10 @@ def edit_company_address():
         session.pop('user_id', None)
         return redirect('/login')
     
+    # Prevent employee accounts from accessing edit page
+    if hasattr(user, 'role') and user.role == 'employee':
+        return redirect('/company/view')
+    
     if not user.organization:
         return redirect('/dashboard')
     
@@ -207,6 +201,30 @@ def employee_maintenance():
     
     return render_template('employee_maintenance.html', user=user)
 
+@dashboard_bp.route('/employee/personal-info')
+@login_required
+def view_personal_info():
+    """View personal information page for employee accounts"""
+    user = User.query.get(session['user_id'])
+    
+    if not user:
+        session.pop('user_id', None)
+        return redirect('/login')
+    
+    # Only allow employee accounts to access this page
+    if not hasattr(user, 'role') or user.role != 'employee':
+        return redirect('/dashboard')
+    
+    # Get the employee record linked to this user account
+    if not user.employee_id:
+        return redirect('/dashboard')
+    
+    employee = Employee.query.get(user.employee_id)
+    if not employee:
+        return redirect('/dashboard')
+    
+    return render_template('employee_personal_info.html', user=user, employee=employee)
+
 @dashboard_bp.route('/company/api/update-address', methods=['POST'])
 @login_required
 def update_company_address():
@@ -215,6 +233,10 @@ def update_company_address():
     
     if not user or not user.organization:
         return jsonify({'success': False, 'error': 'User or organization not found'}), 404
+    
+    # Prevent employee accounts from editing company address
+    if hasattr(user, 'role') and user.role == 'employee':
+        return jsonify({'success': False, 'error': 'You do not have permission to edit company information'}), 403
     
     try:
         data = request.get_json()

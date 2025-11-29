@@ -79,10 +79,8 @@ def login():
         session['user_role'] = user.role
         session.modified = True
 
-        # Determine redirect based on user role
+        # All users (admin and employee) go to dashboard
         redirect_url = '/dashboard'
-        if user.role == 'employee':
-            redirect_url = '/employee/maintenance'
 
         response = make_response(jsonify({
             'message': 'Login successful',

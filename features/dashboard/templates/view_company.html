@@ -446,9 +446,11 @@
                                     </div>
                                     {% endif %}
                                 </div>
+                                {% if not user.role or user.role != 'employee' %}
                                 <button onclick="openEditModal()" style="margin-left: 15px; padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 6px; font-size: 0.875rem; font-weight: 500; white-space: nowrap; cursor: pointer; transition: all 0.2s ease;">
                                     <i class="fas fa-edit"></i> Edit
                                 </button>
+                                {% endif %}
                             </div>
                         </div>
                     </div>

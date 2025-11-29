@@ -33,6 +33,12 @@
                     <i class="fas fa-chevron-down" style="font-size: 0.7rem; margin-left: 5px;"></i>
                 </div>
                 <div class="profile-dropdown-menu" id="profileDropdown">
+                    {% if user.role == 'employee' %}
+                    <a href="/employee/personal-info" class="dropdown-item">
+                        <i class="fas fa-user"></i>
+                        <span>View Personal Information</span>
+                    </a>
+                    {% endif %}
                     <a href="/company/view" class="dropdown-item">
                         <i class="fas fa-building"></i>
                         <span>View Company</span>
@@ -50,6 +56,7 @@
     <nav class="navbar">
         <div class="navbar-left">
             <a id="navHome" href="/dashboard" class="nav-item" onclick="updateSidebarForCategory('Home')">Home</a>
+            {% if not user.role or user.role != 'employee' %}
             <a id="navPersonnel" href="/personnel" class="nav-item" onclick="updateSidebarForCategory('Administrative Personnel')">Administrative Personnel</a>
             <a id="navAttendance" href="/attendance" class="nav-item" onclick="updateSidebarForCategory('Attendance')">Attendance</a>
             <a id="navSalary" href="/salary" class="nav-item" onclick="updateSidebarForCategory('Salary')">Salary</a>
@@ -57,11 +64,17 @@
             <a id="navEvaluateCV" href="/personnel/evaluate-cv" class="nav-item nav-item-evaluate" onclick="updateSidebarForCategory('Administrative Personnel')">
                 <i class="fas fa-brain"></i> Evaluate CV
             </a>
+            {% endif %}
         </div>
     </nav>
 
     <!-- Dynamic Sidebar -->
     {% include 'sidebar.html' %}
+    
+    <!-- Pass user role to JavaScript for sidebar filtering -->
+    <script>
+        window.userRole = '{{ user.role if user.role else "admin" }}';
+    </script>
 
     <!-- Main Content Area -->
     <div class="main-content-with-sidebar">

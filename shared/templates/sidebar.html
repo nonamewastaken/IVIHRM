@@ -194,6 +194,10 @@ function generateSidebar(category) {
         return;
     }
     
+    // Get user role (default to 'admin' if not set)
+    const userRole = window.userRole || 'admin';
+    const isEmployee = userRole === 'employee';
+    
     // Update sidebar title
     const titleElement = document.getElementById('sidebarTitleText');
     const iconElement = document.querySelector('#sidebarTitle i');
@@ -212,6 +216,11 @@ function generateSidebar(category) {
         navElement.innerHTML = '';
         
         categoryData.sections.forEach(section => {
+            // Skip "Quick Actions" section for employee accounts
+            if (isEmployee && section.title === 'Quick Actions') {
+                return;
+            }
+            
             // Create section
             const sectionDiv = document.createElement('div');
             sectionDiv.className = 'nav-section';
